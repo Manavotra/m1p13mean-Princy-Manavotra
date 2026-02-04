@@ -1,10 +1,13 @@
-const http = require('http');
-const app = require('./app');
+// src/server.js
+import dotenv from 'dotenv';
+dotenv.config();
 
-const PORT = 3000;
+import app from './app.js';
+import { connectDB } from './config/database.js';
 
-const server = http.createServer(app);
+connectDB();
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Serveur sur http://localhost:${PORT}`);
 });
