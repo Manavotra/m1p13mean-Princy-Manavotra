@@ -22,6 +22,16 @@ export default class BaseController {
     }
   };
 
+  getById = async (req, res) => {
+    try {
+      const item = await this.Model.findById(req.params.id);
+      if (!item) return res.status(404).json({ message: 'Not found' });
+      res.json(item);
+    } catch (e) {
+      res.status(400).json({ error: e.message });
+    }
+  };
+
   create = async (req, res) => {
     try {
       const item = await this.Model.create(req.body);

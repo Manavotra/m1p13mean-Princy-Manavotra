@@ -1,0 +1,14 @@
+<form (ngSubmit)="submit()">
+  <input *ngFor="let f of fields"
+         [(ngModel)]="form[f]"
+         name="{{f}}"
+         placeholder="{{f}}">
+  <button>Ajouter</button>
+</form>
+
+<ul>
+  <li *ngFor="let item of items">
+    {{ item | json }}
+    <button (click)="delete(item._id)">❌</button>
+  </li>
+</ul>
