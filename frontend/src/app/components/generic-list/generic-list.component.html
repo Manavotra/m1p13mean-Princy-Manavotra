@@ -1,14 +1,47 @@
-<form (ngSubmit)="submit()">
-  <input *ngFor="let f of fields"
-         [(ngModel)]="form[f]"
-         name="{{f}}"
-         placeholder="{{f}}">
-  <button>Ajouter</button>
-</form>
+<!-- FORM CREATE -->
+<div>
+  <h3>Ajouter</h3>
+  <div *ngFor="let f of fields">
+    <input
+      [(ngModel)]="form[f]"
+      [placeholder]="f"
+    />
+  </div>
+  <button (click)="submit()">Ajouter</button>
+</div>
 
-<ul>
-  <li *ngFor="let item of items">
-    {{ item | json }}
-    <button (click)="delete(item._id)">❌</button>
-  </li>
-</ul>
+<hr />
+
+<!-- LIST -->
+<table border="1">
+  <tr>
+    <th *ngFor="let f of fields">{{ f }}</th>
+    <th>Actions</th>
+  </tr>
+
+  <tr *ngFor="let item of items">
+    <td *ngFor="let f of fields">
+      <input *ngIf="editingItem?._id === item._id"
+             [(ngModel)]="editingItem[f]" />
+      <span *ngIf="editingItem?._id !== item._id">
+        {{ item[f] }}
+      </span>
+    </td>
+
+    <td>
+      <button *ngIf="editingItem?._id !== item._id"
+              (click)="edit(item)">
+        Modifier
+      </button>
+
+      <button *ngIf="editingItem?._id === item._id"
+              (click)="save()">
+        Sauver
+      </button>
+
+      <button (click)="delete(item._id)">
+        Supprimer
+      </button>
+    </td>
+  </tr>
+</table>

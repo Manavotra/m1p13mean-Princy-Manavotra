@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseService } from '../../services/base.service';
@@ -10,28 +10,16 @@ import { BaseService } from '../../services/base.service';
   templateUrl: './generic-list.component.html',
   styleUrls: ['./generic-list.component.css']
 })
-export class GenericListComponent {
+export class GenericListComponent implements OnInit {
 
   @Input() endpoint!: string;
   @Input() fields!: string[];
 
   items: any[] = [];
   form: any = {};
-
-  constructor(private service: BaseService<any>) {}
-
-
   editingItem: any = null;
 
-  edit(item: any) {
-    this.editingItem = { ...item };
-  }
-
-  save(updateFn: Function) {
-    updateFn(this.editingItem._id, this.editingItem);
-    this.editingItem = null;
-  }
-
+  constructor(private service: BaseService<any>) {}
 
   ngOnInit() {
     this.load();
@@ -46,6 +34,18 @@ export class GenericListComponent {
     this.service.create(this.endpoint, this.form)
       .subscribe(() => {
         this.form = {};
+        this.load();
+      });
+  }
+
+  edit(item: any) {
+    this.editingItem = { ...item };
+  }
+
+  save() {
+    this.service.update(this.endpoint, this.editingItem._id, this.editingItem)
+      .subscribe(() => {
+        this.editingItem = null;
         this.load();
       });
   }
