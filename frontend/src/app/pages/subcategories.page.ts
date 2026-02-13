@@ -16,6 +16,6 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
 export class SubCategoriesPage {
   fields = [
     { name: 'name', type: 'text' },
-    { name: 'category', type: 'relation', endpoint: 'categories' }
+    { name: 'category', type: 'relation', endpoint: 'category' }
   ];
 }

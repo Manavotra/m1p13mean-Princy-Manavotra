@@ -1,11 +1,14 @@
 // services/base.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class BaseService<T> {
 
-  private api = 'http://localhost:3000/api/';
+  // private api = 'http://localhost:3000/api/';
+
+  private api = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

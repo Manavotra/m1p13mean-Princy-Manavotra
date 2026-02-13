@@ -37,6 +37,7 @@ export class GenericListComponent implements OnInit {
       if (field.type === 'relation') {
         this.service.getAll(field.endpoint)
           .subscribe(data => {
+            console.log("Relations chargées pour", field.name, data);
             this.relationsData[field.name] = data;
           });
       }
