@@ -1,24 +1,28 @@
 // services/base.service.ts
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class BaseService<T> {
+
+  private api = 'http://localhost:3000/api/';
+
   constructor(private http: HttpClient) {}
 
-  getAll(url: string) {
-    return this.http.get<T[]>(url);
+  getAll(endpoint: string) {
+    return this.http.get<T[]>(this.api + endpoint);
   }
 
-  create(url: string, data: T) {
-    return this.http.post(url, data);
+  create(endpoint: string, data: T) {
+    return this.http.post<T>(this.api + endpoint, data);
   }
 
-  update(url: string, id: string, data: T) {   // ✅
-    return this.http.put(`${url}/${id}`, data);
+  update(endpoint: string, id: string, data: T) {
+    return this.http.put<T>(this.api + endpoint + '/' + id, data);
   }
 
-  delete(url: string, id: string) {
-    return this.http.delete(`${url}/${id}`);
+  delete(endpoint: string, id: string) {
+    return this.http.delete(this.api + endpoint + '/' + id);
   }
 }
+

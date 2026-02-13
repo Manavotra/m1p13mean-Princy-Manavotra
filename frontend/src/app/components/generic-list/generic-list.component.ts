@@ -13,21 +13,34 @@ import { BaseService } from '../../services/base.service';
 export class GenericListComponent implements OnInit {
 
   @Input() endpoint!: string;
-  @Input() fields!: string[];
+  @Input() fields!: any[];
 
   items: any[] = [];
   form: any = {};
   editingItem: any = null;
+  relationsData: any = {};
 
   constructor(private service: BaseService<any>) {}
 
   ngOnInit() {
     this.load();
+    this.loadRelations();
   }
 
   load() {
     this.service.getAll(this.endpoint)
       .subscribe(data => this.items = data);
+  }
+
+  loadRelations() {
+    this.fields.forEach(field => {
+      if (field.type === 'relation') {
+        this.service.getAll(field.endpoint)
+          .subscribe(data => {
+            this.relationsData[field.name] = data;
+          });
+      }
+    });
   }
 
   submit() {

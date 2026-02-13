@@ -1,47 +1,77 @@
-<!-- FORM CREATE -->
-<div>
-  <h3>Ajouter</h3>
-  <div *ngFor="let f of fields">
-    <input
-      [(ngModel)]="form[f]"
-      [placeholder]="f"
-    />
-  </div>
-  <button (click)="submit()">Ajouter</button>
+<h3>Ajouter</h3>
+
+<div *ngFor="let field of fields">
+
+  <!-- TEXT -->
+  <input *ngIf="field.type === 'text'"
+         [(ngModel)]="form[field.name]"
+         [placeholder]="field.name" />
+
+  <!-- RELATION -->
+  <select *ngIf="field.type === 'relation'"
+          [(ngModel)]="form[field.name]">
+
+    <option *ngFor="let r of relationsData[field.name]"
+            [value]="r._id">
+
+      {{ r.name || r.label }}
+    </option>
+
+  </select>
+
 </div>
 
-<hr />
+<button type="button" (click)="submit()">Ajouter</button>
 
-<!-- LIST -->
+<hr>
+
 <table border="1">
   <tr>
-    <th *ngFor="let f of fields">{{ f }}</th>
+    <th *ngFor="let field of fields">{{ field.name }}</th>
     <th>Actions</th>
   </tr>
 
   <tr *ngFor="let item of items">
-    <td *ngFor="let f of fields">
-      <input *ngIf="editingItem?._id === item._id"
-             [(ngModel)]="editingItem[f]" />
-      <span *ngIf="editingItem?._id !== item._id">
-        {{ item[f] }}
+    <td *ngFor="let field of fields">
+      <!-- Si relation -->
+      <span *ngIf="item[field.name]?._id">
+        {{ item[field.name].name || item[field.name].label }}
+      </span>
+
+      <!-- Si simple -->
+      <span *ngIf="!item[field.name]?._id">
+        {{ item[field.name] }}
       </span>
     </td>
 
     <td>
-      <button *ngIf="editingItem?._id !== item._id"
-              (click)="edit(item)">
-        Modifier
-      </button>
-
-      <button *ngIf="editingItem?._id === item._id"
-              (click)="save()">
-        Sauver
-      </button>
-
-      <button (click)="delete(item._id)">
-        Supprimer
-      </button>
+      <button type="button" (click)="edit(item)">Modifier</button>
+      <button type="button" (click)="delete(item._id)">Supprimer</button>
     </td>
   </tr>
 </table>
+
+<div *ngIf="editingItem">
+  <h3>Modifier</h3>
+
+  <div *ngFor="let field of fields">
+
+    <!-- TEXT -->
+    <input *ngIf="field.type === 'text'"
+           [(ngModel)]="editingItem[field.name]" />
+
+    <!-- RELATION -->
+    <select *ngIf="field.type === 'relation'"
+            [(ngModel)]="editingItem[field.name]">
+
+      <option *ngFor="let r of relationsData[field.name]"
+              [value]="r._id">
+        {{ r.name || r.label }}
+      </option>
+
+    </select>
+
+  </div>
+
+  <button type="button" (click)="save()">Enregistrer</button>
+</div>

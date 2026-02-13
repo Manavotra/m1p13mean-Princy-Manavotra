@@ -5,17 +5,16 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
   standalone: true,
   imports: [GenericListComponent],
   template: `
-    <h2>Products</h2>
+    <h2>Users</h2>
     <app-generic-list
-      endpoint="products"
+      endpoint="category"
       [fields]="fields">
     </app-generic-list>
   `
 })
-export class ProductsPage {
+
+export class CategoriesPage {
   fields = [
-    { name: 'label', type: 'text' },
-    { name: 'price', type: 'text' },
-    { name: 'stock', type: 'text' }
+    { name: 'name', type: 'text' }
   ];
 }

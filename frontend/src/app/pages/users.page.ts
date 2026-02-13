@@ -7,9 +7,15 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
   template: `
     <h2>Users</h2>
     <app-generic-list
-      endpoint="http://localhost:3000/api/users"
-      [fields]="['name','email','role']">
+      endpoint="users"
+      [fields]="fields">
     </app-generic-list>
   `
 })
-export class UsersPage {}
+export class UsersPage {
+  fields = [
+    { name: 'name', type: 'text' },
+    { name: 'email', type: 'text' },
+    { name: 'manager', type: 'relation', endpoint: 'users' }
+  ];
+}
