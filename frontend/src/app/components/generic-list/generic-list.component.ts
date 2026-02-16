@@ -12,6 +12,10 @@ import { BaseService } from '../../services/base.service';
 })
 export class GenericListComponent implements OnInit {
 
+  isArray(value: any): boolean {
+    return Array.isArray(value);
+  }
+
   @Input() endpoint!: string;
   @Input() fields!: any[];
 
@@ -44,6 +48,24 @@ export class GenericListComponent implements OnInit {
     });
   }
 
+  addArrayItem(fieldName: string) {
+    if (!this.currentModel[fieldName]) {
+      this.currentModel[fieldName] = [];
+    }
+    this.currentModel[fieldName].push('');
+  }
+
+  removeArrayItem(fieldName: string, index: number) {
+    this.currentModel[fieldName].splice(index, 1);
+  }
+
+
+  get currentModel() {
+    return this.editingItem ? this.editingItem : this.form;
+  }
+
+
+
   submit() {
     this.service.create(this.endpoint, this.form)
       .subscribe(() => {
@@ -52,8 +74,12 @@ export class GenericListComponent implements OnInit {
       });
   }
 
+  // edit(item: any) {
+  //   this.editingItem = { ...item };
+  // }
+
   edit(item: any) {
-    this.editingItem = { ...item };
+    this.editingItem = JSON.parse(JSON.stringify(item));
   }
 
   save() {

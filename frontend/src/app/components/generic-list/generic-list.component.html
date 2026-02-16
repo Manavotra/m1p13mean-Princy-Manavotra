@@ -1,27 +1,51 @@
-<h3>Ajouter</h3>
+<h3>{{ editingItem ? 'Modifier' : 'Ajouter' }}</h3>
 
 <div *ngFor="let field of fields">
 
   <!-- TEXT -->
   <input *ngIf="field.type === 'text'"
-         [(ngModel)]="form[field.name]"
+         [(ngModel)]="currentModel[field.name]"
          [placeholder]="field.name" />
+
+  <!-- SELECT (ENUM) -->
+  <select *ngIf="field.type === 'select'"
+          [(ngModel)]="currentModel[field.name]">
+    <option *ngFor="let opt of field.options"
+            [value]="opt">
+      {{ opt }}
+    </option>
+  </select>
+
+  <!-- ARRAY SIMPLE -->
+  <div *ngIf="field.type === 'array'">
+    <div *ngFor="let item of currentModel[field.name]; let i = index">
+      <input [(ngModel)]="currentModel[field.name][i]" />
+      <button type="button"
+              (click)="removeArrayItem(field.name, i)">
+        X
+      </button>
+    </div>
+    <button type="button"
+            (click)="addArrayItem(field.name)">
+      Ajouter
+    </button>
+  </div>
 
   <!-- RELATION -->
   <select *ngIf="field.type === 'relation'"
-          [(ngModel)]="form[field.name]">
-
+          [(ngModel)]="currentModel[field.name]">
     <option *ngFor="let r of relationsData[field.name]"
             [value]="r._id">
-
-      {{ r.name || r.label }}
+      {{ r.name || r.title || r.label }}
     </option>
-
   </select>
 
 </div>
 
-<button type="button" (click)="submit()">Ajouter</button>
+<button type="button"
+        (click)="editingItem ? save() : submit()">
+  {{ editingItem ? 'Enregistrer' : 'Ajouter' }}
+</button>
 
 <hr>
 
@@ -33,45 +57,29 @@
 
   <tr *ngFor="let item of items">
     <td *ngFor="let field of fields">
-      <!-- Si relation -->
+
+      <!-- Relation affichée -->
       <span *ngIf="item[field.name]?._id">
-        {{ item[field.name].name || item[field.name].label }}
+        {{ item[field.name].name || item[field.name].title }}
       </span>
 
-      <!-- Si simple -->
-      <span *ngIf="!item[field.name]?._id">
-        {{ item[field.name] }}
+      <!-- Array affichage -->
+      <span *ngIf="isArray(item[field.name])">
+        {{ item[field.name].join(', ') }}
       </span>
+
+      <!-- Simple -->
+<span *ngIf="!item[field.name]?._id && !isArray(item[field.name])">
+  {{ item[field.name] }}
+</span>
+
     </td>
 
     <td>
-      <button type="button" (click)="edit(item)">Modifier</button>
-      <button type="button" (click)="delete(item._id)">Supprimer</button>
+      <button (click)="edit(item)">Modifier</button>
+      <button (click)="delete(item._id)">Supprimer</button>
     </td>
   </tr>
 </table>
 
-<div *ngIf="editingItem">
-  <h3>Modifier</h3>
 
-  <div *ngFor="let field of fields">
-
-    <!-- TEXT -->
-    <input *ngIf="field.type === 'text'"
-           [(ngModel)]="editingItem[field.name]" />
-
-    <!-- RELATION -->
-    <select *ngIf="field.type === 'relation'"
-            [(ngModel)]="editingItem[field.name]">
-
-      <option *ngFor="let r of relationsData[field.name]"
-              [value]="r._id">
-        {{ r.name || r.label }}
-      </option>
-
-    </select>
-
-  </div>
-
-  <button type="button" (click)="save()">Enregistrer</button>
-</div>

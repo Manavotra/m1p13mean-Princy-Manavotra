@@ -6,24 +6,35 @@ export default class BaseController {
   }
 
   // 🔎 Détection automatique des champs ref
+  // =========================
+  // 🔎 Detect Relations + Virtuals
+  // =========================
   detectRelations(model) {
     const relations = [];
 
+    // Champs classiques
     Object.keys(model.schema.paths).forEach(path => {
       const field = model.schema.paths[path];
 
-      if (field.options && field.options.ref) {
+      // Ref simple
+      if (field.options?.ref) {
         relations.push(path);
       }
 
-      // Cas tableau de références
+      // Tableau de ref
       if (
         field.instance === 'Array' &&
-        field.caster &&
-        field.caster.options &&
-        field.caster.options.ref
+        field.caster?.options?.ref
       ) {
         relations.push(path);
+      }
+    });
+
+    // Virtual populate
+    Object.keys(model.schema.virtuals).forEach(virtual => {
+      const v = model.schema.virtuals[virtual];
+      if (v.options?.ref) {
+        relations.push(virtual);
       }
     });
 
@@ -31,6 +42,9 @@ export default class BaseController {
   }
 
   // 🧠 Population intelligente
+  // =========================
+  // 🧠 Population automatique
+  // =========================
   applyPopulation(query, req) {
     const populate = req.query.populate !== 'false';
 
@@ -42,7 +56,7 @@ export default class BaseController {
       query.populate({
         path: field,
         select: '-__v',
-        options: { limit: 50 } // sécurité
+        options: { limit: 50 }
       });
     });
 
@@ -99,7 +113,9 @@ export default class BaseController {
       const item = await this.model.findByIdAndUpdate(
         req.params.id,
         req.body,
-        { new: true }
+        { new: true,
+          runValidators: true
+        }
       );
 
       console.log("Updated item:", item);

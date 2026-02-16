@@ -5,11 +5,25 @@ import { ProductsPage } from './pages/products.page';
 import { CategoriesPage } from './pages/categories.page';
 import { SubCategoriesPage } from './pages/subcategories.page';
 
+import { ProjectsPage } from './pages/projects.page';
+import { InvoicesPage } from './pages/invoices.page';
+import { AuthorsPage } from './pages/authors.page';
+import { BooksPage } from './pages/books.page';
+import { WarehousesPage } from './pages/warehouses.page';
+import { TasksPage } from './pages/tasks.page';
+
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'users', component: UsersPage },
   { path: 'products', component: ProductsPage },
   { path: 'categories', component: CategoriesPage },
-  { path: 'subcategories', component: SubCategoriesPage }
+  { path: 'subcategories', component: SubCategoriesPage },
 
+  // Complex tests
+  { path: 'projects', component: ProjectsPage },
+  { path: 'invoices', component: InvoicesPage },
+  { path: 'authors', component: AuthorsPage },
+  { path: 'books', component: BooksPage },
+  { path: 'warehouses', component: WarehousesPage },
+  { path: 'tasks', component: TasksPage }
 ];
