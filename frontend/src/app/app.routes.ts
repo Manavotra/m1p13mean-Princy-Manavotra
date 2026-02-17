@@ -12,6 +12,9 @@ import { BooksPage } from './pages/books.page';
 import { WarehousesPage } from './pages/warehouses.page';
 import { TasksPage } from './pages/tasks.page';
 
+import { OrdersPage } from './pages/orders.page';
+
+
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'users', component: UsersPage },
@@ -25,5 +28,8 @@ export const routes: Routes = [
   { path: 'authors', component: AuthorsPage },
   { path: 'books', component: BooksPage },
   { path: 'warehouses', component: WarehousesPage },
-  { path: 'tasks', component: TasksPage }
+  { path: 'tasks', component: TasksPage },
+
+  { path: 'orders', component: OrdersPage }
+
 ];

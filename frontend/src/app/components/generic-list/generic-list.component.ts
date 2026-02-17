@@ -12,10 +12,6 @@ import { BaseService } from '../../services/base.service';
 })
 export class GenericListComponent implements OnInit {
 
-  isArray(value: any): boolean {
-    return Array.isArray(value);
-  }
-
   @Input() endpoint!: string;
   @Input() fields!: any[];
 
@@ -24,52 +20,75 @@ export class GenericListComponent implements OnInit {
   editingItem: any = null;
   relationsData: any = {};
 
+  /** 🔥 Cache pour éviter double download */
+  private loadedRelationEndpoints = new Set<string>();
+
   constructor(private service: BaseService<any>) {}
 
   ngOnInit() {
     this.initializeModelStructure(this.form, this.fields);
     this.load();
-    this.loadRelations();
+    this.loadRelationsRecursive(this.fields); // 🔥 remplacé
   }
 
+  // =============================
+  // PERFORMANCE
+  // =============================
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  isArray(value: any): boolean {
+    return Array.isArray(value);
+  }
+
+  // =============================
+  // DATA LOAD
+  // =============================
 
   load() {
     this.service.getAll(this.endpoint)
       .subscribe(data => this.items = data);
   }
 
-  loadRelations() {
-    this.fields.forEach(field => {
-      if (field.type === 'relation') {
-        this.service.getAll(field.endpoint)
-          .subscribe(data => {
-            console.log("Relations chargées pour", field.name, data);
-            this.relationsData[field.name] = data;
-          });
+  // 🔥 RÉCURSIF + CACHE
+  loadRelationsRecursive(fields: any[]) {
+    fields.forEach(field => {
+
+      if (field.type === 'relation' && field.endpoint) {
+
+        if (!this.loadedRelationEndpoints.has(field.endpoint)) {
+
+          this.loadedRelationEndpoints.add(field.endpoint);
+
+          this.service.getAll(field.endpoint)
+            .subscribe(data => {
+              this.relationsData[field.name] = data;
+            });
+        }
       }
+
+      // 🔁 récursion nested + subdocument
+      if (field.fields) {
+        this.loadRelationsRecursive(field.fields);
+      }
+
     });
   }
 
-  addArrayItem(fieldName: string) {
-    if (!this.currentModel[fieldName]) {
-      this.currentModel[fieldName] = [];
-    }
-    this.currentModel[fieldName].push('');
-  }
-
-  removeArrayItem(fieldName: string, index: number) {
-    this.currentModel[fieldName].splice(index, 1);
-  }
-
+  // =============================
+  // MODEL STRUCTURE
+  // =============================
 
   get currentModel() {
     return this.editingItem ? this.editingItem : this.form;
   }
 
   initializeModelStructure(model: any, fields: any[]) {
+
     fields.forEach(field => {
 
-      // ===== NESTED OBJECT =====
       if (field.type === 'nested') {
 
         if (!model[field.name]) {
@@ -82,22 +101,19 @@ export class GenericListComponent implements OnInit {
         );
       }
 
-      // ===== SIMPLE ARRAY =====
       if (field.type === 'array') {
+
         if (!model[field.name]) {
           model[field.name] = [];
         }
       }
 
-      // ===== SUBDOCUMENT ARRAY =====
       if (field.type === 'subdocument') {
+
         if (!model[field.name]) {
           model[field.name] = [];
         }
 
-        // Important :
-        // Si on édite un document existant,
-        // on initialise la structure interne de chaque item
         model[field.name].forEach((item: any) => {
           this.initializeModelStructure(item, field.fields);
         });
@@ -106,45 +122,44 @@ export class GenericListComponent implements OnInit {
     });
   }
 
+  // =============================
+  // SUBDOCUMENT
+  // =============================
+
   addSubdocumentItem(field: any) {
 
-  if (!this.currentModel[field.name]) {
-    this.currentModel[field.name] = [];
+    if (!this.currentModel[field.name]) {
+      this.currentModel[field.name] = [];
+    }
+
+    const newItem: any = {};
+
+    this.initializeModelStructure(newItem, field.fields);
+
+    this.currentModel[field.name].push(newItem);
   }
 
-  const newItem: any = {};
+  removeSubdocumentItem(fieldName: string, index: number) {
+    this.currentModel[fieldName].splice(index, 1);
+  }
 
-  // Construire dynamiquement la structure
-  this.initializeModelStructure(newItem, field.fields);
-
-  this.currentModel[field.name].push(newItem);
-}
-
-removeSubdocumentItem(fieldName: string, index: number) {
-  this.currentModel[fieldName].splice(index, 1);
-}
-
-
-
-
+  // =============================
+  // CRUD
+  // =============================
 
   submit() {
     this.service.create(this.endpoint, this.form)
       .subscribe(() => {
         this.form = {};
+        this.initializeModelStructure(this.form, this.fields);
         this.load();
       });
   }
-
-  // edit(item: any) {
-  //   this.editingItem = { ...item };
-  // }
 
   edit(item: any) {
     this.editingItem = JSON.parse(JSON.stringify(item));
     this.initializeModelStructure(this.editingItem, this.fields);
   }
-
 
   save() {
     this.service.update(this.endpoint, this.editingItem._id, this.editingItem)

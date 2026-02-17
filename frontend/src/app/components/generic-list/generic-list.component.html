@@ -17,22 +17,24 @@
 <!-- ===== TABLE LISTING ===== -->
 <table border="1">
   <tr>
-    <th *ngFor="let field of fields">{{ field.name }}</th>
+    <th *ngFor="let field of fields; trackBy: trackByIndex">
+      {{ field.name }}
+    </th>
     <th>Actions</th>
   </tr>
 
-  <tr *ngFor="let item of items">
-    <td *ngFor="let field of fields">
+  <tr *ngFor="let item of items; trackBy: trackByIndex">
+    <td *ngFor="let field of fields; trackBy: trackByIndex">
 
-      <!-- NESTED DISPLAY -->
+      <!-- ===== NESTED DISPLAY ===== -->
       <ng-container *ngIf="field.type === 'nested'">
-        <div *ngFor="let subField of field.fields">
+        <div *ngFor="let subField of field.fields; trackBy: trackByIndex">
           <strong>{{ subField.name }}:</strong>
           {{ item[field.name]?.[subField.name] }}
         </div>
       </ng-container>
 
-      <!-- SUBDOCUMENT DISPLAY -->
+      <!-- ===== SUBDOCUMENT DISPLAY ===== -->
       <ng-container *ngIf="field.type === 'subdocument'">
 
         <div *ngIf="item[field.name]?.length === 0">
@@ -40,28 +42,35 @@
         </div>
 
         <ul *ngIf="item[field.name]?.length > 0">
-          <li *ngFor="let sub of item[field.name]">
-            <span *ngFor="let subField of field.fields; let last = last">
-              {{ sub[subField.name] }}<span *ngIf="!last"> | </span>
+          <li *ngFor="let sub of item[field.name]; trackBy: trackByIndex">
+            <span *ngFor="let subField of field.fields; let last = last; trackBy: trackByIndex">
+              {{ sub[subField.name] }}
+              <span *ngIf="!last"> | </span>
             </span>
           </li>
         </ul>
 
       </ng-container>
 
-
-      <!-- Relation affichée -->
-      <span *ngIf="field.type !== 'nested' && item[field.name]?._id">
-        {{ item[field.name].name || item[field.name].title }}
+      <!-- ===== RELATION DISPLAY ===== -->
+      <span *ngIf="field.type !== 'nested'
+                    && field.type !== 'subdocument'
+                    && item[field.name]?._id">
+        {{ item[field.name].name
+           || item[field.name].title
+           || item[field.name].label }}
       </span>
 
-      <!-- Array affichage -->
-      <span *ngIf="field.type !== 'nested' && isArray(item[field.name])">
+      <!-- ===== ARRAY DISPLAY ===== -->
+      <span *ngIf="field.type !== 'nested'
+                    && field.type !== 'subdocument'
+                    && isArray(item[field.name])">
         {{ item[field.name].join(', ') }}
       </span>
 
-      <!-- Simple -->
+      <!-- ===== SIMPLE DISPLAY ===== -->
       <span *ngIf="field.type !== 'nested'
+                    && field.type !== 'subdocument'
                     && !item[field.name]?._id
                     && !isArray(item[field.name])">
         {{ item[field.name] }}
@@ -84,24 +93,23 @@
              let-model="model"
              let-fields="fields">
 
-  <div *ngFor="let field of fields" style="margin-bottom:10px">
+  <div *ngFor="let field of fields; trackBy: trackByIndex"
+       style="margin-bottom:10px">
 
-    <!-- ===== CHAMP COMME TEXT,NUMBER,DATE,EMAIL ===== -->
-<input *ngIf="field.type !== 'nested'
-              && field.type !== 'array'
-              && field.type !== 'relation'
-              && field.type !== 'select'
-              && field.type !== 'subdocument'"
-       [type]="field.type"
-       [(ngModel)]="model[field.name]"
-       [placeholder]="field.name" />
+    <!-- ===== INPUT SIMPLE ===== -->
+    <input *ngIf="field.type !== 'nested'
+                  && field.type !== 'array'
+                  && field.type !== 'relation'
+                  && field.type !== 'select'
+                  && field.type !== 'subdocument'"
+           [type]="field.type"
+           [(ngModel)]="model[field.name]"
+           [placeholder]="field.name" />
 
-
-
-    <!-- ===== SELECT (ENUM) ===== -->
+    <!-- ===== SELECT ENUM ===== -->
     <select *ngIf="field.type === 'select'"
             [(ngModel)]="model[field.name]">
-      <option *ngFor="let opt of field.options"
+      <option *ngFor="let opt of field.options; trackBy: trackByIndex"
               [value]="opt">
         {{ opt }}
       </option>
@@ -110,7 +118,10 @@
     <!-- ===== ARRAY SIMPLE ===== -->
     <div *ngIf="field.type === 'array'">
 
-      <div *ngFor="let item of model[field.name]; let i = index">
+      <div *ngFor="let item of model[field.name];
+                   let i = index;
+                   trackBy: trackByIndex">
+
         <input [(ngModel)]="model[field.name][i]" />
 
         <button type="button"
@@ -123,19 +134,19 @@
               (click)="model[field.name].push('')">
         Ajouter
       </button>
-
     </div>
 
     <!-- ===== RELATION ===== -->
     <select *ngIf="field.type === 'relation'"
             [(ngModel)]="model[field.name]">
-      <option *ngFor="let r of relationsData[field.name]"
+      <option *ngFor="let r of relationsData[field.name];
+                      trackBy: trackByIndex"
               [value]="r._id">
         {{ r.name || r.title || r.label }}
       </option>
     </select>
 
-    <!-- ===== NESTED OBJECT ===== -->
+    <!-- ===== NESTED ===== -->
     <div *ngIf="field.type === 'nested'"
          style="margin-left:20px;
                 border-left:2px solid #ccc;
@@ -153,20 +164,21 @@
 
     </div>
 
-    <!-- ===== SUBDOCUMENT ARRAY ===== -->
+    <!-- ===== SUBDOCUMENT ===== -->
     <div *ngIf="field.type === 'subdocument'"
-        style="margin-left:20px;
+         style="margin-left:20px;
                 border-left:2px solid #4CAF50;
                 padding-left:10px">
 
       <strong>{{ field.name }}</strong>
 
-      <div *ngFor="let subItem of model[field.name]; let i = index"
-          style="margin-bottom:10px;
+      <div *ngFor="let subItem of model[field.name];
+                   let i = index;
+                   trackBy: trackByIndex"
+           style="margin-bottom:10px;
                   padding:10px;
                   border:1px solid #ccc">
 
-        <!-- Récursion sur les champs internes -->
         <ng-container
           *ngTemplateOutlet="renderFields;
                             context:{
@@ -188,7 +200,6 @@
       </button>
 
     </div>
-
 
   </div>
 

@@ -13,6 +13,7 @@ import bookController from '../controllers/book.controller.js';
 import warehouseController from '../controllers/warehouse.controller.js';
 import taskController from '../controllers/task.controller.js';
 
+import orderController from '../controllers/order.controller.js';
 
 const router = express.Router();
 
@@ -84,6 +85,12 @@ router.get('/tasks', taskController.getAll);
 router.post('/tasks', taskController.create);
 router.put('/tasks/:id', taskController.update);
 router.delete('/tasks/:id', taskController.delete);
+
+// Orders
+router.get('/orders', orderController.getAll);
+router.post('/orders', orderController.create);
+router.put('/orders/:id', orderController.update);
+router.delete('/orders/:id', orderController.delete);
 
 
 export default router;
