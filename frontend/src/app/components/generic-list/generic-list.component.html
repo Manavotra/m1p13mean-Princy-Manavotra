@@ -1,46 +1,11 @@
 <h3>{{ editingItem ? 'Modifier' : 'Ajouter' }}</h3>
 
-<div *ngFor="let field of fields">
-
-  <!-- TEXT -->
-  <input *ngIf="field.type === 'text'"
-         [(ngModel)]="currentModel[field.name]"
-         [placeholder]="field.name" />
-
-  <!-- SELECT (ENUM) -->
-  <select *ngIf="field.type === 'select'"
-          [(ngModel)]="currentModel[field.name]">
-    <option *ngFor="let opt of field.options"
-            [value]="opt">
-      {{ opt }}
-    </option>
-  </select>
-
-  <!-- ARRAY SIMPLE -->
-  <div *ngIf="field.type === 'array'">
-    <div *ngFor="let item of currentModel[field.name]; let i = index">
-      <input [(ngModel)]="currentModel[field.name][i]" />
-      <button type="button"
-              (click)="removeArrayItem(field.name, i)">
-        X
-      </button>
-    </div>
-    <button type="button"
-            (click)="addArrayItem(field.name)">
-      Ajouter
-    </button>
-  </div>
-
-  <!-- RELATION -->
-  <select *ngIf="field.type === 'relation'"
-          [(ngModel)]="currentModel[field.name]">
-    <option *ngFor="let r of relationsData[field.name]"
-            [value]="r._id">
-      {{ r.name || r.title || r.label }}
-    </option>
-  </select>
-
-</div>
+<!-- ===== FORMULAIRE RÉCURSIF ===== -->
+<ng-container
+  *ngTemplateOutlet="renderFields;
+                     context:{ model: currentModel,
+                               fields: fields }">
+</ng-container>
 
 <button type="button"
         (click)="editingItem ? save() : submit()">
@@ -49,6 +14,7 @@
 
 <hr>
 
+<!-- ===== TABLE LISTING ===== -->
 <table border="1">
   <tr>
     <th *ngFor="let field of fields">{{ field.name }}</th>
@@ -58,20 +24,30 @@
   <tr *ngFor="let item of items">
     <td *ngFor="let field of fields">
 
+      <!-- NESTED DISPLAY -->
+      <ng-container *ngIf="field.type === 'nested'">
+        <div *ngFor="let subField of field.fields">
+          <strong>{{ subField.name }}:</strong>
+          {{ item[field.name]?.[subField.name] }}
+        </div>
+      </ng-container>
+
       <!-- Relation affichée -->
-      <span *ngIf="item[field.name]?._id">
+      <span *ngIf="field.type !== 'nested' && item[field.name]?._id">
         {{ item[field.name].name || item[field.name].title }}
       </span>
 
       <!-- Array affichage -->
-      <span *ngIf="isArray(item[field.name])">
+      <span *ngIf="field.type !== 'nested' && isArray(item[field.name])">
         {{ item[field.name].join(', ') }}
       </span>
 
       <!-- Simple -->
-<span *ngIf="!item[field.name]?._id && !isArray(item[field.name])">
-  {{ item[field.name] }}
-</span>
+      <span *ngIf="field.type !== 'nested'
+                    && !item[field.name]?._id
+                    && !isArray(item[field.name])">
+        {{ item[field.name] }}
+      </span>
 
     </td>
 
@@ -82,4 +58,76 @@
   </tr>
 </table>
 
+<!-- ===================================================== -->
+<!-- ===== TEMPLATE RÉCURSIF POUR LES CHAMPS ===== -->
+<!-- ===================================================== -->
 
+<ng-template #renderFields
+             let-model="model"
+             let-fields="fields">
+
+  <div *ngFor="let field of fields" style="margin-bottom:10px">
+
+    <!-- ===== TEXT ===== -->
+    <input *ngIf="field.type === 'text'"
+           [(ngModel)]="model[field.name]"
+           [placeholder]="field.name" />
+
+    <!-- ===== SELECT (ENUM) ===== -->
+    <select *ngIf="field.type === 'select'"
+            [(ngModel)]="model[field.name]">
+      <option *ngFor="let opt of field.options"
+              [value]="opt">
+        {{ opt }}
+      </option>
+    </select>
+
+    <!-- ===== ARRAY SIMPLE ===== -->
+    <div *ngIf="field.type === 'array'">
+
+      <div *ngFor="let item of model[field.name]; let i = index">
+        <input [(ngModel)]="model[field.name][i]" />
+
+        <button type="button"
+                (click)="model[field.name].splice(i, 1)">
+          X
+        </button>
+      </div>
+
+      <button type="button"
+              (click)="model[field.name].push('')">
+        Ajouter
+      </button>
+
+    </div>
+
+    <!-- ===== RELATION ===== -->
+    <select *ngIf="field.type === 'relation'"
+            [(ngModel)]="model[field.name]">
+      <option *ngFor="let r of relationsData[field.name]"
+              [value]="r._id">
+        {{ r.name || r.title || r.label }}
+      </option>
+    </select>
+
+    <!-- ===== NESTED OBJECT ===== -->
+    <div *ngIf="field.type === 'nested'"
+         style="margin-left:20px;
+                border-left:2px solid #ccc;
+                padding-left:10px">
+
+      <strong>{{ field.name }}</strong>
+
+      <ng-container
+        *ngTemplateOutlet="renderFields;
+                           context:{
+                             model: model[field.name],
+                             fields: field.fields
+                           }">
+      </ng-container>
+
+    </div>
+
+  </div>
+
+</ng-template>

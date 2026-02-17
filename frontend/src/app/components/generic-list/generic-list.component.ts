@@ -27,9 +27,11 @@ export class GenericListComponent implements OnInit {
   constructor(private service: BaseService<any>) {}
 
   ngOnInit() {
+    this.initializeModelStructure(this.form, this.fields);
     this.load();
     this.loadRelations();
   }
+
 
   load() {
     this.service.getAll(this.endpoint)
@@ -64,6 +66,30 @@ export class GenericListComponent implements OnInit {
     return this.editingItem ? this.editingItem : this.form;
   }
 
+  initializeModelStructure(model: any, fields: any[]) {
+    fields.forEach(field => {
+
+      if (field.type === 'nested') {
+
+        if (!model[field.name]) {
+          model[field.name] = {};
+        }
+
+        // Récursion
+        this.initializeModelStructure(
+          model[field.name],
+          field.fields
+        );
+      }
+
+      if (field.type === 'array' && !model[field.name]) {
+        model[field.name] = [];
+      }
+
+    });
+  }
+
+
 
 
   submit() {
@@ -80,7 +106,9 @@ export class GenericListComponent implements OnInit {
 
   edit(item: any) {
     this.editingItem = JSON.parse(JSON.stringify(item));
+    this.initializeModelStructure(this.editingItem, this.fields);
   }
+
 
   save() {
     this.service.update(this.endpoint, this.editingItem._id, this.editingItem)
