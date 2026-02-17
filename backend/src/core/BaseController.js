@@ -95,14 +95,17 @@ export default class BaseController {
   };
 
   create = async (req, res) => {
-    console.log("create");
+    console.log("CREATE BODY:", req.body);
     try {
       const item = await this.model.create(req.body);
+      console.log("CREATED:", item);
       res.status(201).json(item);
     } catch (e) {
+      console.error("CREATE ERROR:", e);
       res.status(400).json({ error: e.message });
     }
   };
+
 
   update = async (req, res) => {
     console.log("UPDATE HIT");

@@ -15,7 +15,7 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
 export class ProductsPage {
   fields = [
     { name: 'label', type: 'text' },
-    { name: 'price', type: 'text' },
-    { name: 'stock', type: 'text' }
+    { name: 'price', type: 'number' },
+    { name: 'stock', type: 'number' }
   ];
 }

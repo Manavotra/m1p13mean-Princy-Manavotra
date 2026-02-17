@@ -15,13 +15,15 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
 })
 export class InvoicesPage {
 
-  fields = [
-    { name: 'customerName', type: 'text' },
-    { name: 'lines', type: 'subdocument', fields: [
-        { name: 'label', type: 'text' },
+    fields = [
+    { name: 'customer', type: 'text' },
+    { name: 'items', type: 'subdocument', fields: [
+        { name: 'description', type: 'text' },
         { name: 'quantity', type: 'number' },
-        { name: 'price', type: 'number' }
-      ]
+        { name: 'price', type: 'number' },
+        { name: 'date', type: 'date' }
+        ]
     }
-  ];
+    ];
+
 }

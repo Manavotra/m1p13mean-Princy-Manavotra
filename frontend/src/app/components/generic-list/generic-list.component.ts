@@ -69,25 +69,61 @@ export class GenericListComponent implements OnInit {
   initializeModelStructure(model: any, fields: any[]) {
     fields.forEach(field => {
 
+      // ===== NESTED OBJECT =====
       if (field.type === 'nested') {
 
         if (!model[field.name]) {
           model[field.name] = {};
         }
 
-        // Récursion
         this.initializeModelStructure(
           model[field.name],
           field.fields
         );
       }
 
-      if (field.type === 'array' && !model[field.name]) {
-        model[field.name] = [];
+      // ===== SIMPLE ARRAY =====
+      if (field.type === 'array') {
+        if (!model[field.name]) {
+          model[field.name] = [];
+        }
+      }
+
+      // ===== SUBDOCUMENT ARRAY =====
+      if (field.type === 'subdocument') {
+        if (!model[field.name]) {
+          model[field.name] = [];
+        }
+
+        // Important :
+        // Si on édite un document existant,
+        // on initialise la structure interne de chaque item
+        model[field.name].forEach((item: any) => {
+          this.initializeModelStructure(item, field.fields);
+        });
       }
 
     });
   }
+
+  addSubdocumentItem(field: any) {
+
+  if (!this.currentModel[field.name]) {
+    this.currentModel[field.name] = [];
+  }
+
+  const newItem: any = {};
+
+  // Construire dynamiquement la structure
+  this.initializeModelStructure(newItem, field.fields);
+
+  this.currentModel[field.name].push(newItem);
+}
+
+removeSubdocumentItem(fieldName: string, index: number) {
+  this.currentModel[fieldName].splice(index, 1);
+}
+
 
 
 

@@ -32,6 +32,24 @@
         </div>
       </ng-container>
 
+      <!-- SUBDOCUMENT DISPLAY -->
+      <ng-container *ngIf="field.type === 'subdocument'">
+
+        <div *ngIf="item[field.name]?.length === 0">
+          —
+        </div>
+
+        <ul *ngIf="item[field.name]?.length > 0">
+          <li *ngFor="let sub of item[field.name]">
+            <span *ngFor="let subField of field.fields; let last = last">
+              {{ sub[subField.name] }}<span *ngIf="!last"> | </span>
+            </span>
+          </li>
+        </ul>
+
+      </ng-container>
+
+
       <!-- Relation affichée -->
       <span *ngIf="field.type !== 'nested' && item[field.name]?._id">
         {{ item[field.name].name || item[field.name].title }}
@@ -68,10 +86,17 @@
 
   <div *ngFor="let field of fields" style="margin-bottom:10px">
 
-    <!-- ===== TEXT ===== -->
-    <input *ngIf="field.type === 'text'"
-           [(ngModel)]="model[field.name]"
-           [placeholder]="field.name" />
+    <!-- ===== CHAMP COMME TEXT,NUMBER,DATE,EMAIL ===== -->
+<input *ngIf="field.type !== 'nested'
+              && field.type !== 'array'
+              && field.type !== 'relation'
+              && field.type !== 'select'
+              && field.type !== 'subdocument'"
+       [type]="field.type"
+       [(ngModel)]="model[field.name]"
+       [placeholder]="field.name" />
+
+
 
     <!-- ===== SELECT (ENUM) ===== -->
     <select *ngIf="field.type === 'select'"
@@ -127,6 +152,43 @@
       </ng-container>
 
     </div>
+
+    <!-- ===== SUBDOCUMENT ARRAY ===== -->
+    <div *ngIf="field.type === 'subdocument'"
+        style="margin-left:20px;
+                border-left:2px solid #4CAF50;
+                padding-left:10px">
+
+      <strong>{{ field.name }}</strong>
+
+      <div *ngFor="let subItem of model[field.name]; let i = index"
+          style="margin-bottom:10px;
+                  padding:10px;
+                  border:1px solid #ccc">
+
+        <!-- Récursion sur les champs internes -->
+        <ng-container
+          *ngTemplateOutlet="renderFields;
+                            context:{
+                              model: subItem,
+                              fields: field.fields
+                            }">
+        </ng-container>
+
+        <button type="button"
+                (click)="removeSubdocumentItem(field.name, i)">
+          Supprimer ligne
+        </button>
+
+      </div>
+
+      <button type="button"
+              (click)="addSubdocumentItem(field)">
+        Ajouter ligne
+      </button>
+
+    </div>
+
 
   </div>
 
