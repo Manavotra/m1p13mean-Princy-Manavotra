@@ -12,6 +12,11 @@ export class BaseService<T> {
 
   constructor(private http: HttpClient) {}
 
+  getAllWithParams(endpoint: string, params: any) {
+    return this.http.get<T[]>(this.api + endpoint, { params });
+  }
+
+
   getAll(endpoint: string) {
     return this.http.get<T[]>(this.api + endpoint);
   }

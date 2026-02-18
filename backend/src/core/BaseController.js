@@ -1,4 +1,7 @@
 // src/core/BaseController.js
+
+import QueryBuilder from './QueryBuilder.js';
+
 export default class BaseController {
   constructor(model) {
     this.model = model;
@@ -65,10 +68,17 @@ export default class BaseController {
 
   getAll = async (req, res) => {
     try {
-      let query = this.model.find();
+
+      const filter = QueryBuilder.buildFilter(req.query);
+
+      let query = this.model.find(filter);
+
       query = this.applyPopulation(query, req);
+
       const data = await query;
+
       res.json(data);
+
     } catch (err) {
       res.status(500).json(err.message);
     }

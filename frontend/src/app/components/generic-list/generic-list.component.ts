@@ -1,3 +1,4 @@
+// components/generic-list/generic-list.components.ts
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,13 +21,23 @@ export class GenericListComponent implements OnInit {
   editingItem: any = null;
   relationsData: any = {};
 
+  @Input() searchFields!: any[];
+  searchModel: any = {};
+
   /** 🔥 Cache pour éviter double download */
   private loadedRelationEndpoints = new Set<string>();
 
   constructor(private service: BaseService<any>) {}
 
   ngOnInit() {
+    // 🔹 Form CRUD
     this.initializeModelStructure(this.form, this.fields);
+
+    // 🔹 Search model
+    if (this.searchFields?.length) {
+      this.initializeModelStructure(this.searchModel, this.searchFields);
+    }
+
     this.load();
     this.loadRelationsRecursive(this.fields); // 🔥 remplacé
   }
@@ -142,6 +153,47 @@ export class GenericListComponent implements OnInit {
   removeSubdocumentItem(fieldName: string, index: number) {
     this.currentModel[fieldName].splice(index, 1);
   }
+
+
+  
+  // =============================
+  // SEARCH
+  // =============================
+
+  search() {
+
+    const params: any = {};
+
+    const flatten = (obj: any, prefix = '') => {
+      Object.keys(obj).forEach(key => {
+        const value = obj[key];
+        const newKey = prefix ? `${prefix}.${key}` : key;
+
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          flatten(value, newKey);
+        } else if (value !== null && value !== '') {
+          params[`search[${newKey}]`] = value;
+        }
+      });
+    };
+
+    flatten(this.searchModel);
+
+    console.log("SEARCH PARAMS:", params); // 👈 AJOUTE ÇA
+
+    this.service.getAllWithParams(this.endpoint, params)
+      .subscribe(data => this.items = data);
+  }
+
+
+resetSearch() {
+  this.searchModel = {};
+  this.initializeModelStructure(this.searchModel, this.searchFields);
+  this.load();
+}
+
+
+
 
   // =============================
   // CRUD
