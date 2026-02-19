@@ -5,17 +5,18 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
   standalone: true,
   imports: [GenericListComponent],
   template: `
-    <h2>Products</h2>
+    <h2>Projects</h2>
     <app-generic-list
-      endpoint="products"
+      endpoint="projects"
       [fields]="fields">
     </app-generic-list>
   `
 })
-export class ProductsPage {
+export class ProjectsPage {
+
   fields = [
-    { name: 'label', type: 'text' },
-    { name: 'price', type: 'number' },
-    { name: 'stock', type: 'number' }
+    { name: 'name', type: 'text' },
+    // { name: 'status', type: 'select', options: ['draft', 'active', 'completed'] },
+    { name: 'tags', type: 'array' } // tableau simple
   ];
 }
