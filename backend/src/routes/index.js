@@ -5,6 +5,16 @@ import productController from '../controllers/product.controller.js';
 import categoryController from '../controllers/category.controller.js';
 import subCategoryController from '../controllers/subcategory.controller.js';
 
+
+import projectController from '../controllers/project.controller.js';
+import invoiceController from '../controllers/invoice.controller.js';
+import authorController from '../controllers/author.controller.js';
+import bookController from '../controllers/book.controller.js';
+import warehouseController from '../controllers/warehouse.controller.js';
+import taskController from '../controllers/task.controller.js';
+
+import orderController from '../controllers/order.controller.js';
+
 const router = express.Router();
 
 // Users
@@ -35,6 +45,52 @@ router.get('/subcategory/:id', subCategoryController.getById);
 router.post('/subcategory', subCategoryController.create);
 router.put('/subcategory/:id', subCategoryController.update);
 router.delete('/subcategory/:id', subCategoryController.delete);
+
+
+// ========================
+// COMPLEX CASES
+// ========================
+
+// 1️⃣ Project (tableaux + enum)
+router.get('/projects', projectController.getAll);
+router.post('/projects', projectController.create);
+router.put('/projects/:id', projectController.update);
+router.delete('/projects/:id', projectController.delete);
+
+// 2️⃣ Invoice (sous-documents)
+router.get('/invoices', invoiceController.getAll);
+router.post('/invoices', invoiceController.create);
+router.put('/invoices/:id', invoiceController.update);
+router.delete('/invoices/:id', invoiceController.delete);
+
+// 3️⃣ Author / Book (relations)
+router.get('/authors', authorController.getAll);
+router.post('/authors', authorController.create);
+router.put('/authors/:id', authorController.update);
+router.delete('/authors/:id', authorController.delete);
+
+router.get('/books', bookController.getAll);
+router.post('/books', bookController.create);
+router.put('/books/:id', bookController.update);
+router.delete('/books/:id', bookController.delete);
+
+// 4️⃣ Warehouse (imbrication profonde)
+router.get('/warehouses', warehouseController.getAll);
+router.post('/warehouses', warehouseController.create);
+router.put('/warehouses/:id', warehouseController.update);
+router.delete('/warehouses/:id', warehouseController.delete);
+
+// 5️⃣ Task (enum + relation user)
+router.get('/tasks', taskController.getAll);
+router.post('/tasks', taskController.create);
+router.put('/tasks/:id', taskController.update);
+router.delete('/tasks/:id', taskController.delete);
+
+// Orders
+router.get('/orders', orderController.getAll);
+router.post('/orders', orderController.create);
+router.put('/orders/:id', orderController.update);
+router.delete('/orders/:id', orderController.delete);
 
 
 export default router;

@@ -1,77 +1,206 @@
-<h3>Ajouter</h3>
+<h3>{{ editingItem ? 'Modifier' : 'Ajouter' }}</h3>
 
-<div *ngFor="let field of fields">
+<!-- ===== FORMULAIRE RÉCURSIF ===== -->
+<ng-container
+  *ngTemplateOutlet="renderFields;
+                     context:{ model: currentModel,
+                               fields: fields }">
+</ng-container>
 
-  <!-- TEXT -->
-  <input *ngIf="field.type === 'text'"
-         [(ngModel)]="form[field.name]"
-         [placeholder]="field.name" />
-
-  <!-- RELATION -->
-  <select *ngIf="field.type === 'relation'"
-          [(ngModel)]="form[field.name]">
-
-    <option *ngFor="let r of relationsData[field.name]"
-            [value]="r._id">
-
-      {{ r.name || r.label }}
-    </option>
-
-  </select>
-
-</div>
-
-<button type="button" (click)="submit()">Ajouter</button>
+<button type="button"
+        (click)="editingItem ? save() : submit()">
+  {{ editingItem ? 'Enregistrer' : 'Ajouter' }}
+</button>
 
 <hr>
 
+<!-- ===== TABLE LISTING ===== -->
 <table border="1">
   <tr>
-    <th *ngFor="let field of fields">{{ field.name }}</th>
+    <th *ngFor="let field of fields; trackBy: trackByIndex">
+      {{ field.name }}
+    </th>
     <th>Actions</th>
   </tr>
 
-  <tr *ngFor="let item of items">
-    <td *ngFor="let field of fields">
-      <!-- Si relation -->
-      <span *ngIf="item[field.name]?._id">
-        {{ item[field.name].name || item[field.name].label }}
+  <tr *ngFor="let item of items; trackBy: trackByIndex">
+    <td *ngFor="let field of fields; trackBy: trackByIndex">
+
+      <!-- ===== NESTED DISPLAY ===== -->
+      <ng-container *ngIf="field.type === 'nested'">
+        <div *ngFor="let subField of field.fields; trackBy: trackByIndex">
+          <strong>{{ subField.name }}:</strong>
+          {{ item[field.name]?.[subField.name] }}
+        </div>
+      </ng-container>
+
+      <!-- ===== SUBDOCUMENT DISPLAY ===== -->
+      <ng-container *ngIf="field.type === 'subdocument'">
+
+        <div *ngIf="item[field.name]?.length === 0">
+          —
+        </div>
+
+        <ul *ngIf="item[field.name]?.length > 0">
+          <li *ngFor="let sub of item[field.name]; trackBy: trackByIndex">
+            <span *ngFor="let subField of field.fields; let last = last; trackBy: trackByIndex">
+              {{ sub[subField.name] }}
+              <span *ngIf="!last"> | </span>
+            </span>
+          </li>
+        </ul>
+
+      </ng-container>
+
+      <!-- ===== RELATION DISPLAY ===== -->
+      <span *ngIf="field.type !== 'nested'
+                    && field.type !== 'subdocument'
+                    && item[field.name]?._id">
+        {{ item[field.name].name
+           || item[field.name].title
+           || item[field.name].label }}
       </span>
 
-      <!-- Si simple -->
-      <span *ngIf="!item[field.name]?._id">
+      <!-- ===== ARRAY DISPLAY ===== -->
+      <span *ngIf="field.type !== 'nested'
+                    && field.type !== 'subdocument'
+                    && isArray(item[field.name])">
+        {{ item[field.name].join(', ') }}
+      </span>
+
+      <!-- ===== SIMPLE DISPLAY ===== -->
+      <span *ngIf="field.type !== 'nested'
+                    && field.type !== 'subdocument'
+                    && !item[field.name]?._id
+                    && !isArray(item[field.name])">
         {{ item[field.name] }}
       </span>
+
     </td>
 
     <td>
-      <button type="button" (click)="edit(item)">Modifier</button>
-      <button type="button" (click)="delete(item._id)">Supprimer</button>
+      <button (click)="edit(item)">Modifier</button>
+      <button (click)="delete(item._id)">Supprimer</button>
     </td>
   </tr>
 </table>
 
-<div *ngIf="editingItem">
-  <h3>Modifier</h3>
+<!-- ===================================================== -->
+<!-- ===== TEMPLATE RÉCURSIF POUR LES CHAMPS ===== -->
+<!-- ===================================================== -->
 
-  <div *ngFor="let field of fields">
+<ng-template #renderFields
+             let-model="model"
+             let-fields="fields">
 
-    <!-- TEXT -->
-    <input *ngIf="field.type === 'text'"
-           [(ngModel)]="editingItem[field.name]" />
+  <div *ngFor="let field of fields; trackBy: trackByIndex"
+       style="margin-bottom:10px">
 
-    <!-- RELATION -->
-    <select *ngIf="field.type === 'relation'"
-            [(ngModel)]="editingItem[field.name]">
+    <!-- ===== INPUT SIMPLE ===== -->
+    <input *ngIf="field.type !== 'nested'
+                  && field.type !== 'array'
+                  && field.type !== 'relation'
+                  && field.type !== 'select'
+                  && field.type !== 'subdocument'"
+           [type]="field.type"
+           [(ngModel)]="model[field.name]"
+           [placeholder]="field.name" />
 
-      <option *ngFor="let r of relationsData[field.name]"
-              [value]="r._id">
-        {{ r.name || r.label }}
+    <!-- ===== SELECT ENUM ===== -->
+    <select *ngIf="field.type === 'select'"
+            [(ngModel)]="model[field.name]">
+      <option *ngFor="let opt of field.options; trackBy: trackByIndex"
+              [value]="opt">
+        {{ opt }}
       </option>
-
     </select>
+
+    <!-- ===== ARRAY SIMPLE ===== -->
+    <div *ngIf="field.type === 'array'">
+
+      <div *ngFor="let item of model[field.name];
+                   let i = index;
+                   trackBy: trackByIndex">
+
+        <input [(ngModel)]="model[field.name][i]" />
+
+        <button type="button"
+                (click)="model[field.name].splice(i, 1)">
+          X
+        </button>
+      </div>
+
+      <button type="button"
+              (click)="model[field.name].push('')">
+        Ajouter
+      </button>
+    </div>
+
+    <!-- ===== RELATION ===== -->
+    <select *ngIf="field.type === 'relation'"
+            [(ngModel)]="model[field.name]">
+      <option *ngFor="let r of relationsData[field.name];
+                      trackBy: trackByIndex"
+              [value]="r._id">
+        {{ r.name || r.title || r.label }}
+      </option>
+    </select>
+
+    <!-- ===== NESTED ===== -->
+    <div *ngIf="field.type === 'nested'"
+         style="margin-left:20px;
+                border-left:2px solid #ccc;
+                padding-left:10px">
+
+      <strong>{{ field.name }}</strong>
+
+      <ng-container
+        *ngTemplateOutlet="renderFields;
+                           context:{
+                             model: model[field.name],
+                             fields: field.fields
+                           }">
+      </ng-container>
+
+    </div>
+
+    <!-- ===== SUBDOCUMENT ===== -->
+    <div *ngIf="field.type === 'subdocument'"
+         style="margin-left:20px;
+                border-left:2px solid #4CAF50;
+                padding-left:10px">
+
+      <strong>{{ field.name }}</strong>
+
+      <div *ngFor="let subItem of model[field.name];
+                   let i = index;
+                   trackBy: trackByIndex"
+           style="margin-bottom:10px;
+                  padding:10px;
+                  border:1px solid #ccc">
+
+        <ng-container
+          *ngTemplateOutlet="renderFields;
+                            context:{
+                              model: subItem,
+                              fields: field.fields
+                            }">
+        </ng-container>
+
+        <button type="button"
+                (click)="removeSubdocumentItem(field.name, i)">
+          Supprimer ligne
+        </button>
+
+      </div>
+
+      <button type="button"
+              (click)="addSubdocumentItem(field)">
+        Ajouter ligne
+      </button>
+
+    </div>
 
   </div>
 
-  <button type="button" (click)="save()">Enregistrer</button>
-</div>
+</ng-template>
