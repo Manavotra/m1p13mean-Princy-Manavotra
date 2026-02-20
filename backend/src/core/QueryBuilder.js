@@ -1,33 +1,52 @@
-// core/QueryBuilder.js
+// src/core/QueryBuilder.js
+
 export default class QueryBuilder {
 
-  static buildFilter(queryParams) {
+  static buildFilter(queryParams, model) {
     const filter = {};
 
     Object.entries(queryParams).forEach(([key, value]) => {
 
       if (key === 'populate') return;
+      if (!key.startsWith('search[')) return;
 
-      // clé type : search[name]
-      if (key.startsWith('search[')) {
+      const field = key.replace('search[', '').replace(']', '');
 
-        const field = key.replace('search[', '').replace(']', '');
+      if (field === '_id') return; // 🔥 exclusion automatique
 
-        filter[field] = this.buildCondition(value);
-      }
+      const schemaPath = model.schema.path(field);
+
+      if (!schemaPath) return;
+
+      filter[field] = this.buildCondition(
+        value,
+        schemaPath.instance
+      );
 
     });
 
     return filter;
   }
 
-  static buildCondition(value) {
+  static buildCondition(value, type) {
 
-    // simple contains par défaut
-    if (typeof value === 'string') {
-      return { $regex: value, $options: 'i' };
+    if (value === undefined || value === null || value === '') {
+      return undefined;
     }
 
-    return value;
+    switch (type) {
+
+      case 'String':
+        return { $regex: value, $options: 'i' };
+
+      case 'Number':
+        return Number(value);
+
+      case 'ObjectID':
+        return value;
+
+      default:
+        return value;
+    }
   }
 }

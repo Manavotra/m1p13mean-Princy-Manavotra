@@ -1,5 +1,5 @@
 // services/base.service.ts
-import { HttpClient } from '@angular/common/http';
+import { HttpClient,HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 
@@ -12,13 +12,23 @@ export class BaseService<T> {
 
   constructor(private http: HttpClient) {}
 
-  getAllWithParams(endpoint: string, params: any) {
-    return this.http.get<T[]>(this.api + endpoint, { params });
-  }
-
 
   getAll(endpoint: string) {
     return this.http.get<T[]>(this.api + endpoint);
+  }
+
+  getAllWithParams(endpoint: string, paramsObj: any) {
+
+    let params = new HttpParams();
+
+    Object.keys(paramsObj).forEach(key => {
+      params = params.set(key, paramsObj[key]);
+    });
+
+    return this.http.get<T[]>(
+      this.api + endpoint,
+      { params }
+    );
   }
 
   create(endpoint: string, data: T) {

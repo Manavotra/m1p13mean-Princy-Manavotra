@@ -21,8 +21,8 @@ export class ProductsPage {
   ];
   searchFields = [
     { name: 'label', type: 'text' },
-    { name: 'price', type: 'number' }
-
+    { name: 'price', type: 'number' },   // 🔥 number search
+    { name: 'stock', type: 'number' }
   ];
 
 }

@@ -8,7 +8,6 @@ export default class BaseController {
     this.populateFields = this.detectRelations(model);
   }
 
-  // 🔎 Détection automatique des champs ref
   // =========================
   // 🔎 Detect Relations + Virtuals
   // =========================
@@ -44,7 +43,6 @@ export default class BaseController {
     return relations;
   }
 
-  // 🧠 Population intelligente
   // =========================
   // 🧠 Population automatique
   // =========================
@@ -69,7 +67,9 @@ export default class BaseController {
   getAll = async (req, res) => {
     try {
 
-      const filter = QueryBuilder.buildFilter(req.query);
+      const filter = QueryBuilder.buildFilter(
+        req.query,
+        this.model);
 
       let query = this.model.find(filter);
 
@@ -80,6 +80,7 @@ export default class BaseController {
       res.json(data);
 
     } catch (err) {
+      console.error("GET ALL ERROR:", err);
       res.status(500).json(err.message);
     }
   };
