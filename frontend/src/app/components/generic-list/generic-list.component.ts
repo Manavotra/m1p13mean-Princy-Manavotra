@@ -35,7 +35,7 @@ export class GenericListComponent implements OnInit {
 
     // 🔹 Search model
     if (this.searchFields?.length) {
-      this.initializeModelStructure(this.searchModel, this.searchFields);
+      this.initializeModelStructure(this.searchModel, this.searchFields, true);
     }
 
     this.load();
@@ -96,31 +96,46 @@ export class GenericListComponent implements OnInit {
     return this.editingItem ? this.editingItem : this.form;
   }
 
-  initializeModelStructure(model: any, fields: any[]) {
+initializeModelStructure(model: any, fields: any[], isSearch = false) {
 
-    fields.forEach(field => {
+  fields.forEach(field => {
 
-      if (field.type === 'nested') {
+    if (field.type === 'nested') {
 
+      if (!model[field.name]) {
+        model[field.name] = {};
+      }
+
+      this.initializeModelStructure(
+        model[field.name],
+        field.fields,
+        isSearch
+      );
+    }
+
+    if (field.type === 'array') {
+
+      if (!model[field.name]) {
+        model[field.name] = [];
+      }
+    }
+
+    if (field.type === 'subdocument') {
+
+      if (isSearch) {
+        // 🔥 MODE SEARCH → objet simple
         if (!model[field.name]) {
           model[field.name] = {};
         }
 
         this.initializeModelStructure(
           model[field.name],
-          field.fields
+          field.fields,
+          true
         );
-      }
 
-      if (field.type === 'array') {
-
-        if (!model[field.name]) {
-          model[field.name] = [];
-        }
-      }
-
-      if (field.type === 'subdocument') {
-
+      } else {
+        // 🔥 MODE CRUD NORMAL → array
         if (!model[field.name]) {
           model[field.name] = [];
         }
@@ -129,9 +144,10 @@ export class GenericListComponent implements OnInit {
           this.initializeModelStructure(item, field.fields);
         });
       }
+    }
 
-    });
-  }
+  });
+}
 
   // =============================
   // SUBDOCUMENT
@@ -160,37 +176,45 @@ export class GenericListComponent implements OnInit {
   // SEARCH
   // =============================
 
-  search() {
+search() {
 
-    const params: any = {};
+  const flatParams = this.flattenSearchModel(this.searchModel);
 
-    const flatten = (obj: any, prefix = '') => {
-      Object.keys(obj).forEach(key => {
-        const value = obj[key];
-        const newKey = prefix ? `${prefix}.${key}` : key;
+  console.log("🔥 FLATTENED SEARCH:", flatParams);
 
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
-          flatten(value, newKey);
-        } else if (value !== null && value !== '') {
-          params[`search[${newKey}]`] = value;
-        }
-      });
-    };
+  this.service
+    .getAllWithParams(this.endpoint, flatParams)
+    .subscribe(data => this.items = data);
+}
 
-    flatten(this.searchModel);
 
-    console.log("SEARCH PARAMS:", params); // 👈 AJOUTE ÇA
-
-    this.service.getAllWithParams(this.endpoint, params)
-      .subscribe(data => this.items = data);
+  resetSearch() {
+    this.searchModel = {};
+    this.initializeModelStructure(this.searchModel, this.searchFields);
+    this.load();
   }
 
 
-resetSearch() {
-  this.searchModel = {};
-  this.initializeModelStructure(this.searchModel, this.searchFields);
-  this.load();
-}
+  private flattenSearchModel(obj: any, parentKey = '', result: any = {}) {
+
+    Object.keys(obj).forEach(key => {
+
+      const value = obj[key];
+
+      if (value === null || value === undefined || value === '') return;
+
+      const newKey = parentKey ? `${parentKey}.${key}` : key;
+
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        this.flattenSearchModel(value, newKey, result);
+      } else {
+        result[newKey] = value;
+      }
+
+    });
+
+    return result;
+  }
 
 
 

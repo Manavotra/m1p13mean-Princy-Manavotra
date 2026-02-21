@@ -8,7 +8,8 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
     <h2>Orders</h2>
     <app-generic-list
       endpoint="orders"
-      [fields]="fields">
+      [fields]="fields"
+      [searchFields]="searchFields">
     </app-generic-list>
   `
 })
@@ -59,5 +60,49 @@ export class OrdersPage {
     }
 
   ];
+
+  searchFields = [
+    {
+      name: 'customer',
+      type: 'relation',
+      endpoint: 'users'
+    },
+
+    {
+      name: 'status',
+      type: 'select',
+      options: ['pending', 'confirmed', 'shipped', 'delivered']
+    },
+
+    {
+      name: 'shippingAddress',
+      type: 'nested',
+      fields: [
+        { name: 'street', type: 'text' },
+        { name: 'city', type: 'text' },
+        { name: 'zipCode', type: 'text' },
+        { name: 'country', type: 'text' }
+      ]
+    },
+
+    {
+      name: 'notes',
+      type: 'array'
+    },
+
+    {
+      name: 'products',
+      type: 'subdocument',
+      fields: [
+        {
+          name: 'product',
+          type: 'relation',
+          endpoint: 'products'
+        },
+        { name: 'quantity', type: 'number' },
+        { name: 'unitPrice', type: 'number' }
+      ]
+    }
+];
 
 }

@@ -9,7 +9,9 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
     <h2>Invoices</h2>
     <app-generic-list
       endpoint="invoices"
-      [fields]="fields">
+      [fields]="fields"
+      [searchFields]="searchFields">
+
     </app-generic-list>
   `
 })
@@ -24,6 +26,28 @@ export class InvoicesPage {
         { name: 'date', type: 'date' }
         ]
     }
+    ];
+
+    searchFields = [
+      { name: 'customer', type: 'text' },
+
+      // 🔥 ROOT RANGE
+      { name: 'createdAt', type: 'range-date' },
+
+      {
+        name: 'items',
+        type: 'subdocument',
+        fields: [
+          { name: 'description', type: 'text' },
+          { name: 'quantity', type: 'number' },
+
+          // 🔥 SUBDOCUMENT RANGE NUMBER
+          { name: 'price', type: 'range-number' },
+
+          // 🔥 SUBDOCUMENT RANGE DATE
+          { name: 'date', type: 'range-date' }
+        ]
+      }
     ];
 
 }
