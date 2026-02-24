@@ -1,3 +1,4 @@
+// components/generic-list/generic-list.components.ts
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,13 +21,23 @@ export class GenericListComponent implements OnInit {
   editingItem: any = null;
   relationsData: any = {};
 
+  @Input() searchFields!: any[];
+  searchModel: any = {};
+
   /** 🔥 Cache pour éviter double download */
   private loadedRelationEndpoints = new Set<string>();
 
   constructor(private service: BaseService<any>) {}
 
   ngOnInit() {
+    // 🔹 Form CRUD
     this.initializeModelStructure(this.form, this.fields);
+
+    // 🔹 Search model
+    if (this.searchFields?.length) {
+      this.initializeModelStructure(this.searchModel, this.searchFields, true);
+    }
+
     this.load();
     this.loadRelationsRecursive(this.fields); // 🔥 remplacé
   }
@@ -85,31 +96,46 @@ export class GenericListComponent implements OnInit {
     return this.editingItem ? this.editingItem : this.form;
   }
 
-  initializeModelStructure(model: any, fields: any[]) {
+initializeModelStructure(model: any, fields: any[], isSearch = false) {
 
-    fields.forEach(field => {
+  fields.forEach(field => {
 
-      if (field.type === 'nested') {
+    if (field.type === 'nested') {
 
+      if (!model[field.name]) {
+        model[field.name] = {};
+      }
+
+      this.initializeModelStructure(
+        model[field.name],
+        field.fields,
+        isSearch
+      );
+    }
+
+    if (field.type === 'array') {
+
+      if (!model[field.name]) {
+        model[field.name] = [];
+      }
+    }
+
+    if (field.type === 'subdocument') {
+
+      if (isSearch) {
+        // 🔥 MODE SEARCH → objet simple
         if (!model[field.name]) {
           model[field.name] = {};
         }
 
         this.initializeModelStructure(
           model[field.name],
-          field.fields
+          field.fields,
+          true
         );
-      }
 
-      if (field.type === 'array') {
-
-        if (!model[field.name]) {
-          model[field.name] = [];
-        }
-      }
-
-      if (field.type === 'subdocument') {
-
+      } else {
+        // 🔥 MODE CRUD NORMAL → array
         if (!model[field.name]) {
           model[field.name] = [];
         }
@@ -118,9 +144,10 @@ export class GenericListComponent implements OnInit {
           this.initializeModelStructure(item, field.fields);
         });
       }
+    }
 
-    });
-  }
+  });
+}
 
   // =============================
   // SUBDOCUMENT
@@ -142,6 +169,55 @@ export class GenericListComponent implements OnInit {
   removeSubdocumentItem(fieldName: string, index: number) {
     this.currentModel[fieldName].splice(index, 1);
   }
+
+
+  
+  // =============================
+  // SEARCH
+  // =============================
+
+search() {
+
+  const flatParams = this.flattenSearchModel(this.searchModel);
+
+  console.log("🔥 FLATTENED SEARCH:", flatParams);
+
+  this.service
+    .getAllWithParams(this.endpoint, flatParams)
+    .subscribe(data => this.items = data);
+}
+
+
+  resetSearch() {
+    this.searchModel = {};
+    this.initializeModelStructure(this.searchModel, this.searchFields);
+    this.load();
+  }
+
+
+  private flattenSearchModel(obj: any, parentKey = '', result: any = {}) {
+
+    Object.keys(obj).forEach(key => {
+
+      const value = obj[key];
+
+      if (value === null || value === undefined || value === '') return;
+
+      const newKey = parentKey ? `${parentKey}.${key}` : key;
+
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        this.flattenSearchModel(value, newKey, result);
+      } else {
+        result[newKey] = value;
+      }
+
+    });
+
+    return result;
+  }
+
+
+
 
   // =============================
   // CRUD

@@ -4,7 +4,8 @@
 <ng-container
   *ngTemplateOutlet="renderFields;
                      context:{ model: currentModel,
-                               fields: fields }">
+                               fields: fields,
+                               isSearch: false }">
 </ng-container>
 
 <button type="button"
@@ -13,6 +14,20 @@
 </button>
 
 <hr>
+
+<h3>Recherche</h3>
+
+<ng-container
+  *ngTemplateOutlet="renderFields;
+                     context:{ model: searchModel,
+                               fields: searchFields,
+                               isSearch: true }">
+</ng-container>
+
+<button type="button" (click)="search()">Rechercher</button>
+<button type="button" (click)="resetSearch()">Reset</button>
+
+
 
 <!-- ===== TABLE LISTING ===== -->
 <table border="1">
@@ -91,17 +106,47 @@
 
 <ng-template #renderFields
              let-model="model"
-             let-fields="fields">
+             let-fields="fields"
+             let-isSearch="isSearch">
 
   <div *ngFor="let field of fields; trackBy: trackByIndex"
        style="margin-bottom:10px">
 
+    <!-- ===== INPUT DATE ===== -->
+    <div *ngIf="field.type === 'range-date'">
+
+      <input type="date"
+            [(ngModel)]="model[field.name + '_from']"
+            [placeholder]="field.name + ' from'" />
+
+      <input type="date"
+            [(ngModel)]="model[field.name + '_to']"
+            [placeholder]="field.name + ' to'" />
+
+    </div>
+
+    <!-- ===== INPUT NUMBER ===== -->
+    <div *ngIf="field.type === 'range-number'">
+
+      <input type="number"
+            [(ngModel)]="model[field.name + '_min']"
+            [placeholder]="field.name + ' min'" />
+
+      <input type="number"
+            [(ngModel)]="model[field.name + '_max']"
+            [placeholder]="field.name + ' max'" />
+
+    </div>
+
+
     <!-- ===== INPUT SIMPLE ===== -->
-    <input *ngIf="field.type !== 'nested'
-                  && field.type !== 'array'
-                  && field.type !== 'relation'
-                  && field.type !== 'select'
-                  && field.type !== 'subdocument'"
+<input *ngIf="field.type !== 'nested'
+              && field.type !== 'array'
+              && field.type !== 'relation'
+              && field.type !== 'select'
+              && field.type !== 'subdocument'
+              && field.type !== 'range-date'
+              && field.type !== 'range-number'"
            [type]="field.type"
            [(ngModel)]="model[field.name]"
            [placeholder]="field.name" />
@@ -154,50 +199,84 @@
 
       <strong>{{ field.name }}</strong>
 
-      <ng-container
-        *ngTemplateOutlet="renderFields;
-                           context:{
-                             model: model[field.name],
-                             fields: field.fields
-                           }">
+      <ng-container *ngIf="isSearch">
+        <ng-container
+          *ngTemplateOutlet="renderFields;
+                             context:{
+                               model: model[field.name],
+                               fields: field.fields,
+                               isSearch: true
+                             }">
+        </ng-container>
+      </ng-container>
+
+      <ng-container *ngIf="!isSearch">
+        <ng-container
+          *ngTemplateOutlet="renderFields;
+                             context:{
+                               model: model[field.name],
+                               fields: field.fields,
+                               isSearch: false
+                             }">
+        </ng-container>
       </ng-container>
 
     </div>
 
     <!-- ===== SUBDOCUMENT ===== -->
     <div *ngIf="field.type === 'subdocument'"
-         style="margin-left:20px;
+        style="margin-left:20px;
                 border-left:2px solid #4CAF50;
                 padding-left:10px">
 
       <strong>{{ field.name }}</strong>
 
-      <div *ngFor="let subItem of model[field.name];
-                   let i = index;
-                   trackBy: trackByIndex"
-           style="margin-bottom:10px;
-                  padding:10px;
-                  border:1px solid #ccc">
+      <!-- 🔥 MODE RECHERCHE -->
+      <ng-container *ngIf="isSearch">
 
         <ng-container
           *ngTemplateOutlet="renderFields;
                             context:{
-                              model: subItem,
-                              fields: field.fields
+                              model: model[field.name],
+                              fields: field.fields,
+                              isSearch: true
                             }">
         </ng-container>
 
+      </ng-container>
+
+      <!-- 🔥 MODE CRUD NORMAL -->
+      <ng-container *ngIf="!isSearch">
+
+        <div *ngFor="let subItem of model[field.name];
+                    let i = index;
+                    trackBy: trackByIndex"
+            style="margin-bottom:10px;
+                    padding:10px;
+                    border:1px solid #ccc">
+
+          <ng-container
+            *ngTemplateOutlet="renderFields;
+                              context:{
+                                model: subItem,
+                                fields: field.fields,
+                                isSearch: false
+                              }">
+          </ng-container>
+
+          <button type="button"
+                  (click)="removeSubdocumentItem(field.name, i)">
+            Supprimer ligne
+          </button>
+
+        </div>
+
         <button type="button"
-                (click)="removeSubdocumentItem(field.name, i)">
-          Supprimer ligne
+                (click)="addSubdocumentItem(field)">
+          Ajouter ligne
         </button>
 
-      </div>
-
-      <button type="button"
-              (click)="addSubdocumentItem(field)">
-        Ajouter ligne
-      </button>
+      </ng-container>
 
     </div>
 
