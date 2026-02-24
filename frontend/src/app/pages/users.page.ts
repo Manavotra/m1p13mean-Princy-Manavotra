@@ -8,7 +8,8 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
     <h2>Users</h2>
     <app-generic-list
       endpoint="users"
-      [fields]="fields">
+      [fields]="fields"
+      [searchFields]="searchFields">
     </app-generic-list>
   `
 })
@@ -17,5 +18,12 @@ export class UsersPage {
     { name: 'name', type: 'text' },
     { name: 'email', type: 'text' },
     { name: 'manager', type: 'relation', endpoint: 'users' }
+  ];
+
+  searchFields = [
+    { name: 'name', type: 'text' },
+    { name: 'email', type: 'text' },
+    { name: 'manager', type: 'relation', endpoint: 'users' }
+
   ];
 }

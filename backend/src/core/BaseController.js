@@ -1,11 +1,13 @@
 // src/core/BaseController.js
+
+import QueryBuilder from './QueryBuilder.js';
+
 export default class BaseController {
   constructor(model) {
     this.model = model;
     this.populateFields = this.detectRelations(model);
   }
 
-  // 🔎 Détection automatique des champs ref
   // =========================
   // 🔎 Detect Relations + Virtuals
   // =========================
@@ -41,7 +43,6 @@ export default class BaseController {
     return relations;
   }
 
-  // 🧠 Population intelligente
   // =========================
   // 🧠 Population automatique
   // =========================
@@ -65,11 +66,21 @@ export default class BaseController {
 
   getAll = async (req, res) => {
     try {
-      let query = this.model.find();
+
+      const filter = QueryBuilder.buildFilter(
+        req.query,
+        this.model);
+
+      let query = this.model.find(filter);
+
       query = this.applyPopulation(query, req);
+
       const data = await query;
+
       res.json(data);
+
     } catch (err) {
+      console.error("GET ALL ERROR:", err);
       res.status(500).json(err.message);
     }
   };
