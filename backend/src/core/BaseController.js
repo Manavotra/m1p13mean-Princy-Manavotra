@@ -2,6 +2,8 @@
 
 import QueryBuilder from './QueryBuilder.js';
 
+import fs from 'fs';
+
 export default class BaseController {
   constructor(model) {
     this.model = model;
@@ -108,6 +110,10 @@ export default class BaseController {
   create = async (req, res) => {
     console.log("CREATE BODY:", req.body);
     try {
+
+      // 🔥 Injecte fichiers si présents
+      this.processFiles(req);
+
       const item = await this.model.create(req.body);
       console.log("CREATED:", item);
       res.status(201).json(item);
@@ -124,17 +130,31 @@ export default class BaseController {
     console.log("Body:", req.body);
 
     try {
-      const item = await this.model.findByIdAndUpdate(
+
+      const oldDoc = await this.model.findById(req.params.id);
+
+      // 🔥 Injecte fichiers si présents
+      this.processFiles(req);
+
+
+      const updated = await this.model.findByIdAndUpdate(
         req.params.id,
         req.body,
-        { new: true,
-          runValidators: true
-        }
+        { returnDocument: 'after', runValidators: true }
       );
 
-      console.log("Updated item:", item);
+      // 🔥 Nettoyage images inutilisées
+      const oldImages = this.extractImagePaths(oldDoc);
+      const newImages = this.extractImagePaths(updated);
 
-      res.json(item);
+      const toDelete = oldImages.filter(path => !newImages.includes(path));
+
+      toDelete.forEach(path => this.deleteFile(path));
+
+      console.log("Updated item:", updated);
+
+      res.json(updated);
+
     } catch (e) {
       console.error("UPDATE ERROR:", e);
       res.status(400).json({ error: e.message });
@@ -143,13 +163,104 @@ export default class BaseController {
 
 
   delete = async (req, res) => {
-      console.log("delete");
+    console.log("delete");
+
     try {
+
+      const doc = await this.model.findById(req.params.id);
+
+      const images = this.extractImagePaths(doc);
+
+      images.forEach(path => this.deleteFile(path));
+
       await this.model.findByIdAndDelete(req.params.id);
-      res.json({ message: 'Supprimé' });
+
+      res.json({ message: 'Deleted successfully' });
+
     } catch (e) {
       res.status(400).json({ error: e.message });
     }
   };
+
+  // =========================
+  // IMAGES
+  // =========================
+
+  setDeepValue(obj, path, value) {
+    const keys = path
+      .replace(/\]/g, '')
+      .split(/\[|\./);
+
+    let current = obj;
+
+    keys.forEach((key, index) => {
+
+      if (index === keys.length - 1) {
+        current[key] = value;
+      } else {
+        if (!current[key]) {
+          current[key] = isNaN(keys[index + 1]) ? {} : [];
+        }
+        current = current[key];
+      }
+
+    });
+  }
+
+  processFiles(req) {
+
+    // Cas single file
+    if (req.file) {
+      this.setDeepValue(req.body, req.file.fieldname, req.file.path);
+    }
+
+    // Cas multiple files
+    if (req.files) {
+
+      Object.values(req.files).flat().forEach(file => {
+        this.setDeepValue(req.body, file.fieldname, file.path);
+      });
+      }
+  }
+
+  extractImagePaths(obj, results = []) {
+
+    if (!obj) return results;
+
+    if (typeof obj === 'string') {
+
+      // Normalise Windows + Linux
+      const normalized = obj.replace(/\\/g, '/');
+
+      if (normalized.includes('uploads/')) {
+        results.push(obj);
+      }
+    }
+
+    if (Array.isArray(obj)) {
+      obj.forEach(item => this.extractImagePaths(item, results));
+    }
+
+    if (typeof obj === 'object') {
+      Object.values(obj).forEach(value => {
+        this.extractImagePaths(value, results);
+      });
+    }
+
+    return results;
+  }
+
+
+  deleteFile(path) {
+
+    if (!path) return;
+
+    const normalized = path.replace(/\\/g, '/');
+
+    if (fs.existsSync(normalized)) {
+      fs.unlinkSync(normalized);
+      console.log("🗑 Deleted:", normalized);
+    }
+  }
 
 }

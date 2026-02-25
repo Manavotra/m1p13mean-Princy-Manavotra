@@ -223,6 +223,25 @@ search() {
   // CRUD
   // =============================
 
+  onFileChange(event: any, model: any, fieldName: string) {
+
+    const file = event.target.files[0];
+
+    if (file) {
+      model[fieldName] = file;
+    }
+  }
+
+  isImagePath(value: any): boolean {
+    return typeof value === 'string' && value.includes('uploads');
+  }
+
+
+  getImageUrl(path: string): string {
+    return `${this.service['api'].replace('/api/', '/')}${path}`;
+  }
+
+
   submit() {
     this.service.create(this.endpoint, this.form)
       .subscribe(() => {

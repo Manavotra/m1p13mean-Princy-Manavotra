@@ -83,6 +83,14 @@
         {{ item[field.name].join(', ') }}
       </span>
 
+
+      <!-- ===== IMAGE DISPLAY ===== -->
+      <img *ngIf="field.type === 'image' && item[field.name]"
+          [src]="getImageUrl(item[field.name])"
+          width="60"
+          style="border-radius:4px;" />
+
+
       <!-- ===== SIMPLE DISPLAY ===== -->
       <span *ngIf="field.type !== 'nested'
                     && field.type !== 'subdocument'
@@ -138,18 +146,33 @@
 
     </div>
 
+    <!-- ===== IMAGE UPLOAD ===== -->
+    <div *ngIf="field.type === 'image'">
+
+      <input type="file"
+            (change)="onFileChange($event, model, field.name)" />
+
+      <!-- Preview -->
+      <div *ngIf="model[field.name] && isImagePath(model[field.name])">
+        <img [src]="getImageUrl(model[field.name])"
+            width="100"
+            style="margin-top:5px; border:1px solid #ccc;" />
+      </div>
+
+    </div>
+
 
     <!-- ===== INPUT SIMPLE ===== -->
-<input *ngIf="field.type !== 'nested'
-              && field.type !== 'array'
-              && field.type !== 'relation'
-              && field.type !== 'select'
-              && field.type !== 'subdocument'
-              && field.type !== 'range-date'
-              && field.type !== 'range-number'"
-           [type]="field.type"
-           [(ngModel)]="model[field.name]"
-           [placeholder]="field.name" />
+    <input *ngIf="field.type !== 'nested'
+                  && field.type !== 'array'
+                  && field.type !== 'relation'
+                  && field.type !== 'select'
+                  && field.type !== 'subdocument'
+                  && field.type !== 'range-date'
+                  && field.type !== 'range-number'"
+              [type]="field.type"
+              [(ngModel)]="model[field.name]"
+              [placeholder]="field.name" />
 
     <!-- ===== SELECT ENUM ===== -->
     <select *ngIf="field.type === 'select'"
