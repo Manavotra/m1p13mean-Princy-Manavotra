@@ -13,37 +13,60 @@ export default class BaseController {
   // =========================
   // 🔎 Detect Relations + Virtuals
   // =========================
-  detectRelations(model) {
-    const relations = [];
+detectRelations(model) {
+  const relations = [];
 
-    // Champs classiques
-    Object.keys(model.schema.paths).forEach(path => {
-      const field = model.schema.paths[path];
+  const walkSchema = (schema, prefix = '') => {
 
-      // Ref simple
+    Object.keys(schema.paths).forEach(path => {
+
+      const fullPath = prefix ? `${prefix}.${path}` : path;
+      const field = schema.paths[path];
+
+      // 🔹 Ref simple
       if (field.options?.ref) {
-        relations.push(path);
+        relations.push(fullPath);
       }
 
-      // Tableau de ref
+      // 🔹 Tableau de ref
       if (
         field.instance === 'Array' &&
         field.caster?.options?.ref
       ) {
-        relations.push(path);
+        relations.push(fullPath);
       }
+
+      // 🔥 Subdocument (single nested)
+      if (field.schema) {
+        walkSchema(field.schema, fullPath);
+      }
+
+      // 🔥 Tableau de subdocuments
+      if (
+        field.instance === 'Array' &&
+        field.schema
+      ) {
+        walkSchema(field.schema, fullPath);
+      }
+
     });
 
-    // Virtual populate
-    Object.keys(model.schema.virtuals).forEach(virtual => {
-      const v = model.schema.virtuals[virtual];
-      if (v.options?.ref) {
-        relations.push(virtual);
-      }
-    });
+    // 🔹 Virtual populate (uniquement root level)
+    if (!prefix) {
+      Object.keys(schema.virtuals).forEach(virtual => {
+        const v = schema.virtuals[virtual];
+        if (v.options?.ref) {
+          relations.push(virtual);
+        }
+      });
+    }
+  };
 
-    return relations;
-  }
+  walkSchema(model.schema);
+  
+
+  return relations;
+}
 
   // =========================
   // 🧠 Population automatique
@@ -78,6 +101,7 @@ export default class BaseController {
       query = this.applyPopulation(query, req);
 
       const data = await query;
+      console.log(JSON.stringify(data, null, 2));
 
       res.json(data);
 

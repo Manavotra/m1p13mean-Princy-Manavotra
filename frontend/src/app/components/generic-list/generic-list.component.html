@@ -9,8 +9,9 @@
 </ng-container>
 
 <button type="button"
+        [disabled]="isProcessing"
         (click)="editingItem ? save() : submit()">
-  {{ editingItem ? 'Enregistrer' : 'Ajouter' }}
+  {{ isProcessing ? 'Traitement...' : (editingItem ? 'Enregistrer' : 'Ajouter') }}
 </button>
 
 <hr>
@@ -24,8 +25,17 @@
                                isSearch: true }">
 </ng-container>
 
-<button type="button" (click)="search()">Rechercher</button>
-<button type="button" (click)="resetSearch()">Reset</button>
+<button type="button"
+        [disabled]="isProcessing"
+        (click)="search()">
+  Rechercher
+</button>
+
+<button type="button"
+        [disabled]="isProcessing"
+        (click)="resetSearch()">
+  Reset
+</button>
 
 
 
@@ -41,31 +51,62 @@
   <tr *ngFor="let item of items; trackBy: trackByIndex">
     <td *ngFor="let field of fields; trackBy: trackByIndex">
 
-      <!-- ===== NESTED DISPLAY ===== -->
-      <ng-container *ngIf="field.type === 'nested'">
-        <div *ngFor="let subField of field.fields; trackBy: trackByIndex">
-          <strong>{{ subField.name }}:</strong>
-          {{ item[field.name]?.[subField.name] }}
-        </div>
-      </ng-container>
+<!-- ===== NESTED DISPLAY (TABLE STYLE) ===== -->
+<ng-container *ngIf="field.type === 'nested'">
 
-      <!-- ===== SUBDOCUMENT DISPLAY ===== -->
-      <ng-container *ngIf="field.type === 'subdocument'">
+  <table style="width:100%; border-collapse:collapse; font-size:12px;">
+    <tr *ngFor="let subField of field.fields">
+      <td style="border:1px solid #eee; padding:4px; font-weight:600;">
+        {{ subField.name }}
+      </td>
+      <td style="border:1px solid #eee; padding:4px;">
+        {{ item[field.name]?.[subField.name] || '—' }}
+      </td>
+    </tr>
+  </table>
 
-        <div *ngIf="item[field.name]?.length === 0">
-          —
-        </div>
+</ng-container>
 
-        <ul *ngIf="item[field.name]?.length > 0">
-          <li *ngFor="let sub of item[field.name]; trackBy: trackByIndex">
-            <span *ngFor="let subField of field.fields; let last = last; trackBy: trackByIndex">
-              {{ sub[subField.name] }}
-              <span *ngIf="!last"> | </span>
-            </span>
-          </li>
-        </ul>
+<!-- ===== SUBDOCUMENT DISPLAY (TABLE STYLE) ===== -->
+<ng-container *ngIf="field.type === 'subdocument'">
 
-      </ng-container>
+  <div *ngIf="!item[field.name] || item[field.name].length === 0">
+    —
+  </div>
+
+  <table *ngIf="item[field.name]?.length > 0"
+         style="width:100%; border-collapse:collapse; font-size:12px;">
+
+    <!-- Header -->
+    <tr style="background:#f3f3f3;">
+      <th *ngFor="let subField of field.fields"
+          style="border:1px solid #ddd; padding:4px; text-align:left;">
+        {{ subField.name }}
+      </th>
+    </tr>
+
+    <!-- Rows -->
+    <tr *ngFor="let sub of item[field.name]; trackBy: trackByIndex">
+      <td *ngFor="let subField of field.fields"
+          style="border:1px solid #eee; padding:4px;">
+
+        <!-- Relation peuplée -->
+        <ng-container *ngIf="sub[subField.name]?._id; else normalValue">
+          {{ sub[subField.name][subField.displayField || 'name']
+             || sub[subField.name]._id }}
+        </ng-container>
+
+        <!-- Valeur normale -->
+        <ng-template #normalValue>
+          {{ sub[subField.name] }}
+        </ng-template>
+
+      </td>
+    </tr>
+
+  </table>
+
+</ng-container>
 
       <!-- ===== RELATION DISPLAY ===== -->
       <span *ngIf="field.type !== 'nested'
@@ -103,8 +144,17 @@
     </td>
 
     <td>
-      <button (click)="edit(item)">Modifier</button>
-      <button (click)="delete(item._id)">Supprimer</button>
+      <button type="button"
+              [disabled]="isProcessing"
+              (click)="edit(item)">
+        Modifier
+      </button>
+
+      <button type="button"
+              [disabled]="isProcessing"
+              (click)="delete(item._id)">
+        Supprimer
+      </button>
     </td>
   </tr>
 </table>
