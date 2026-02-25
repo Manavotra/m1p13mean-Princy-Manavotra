@@ -1,0 +1,39 @@
+<div class="drawer lg:drawer-open">
+  <input id="customer-drawer" type="checkbox" class="drawer-toggle" />
+
+  <div class="drawer-content flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <app-navbar role="Client"></app-navbar>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 bg-base-100">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer bg-base-200 text-base-content p-10">
+      <div>
+        <span class="footer-title">Centre Commercial</span>
+        <a class="link link-hover">À propos</a>
+        <a class="link link-hover">Contact</a>
+      </div>
+      <div>
+        <span class="footer-title">Informations</span>
+        <a class="link link-hover">Conditions générales</a>
+        <a class="link link-hover">Politique de confidentialité</a>
+      </div>
+      <div>
+        <span class="footer-title">Projet MEAN M1P13</span>
+        <p>Aina Princy & Manavotra Jahnhah</p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Sidebar -->
+  <app-sidebar
+    drawerId="customer-drawer"
+    role="customer">
+  </app-sidebar>
+</div>
