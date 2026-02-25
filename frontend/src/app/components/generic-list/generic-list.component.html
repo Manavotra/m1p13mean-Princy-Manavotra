@@ -94,6 +94,7 @@
       <!-- ===== SIMPLE DISPLAY ===== -->
       <span *ngIf="field.type !== 'nested'
                     && field.type !== 'subdocument'
+                    && field.type !== 'image'
                     && !item[field.name]?._id
                     && !isArray(item[field.name])">
         {{ item[field.name] }}
