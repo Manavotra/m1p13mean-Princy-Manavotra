@@ -1,0 +1,31 @@
+<div class="drawer-side">
+  <label [for]="drawerId" class="drawer-overlay"></label>
+
+  <aside class="w-72 min-h-full bg-base-100 border-r">
+
+    <!-- Logo -->
+    <div class="p-6 text-2xl font-bold border-b">
+      M1P13 MEAN
+    </div>
+
+    <!-- Menu -->
+    <ul class="menu p-4 text-base-content">
+<li class="menu-title">
+  <span>{{ role.toUpperCase() }}</span>
+</li>
+
+@for (item of getMenu(); track item.label) {
+  <li>
+    <a [href]="item.link" class="flex items-center gap-2">
+      <span>{{ item.icon }}</span>
+      <span>{{ item.label }}</span>
+    </a>
+  </li>
+} @empty {
+  <li>No menu items found.</li>
+}
+
+    </ul>
+
+  </aside>
+</div>

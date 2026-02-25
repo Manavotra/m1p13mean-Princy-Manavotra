@@ -1,0 +1,200 @@
+<!-- Optional: add (window:scroll)="onScroll()" and `scrolled` boolean -->
+<header
+  class="sticky top-0 z-50 w-full
+         bg-base-100/75 backdrop-blur-md
+         border-b border-base-200"
+  [class.shadow-sm]="scrolled"
+>
+  <div class="mx-auto w-full px-4 sm:px-6">
+    <div class="h-16 flex items-center gap-4">
+
+      <!-- LEFT: Title + Badge -->
+      <div class="flex items-center gap-3 min-w-0">
+        <!-- Optional brand mark -->
+        <div class="hidden sm:flex w-9 h-9 rounded-xl bg-primary/10 items-center justify-center">
+          <span class="text-primary font-bold">{{ role.charAt(0) }}</span>
+        </div>
+
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 min-w-0">
+            <h1 class="text-lg sm:text-xl font-semibold tracking-tight truncate">
+              {{ role }} Panel
+            </h1>
+
+            <span
+              class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full
+                     text-xs font-medium border border-base-300 bg-base-100"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+              <span class="capitalize">{{ role }}</span>
+            </span>
+          </div>
+
+          <!-- Optional subtitle -->
+          <!-- <p class="text-xs opacity-60 truncate">Manage products, orders, and customers</p> -->
+        </div>
+      </div>
+
+      <!-- CENTER: Search (Command bar style) -->
+      <div class="flex-1 flex justify-center">
+        <div class="w-full max-w-2xl">
+          <label
+            class="group flex items-center gap-2
+                   h-11 rounded-full
+                   border border-base-300 bg-base-100/60
+                   px-4
+                   focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/20
+                   transition"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-4 w-4 opacity-60 group-focus-within:opacity-90 transition"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+
+            <input
+              type="text"
+              placeholder="Search products, orders, customers…"
+              class="w-full bg-transparent outline-none text-sm"
+            />
+
+            <span class="hidden md:inline-flex text-xs opacity-50 border border-base-300 rounded-md px-2 py-1">
+              Ctrl K
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- RIGHT: Actions + User -->
+      <div class="flex items-center gap-2">
+
+        <!-- Theme toggle -->
+        <button
+          class="btn btn-ghost btn-circle h-10 w-10
+                 hover:bg-base-200 active:scale-95 transition"
+          (click)="toggleTheme()"
+          aria-label="Toggle theme"
+          title="Toggle theme"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg"
+               class="h-5 w-5"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 3v1m0 16v1m8.66-10H21M3 12H2m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707"/>
+          </svg>
+        </button>
+
+        <!-- Notifications -->
+        <div class="dropdown dropdown-end">
+          <label
+            tabindex="0"
+            class="btn btn-ghost btn-circle h-10 w-10
+                   hover:bg-base-200 active:scale-95 transition relative"
+            aria-label="Notifications"
+            title="Notifications"
+          >
+            <!-- dot -->
+            <span class="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-base-100"></span>
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-5 w-5"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 17h5l-1.405-1.405M19 13V8a7 7 0 10-14 0v5l-1.405 1.405M9 21h6"/>
+            </svg>
+          </label>
+
+          <div
+            tabindex="0"
+            class="dropdown-content mt-3 w-96 max-w-[92vw]
+                   bg-base-100 border border-base-200 rounded-2xl shadow-xl overflow-hidden"
+          >
+            <div class="px-4 py-3 border-b border-base-200 flex items-center justify-between">
+              <div class="font-semibold">Notifications</div>
+              <button class="btn btn-ghost btn-xs">Mark all read</button>
+            </div>
+
+            <div class="max-h-80 overflow-auto p-2">
+              <div class="p-3 text-sm opacity-70">No new notifications</div>
+
+              <!-- Example item
+              <a class="flex gap-3 p-3 rounded-xl hover:bg-base-200 transition">
+                <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-semibold">O</div>
+                <div class="min-w-0">
+                  <div class="text-sm font-medium truncate">Order #4821 shipped</div>
+                  <div class="text-xs opacity-60">2 minutes ago</div>
+                </div>
+              </a>
+              -->
+            </div>
+
+            <div class="p-3 border-t border-base-200">
+              <button class="btn btn-outline btn-sm w-full rounded-xl">View all</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart (Client only) -->
+        @if (role === 'Client') {
+          <div class="indicator">
+            <span class="indicator-item badge badge-primary badge-sm">3</span>
+            <button
+              class="btn btn-ghost btn-circle h-10 w-10 hover:bg-base-200 active:scale-95 transition"
+              aria-label="Cart"
+              title="Cart"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   class="h-5 w-5"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4m1.6 8L5 6m2 7l-1 5h12m-6 0a1 1 0 11-2 0 1 1 0 012 0zm6 0a1 1 0 11-2 0 1 1 0 012 0z"/>
+              </svg>
+            </button>
+          </div>
+        }
+
+        <!-- User pill (better than plain circle) -->
+        <div class="dropdown dropdown-end">
+          <label
+            tabindex="0"
+            class="flex items-center gap-2 h-11 pl-2 pr-3 rounded-full
+                   border border-base-300 bg-base-100/60
+                   hover:bg-base-200/60 transition cursor-pointer"
+            aria-label="Account menu"
+          >
+            <div class="relative">
+              <div class="w-9 h-9 rounded-full bg-primary text-primary-content flex items-center justify-center font-semibold">
+                {{ role.charAt(0) }}
+              </div>
+              <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-success ring-2 ring-base-100"></span>
+            </div>
+
+            <div class="hidden sm:flex flex-col leading-tight">
+              <span class="text-sm font-medium capitalize">{{ role }}</span>
+              <span class="text-xs opacity-60">Online</span>
+            </div>
+
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-60 ml-1 hidden sm:block"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </label>
+
+          <ul
+            tabindex="0"
+            class="dropdown-content mt-3 p-2 w-56
+                   bg-base-100 border border-base-200 rounded-2xl shadow-xl menu menu-sm"
+          >
+            <li class="menu-title"><span>Account</span></li>
+            <li><a>Profile</a></li>
+            <li><a>Settings</a></li>
+            <li class="divider my-1"></li>
+            <li><a class="text-error">Logout</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</header>

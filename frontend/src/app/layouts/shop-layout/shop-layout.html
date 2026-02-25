@@ -1,0 +1,33 @@
+<div class="drawer lg:drawer-open">
+  <input id="shop-drawer" type="checkbox" class="drawer-toggle" />
+
+  <div class="drawer-content flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <app-navbar role="Boutique"></app-navbar>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 bg-base-200">
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold">Espace Boutique</h1>
+        <p class="text-sm opacity-70">Gestion des produits et commandes</p>
+      </div>
+
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-4 bg-base-300 text-base-content">
+      <div>
+        <p>Aina Princy & Manavotra Jahnhah</p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Sidebar -->
+  <app-sidebar
+    drawerId="shop-drawer"
+    role="shop">
+  </app-sidebar>
+</div>
