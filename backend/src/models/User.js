@@ -9,7 +9,11 @@ const userSchema = new mongoose.Schema({
   manager: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }
-});
+  },
+
+  // 🔥 Nouveau champ image générique
+  avatar: String // URL ou chemin fichier
+
+}, { timestamps: true });
 
 export default mongoose.model('User', userSchema);

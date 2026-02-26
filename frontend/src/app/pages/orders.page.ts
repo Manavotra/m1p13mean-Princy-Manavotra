@@ -52,7 +52,8 @@ export class OrdersPage {
         {
           name: 'product',
           type: 'relation',
-          endpoint: 'products'
+          endpoint: 'products',
+          displayField: 'label'
         },
         { name: 'quantity', type: 'number' },
         { name: 'unitPrice', type: 'number' }
