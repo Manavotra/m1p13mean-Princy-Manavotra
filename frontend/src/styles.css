@@ -1,3 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html[data-theme*="dark"] .icon-sun { display: none; }
+html:not([data-theme*="dark"]) .icon-moon { display: none; }
