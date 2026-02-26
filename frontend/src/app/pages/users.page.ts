@@ -17,6 +17,7 @@ export class UsersPage {
   fields = [
     { name: 'name', type: 'text' },
     { name: 'email', type: 'text' },
+    { name: 'avatar', type: 'image' }, // 🔥 nouveau type
     { name: 'manager', type: 'relation', endpoint: 'users' }
   ];
 

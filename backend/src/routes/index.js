@@ -15,13 +15,27 @@ import taskController from '../controllers/task.controller.js';
 
 import orderController from '../controllers/order.controller.js';
 
+import upload from '../middlewares/upload.middleware.js';
+
 const router = express.Router();
 
 // Users
 router.get('/users', userController.getAll);
 router.get('/users/:id', userController.getOne);
-router.post('/users', userController.create);
-router.put('/users/:id', userController.update);
+
+// Upload single avatar
+router.post(
+  '/users',
+  upload.single('avatar'),
+  userController.create
+);
+
+router.put(
+  '/users/:id',
+  upload.single('avatar'),
+  userController.update
+);
+
 router.delete('/users/:id', userController.delete);
 
 // Products

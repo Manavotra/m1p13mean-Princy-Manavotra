@@ -10,6 +10,45 @@ export class BaseService<T> {
 
   private api = environment.apiUrl;
 
+  private buildFormDataIfNeeded(data: any): any {
+
+    const formData = new FormData();
+    let hasFile = false;
+
+    const appendRecursive = (obj: any, parentKey = '') => {
+
+      Object.keys(obj).forEach(key => {
+
+        const value = obj[key];
+        const fullKey = parentKey ? `${parentKey}[${key}]` : key;
+
+        if (value instanceof File) {
+          formData.append(fullKey, value);
+          hasFile = true;
+        }
+
+        else if (Array.isArray(value)) {
+          value.forEach((v, index) => {
+            appendRecursive(v, `${fullKey}[${index}]`);
+          });
+        }
+
+        else if (typeof value === 'object' && value !== null) {
+          appendRecursive(value, fullKey);
+        }
+
+        else {
+          formData.append(fullKey, value);
+        }
+
+      });
+    };
+
+    appendRecursive(data);
+
+    return hasFile ? formData : data;
+  }
+
   constructor(private http: HttpClient) {}
 
 
@@ -68,13 +107,15 @@ export class BaseService<T> {
     );
   }
 
-  create(endpoint: string, data: T) {
-    return this.http.post<T>(this.api + endpoint, data);
-  }
+create(endpoint: string, data: any) {
+  const payload = this.buildFormDataIfNeeded(data);
+  return this.http.post(this.api + endpoint, payload);
+}
 
-  update(endpoint: string, id: string, data: T) {
-    return this.http.put<T>(this.api + endpoint + '/' + id, data);
-  }
+update(endpoint: string, id: string, data: any) {
+  const payload = this.buildFormDataIfNeeded(data);
+  return this.http.put(this.api + endpoint + '/' + id, payload);
+}
 
   delete(endpoint: string, id: string) {
     return this.http.delete(this.api + endpoint + '/' + id);
