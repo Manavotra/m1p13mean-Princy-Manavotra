@@ -186,23 +186,35 @@ initializeModelStructure(model: any, fields: any[], isSearch = false) {
   // =============================
 
 search() {
-
   const flatParams = this.flattenSearchModel(this.searchModel);
 
   console.log("🔥 FLATTENED SEARCH:", flatParams);
 
-  this.service
-    .getAllWithParams(this.endpoint, flatParams)
-    .subscribe(data => 
-      this.items = data);
+  this.service.getAllWithParams(this.endpoint, flatParams)
+    .subscribe(data => {
+      this.items = [...data];      // 🔹 Nouvelle référence pour Angular
+      this.cdr.detectChanges();    // 🔹 Force le rafraîchissement immédiat
+    });
 }
 
 
-  resetSearch() {
-    this.searchModel = {};
-    this.initializeModelStructure(this.searchModel, this.searchFields);
-    this.load();
-  }
+resetSearch() {
+  this.searchModel = {};
+  this.initializeModelStructure(this.searchModel, this.searchFields);
+
+  this.service.getAll(this.endpoint)
+    .subscribe(data => {
+      this.items = [...data];      // 🔹 Nouvelle référence
+      this.cdr.detectChanges();    // 🔹 Angular voit le changement
+    });
+}
+
+
+  // resetSearch() {
+  //   this.searchModel = {};
+  //   this.initializeModelStructure(this.searchModel, this.searchFields);
+  //   this.load();
+  // }
 
 
   private flattenSearchModel(obj: any, parentKey = '', result: any = {}) {
@@ -242,41 +254,31 @@ search() {
     return `${this.service['api'].replace('/api/', '/')}${path}`;
   }
 
+  refreshList() {
+    this.service.getAll(this.endpoint)
+      .subscribe(data => {
+        this.items = [...data];   // 🔹 Nouvelle référence pour Angular
+        this.cdr.detectChanges(); // 🔹 Force le rafraîchissement
+      });
+  }
+
 
 submit() {
-
   if (this.isProcessing) return;
-
   this.isProcessing = true;
 
   const payload = this.buildPayload(this.form);
 
   this.service.create(this.endpoint, payload)
     .subscribe({
-      next: (createdItem: any) => {
-
-        console.log("TYPE:", typeof createdItem);
-        console.log("DATA:", createdItem);
-
-        // 🔥 CLONE PROPRE pour éviter les problèmes Angular
-        const itemClone = JSON.parse(JSON.stringify(createdItem));
-
-        this.items = [itemClone, ...this.items];
-
-
+      next: () => {
         this.form = {};
         this.initializeModelStructure(this.form, this.fields);
-
+        this.refreshList();           // 🔹 Rafraîchit tout
         this.isProcessing = false;
-
-        // 🔥 Force Angular à voir le changement
-        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error("CREATE ERROR", err);
-        this.isProcessing = false;
-      },
-      complete: () => {
         this.isProcessing = false;
       }
     });
@@ -288,57 +290,39 @@ submit() {
   }
 
 save() {
-
   if (this.isProcessing) return;
-
   this.isProcessing = true;
 
   const payload = this.buildPayload(this.editingItem);
 
   this.service.update(this.endpoint, this.editingItem._id, payload)
     .subscribe({
-      next: (updatedItem: any) => {
-
-        const index = this.items.findIndex(i => i._id === updatedItem._id);
-
-        if (index !== -1) {
-          this.items[index] = updatedItem;
-          this.items = [...this.items];
-        }
-
+      next: () => {
         this.editingItem = null;
+        this.refreshList();           // 🔹 Rafraîchit tout
         this.isProcessing = false;
-
-        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error("UPDATE ERROR", err);
-        this.isProcessing = false;
-      },
-      complete: () => {
         this.isProcessing = false;
       }
     });
 }
 
+
 delete(id: string) {
-
   if (this.isProcessing) return;
-
   this.isProcessing = true;
 
   this.service.delete(this.endpoint, id)
     .subscribe({
       next: () => {
-        this.items = this.items.filter(item => item._id !== id);
-        this.items = [...this.items]; // 🔥 trigger change detection
+        this.refreshList();           // 🔹 Rafraîchit tout
         this.isProcessing = false;
-        this.cdr.detectChanges();   // 🔥 Angular voit le changement immédiatement
       },
       error: (err) => {
         console.error("DELETE ERROR", err);
         this.isProcessing = false;
-        this.cdr.detectChanges();
       }
     });
 }
