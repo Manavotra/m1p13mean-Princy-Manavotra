@@ -58,10 +58,6 @@
               placeholder="Search products, orders, customers…"
               class="w-full bg-transparent outline-none text-sm"
             />
-
-            <span class="hidden md:inline-flex text-xs opacity-50 border border-base-300 rounded-md px-2 py-1">
-              Ctrl K
-            </span>
           </label>
         </div>
       </div>
@@ -70,40 +66,46 @@
       <div class="flex items-center gap-2">
 
         <!-- Theme toggle -->
-        <button
-          class="btn btn-ghost btn-circle h-10 w-10
-                 hover:bg-base-200 active:scale-95 transition"
-          (click)="toggleTheme()"
-          aria-label="Toggle theme"
-          title="Toggle theme"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg"
-               class="h-5 w-5"
-               fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 3v1m0 16v1m8.66-10H21M3 12H2m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707"/>
-          </svg>
-        </button>
+<button
+  class="btn btn-ghost btn-circle h-10 w-10 hover:bg-base-200 active:scale-95 transition"
+  (click)="toggleTheme()"
+  aria-label="Toggle theme"
+  title="Toggle theme"
+>
+  <!-- Sun (visible in light mode) -->
+  <svg class="icon-sun h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+       viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364-1.414 1.414M7.05 16.95l-1.414 1.414m0-11.314L7.05 7.05m9.9 9.9 1.414 1.414M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+  </svg>
+
+  <!-- Moon (visible in dark mode) -->
+  <svg class="icon-moon h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none"
+       viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+  </svg>
+</button>
 
         <!-- Notifications -->
         <div class="dropdown dropdown-end">
-          <label
-            tabindex="0"
-            class="btn btn-ghost btn-circle h-10 w-10
-                   hover:bg-base-200 active:scale-95 transition relative"
-            aria-label="Notifications"
-            title="Notifications"
-          >
-            <!-- dot -->
-            <span class="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-base-100"></span>
+<label
+  tabindex="0"
+  class="btn btn-ghost btn-circle h-10 w-10
+         hover:bg-base-200 active:scale-95 transition relative"
+  aria-label="Notifications"
+  title="Notifications"
+>
+  <!-- dot -->
+  <span class="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-base-100"></span>
 
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="h-5 w-5"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 17h5l-1.405-1.405M19 13V8a7 7 0 10-14 0v5l-1.405 1.405M9 21h6"/>
-            </svg>
-          </label>
+  <!-- Cleaner bell icon -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+       viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15 17h5l-1.5-1.5a2 2 0 01-.5-1.3V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.5 1.3L4 17h5m6 0a3 3 0 01-6 0"/>
+  </svg>
+</label>
 
           <div
             tabindex="0"
@@ -125,8 +127,8 @@
                   <div class="text-sm font-medium truncate">Order #4821 shipped</div>
                   <div class="text-xs opacity-60">2 minutes ago</div>
                 </div>
-              </a>
-              -->
+              </a> -->
+             
             </div>
 
             <div class="p-3 border-t border-base-200">
@@ -136,23 +138,26 @@
         </div>
 
         <!-- Cart (Client only) -->
-        @if (role === 'Client') {
-          <div class="indicator">
-            <span class="indicator-item badge badge-primary badge-sm">3</span>
-            <button
-              class="btn btn-ghost btn-circle h-10 w-10 hover:bg-base-200 active:scale-95 transition"
-              aria-label="Cart"
-              title="Cart"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg"
-                   class="h-5 w-5"
-                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 3h2l.4 2M7 13h10l4-8H5.4m1.6 8L5 6m2 7l-1 5h12m-6 0a1 1 0 11-2 0 1 1 0 012 0zm6 0a1 1 0 11-2 0 1 1 0 012 0z"/>
-              </svg>
-            </button>
-          </div>
-        }
+@if (role === 'Client') {
+  <div class="indicator">
+<span class="indicator-item badge badge-primary badge-sm top-2 right-2">
+  3
+</span>
+
+    <button
+      class="btn btn-ghost btn-circle h-10 w-10 hover:bg-base-200 active:scale-95 transition"
+      aria-label="Cart"
+      title="Cart"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg"
+           class="h-5 w-5"
+           fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4m1.6 8L5 6m2 7l-1 5h12m-6 0a1 1 0 11-2 0 1 1 0 012 0zm6 0a1 1 0 11-2 0 1 1 0 012 0z"/>
+      </svg>
+    </button>
+  </div>
+}
 
         <!-- User pill (better than plain circle) -->
         <div class="dropdown dropdown-end">
@@ -181,17 +186,21 @@
             </svg>
           </label>
 
-          <ul
-            tabindex="0"
-            class="dropdown-content mt-3 p-2 w-56
-                   bg-base-100 border border-base-200 rounded-2xl shadow-xl menu menu-sm"
-          >
-            <li class="menu-title"><span>Account</span></li>
-            <li><a>Profile</a></li>
-            <li><a>Settings</a></li>
-            <li class="divider my-1"></li>
-            <li><a class="text-error">Logout</a></li>
-          </ul>
+<ul
+  tabindex="0"
+  class="dropdown-content mt-3 p-2 w-56
+         bg-base-100 border border-base-200 rounded-2xl shadow-xl menu menu-sm"
+>
+  <li class="menu-title"><span>Account</span></li>
+  <li><a>Profile</a></li>
+  <li><a>Settings</a></li>
+
+  <li class="my-1 px-2">
+    <hr class="border-base-200 opacity-70" />
+  </li>
+
+  <li><a class="text-error">Logout</a></li>
+</ul>
         </div>
 
       </div>

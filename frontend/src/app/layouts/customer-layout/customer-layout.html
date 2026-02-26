@@ -4,7 +4,7 @@
   <div class="drawer-content flex flex-col min-h-screen">
 
     <!-- Navbar -->
-    <app-navbar role="Client"></app-navbar>
+    <app-navbar role="Client" class="sticky top-0 z-50"></app-navbar>
 
     <!-- Main Content -->
     <main class="flex-1 p-6 bg-base-100">
@@ -12,20 +12,23 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer bg-base-200 text-base-content p-10">
-      <div>
-        <span class="footer-title">Centre Commercial</span>
-        <a class="link link-hover">À propos</a>
-        <a class="link link-hover">Contact</a>
-      </div>
-      <div>
-        <span class="footer-title">Informations</span>
-        <a class="link link-hover">Conditions générales</a>
-        <a class="link link-hover">Politique de confidentialité</a>
-      </div>
-      <div>
-        <span class="footer-title">Projet MEAN M1P13</span>
-        <p>Aina Princy & Manavotra Jahnhah</p>
+    <footer class="border-t border-base-300 bg-base-100/80 backdrop-blur-md">
+      <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="text-sm">
+          <span class="font-semibold">Centre Commercial</span>
+          <span class="opacity-60"> · Administration</span>
+          <div class="text-xs opacity-60 mt-1">
+            © {{ year }} — Tous droits réservés.
+          </div>
+        </div>
+
+        <p class="text-sm opacity-70 text-center sm:text-right">
+          Projet réalisé par <span class="font-medium">RATSIMBA Tahiana</span>
+          <span class="font-medium"> Princy </span>&amp;
+          <span class="font-medium"> Jahnhah </span>
+          <span class="font-medium">Manavotra </span>
+          <span class="font-medium">Féliciana</span>
+        </p>
       </div>
     </footer>
 

@@ -10,5 +10,5 @@ import { NavbarComponent } from "../../shared/components/navbar/navbar";
   styleUrl: './shop-layout.css',
 })
 export class ShopLayout {
-
+year = new Date().getFullYear();
 }

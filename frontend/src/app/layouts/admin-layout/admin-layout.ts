@@ -10,5 +10,7 @@ import { SidebarComponent } from "../../shared/components/sidebar/sidebar";
   styleUrl: './admin-layout.css',
 })
 export class AdminLayout {
+new: any;
+year = new Date().getFullYear();
 
 }

@@ -10,5 +10,6 @@ import { RouterOutlet } from "@angular/router";
   styleUrl: './customer-layout.css',
 })
 export class CustomerLayout {
+  year = new Date().getFullYear();
 
 }
