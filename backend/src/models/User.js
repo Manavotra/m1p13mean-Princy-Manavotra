@@ -1,19 +1,30 @@
 // src/models/User.js
 import mongoose from 'mongoose';
 
-const userSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
+
   name: String,
-  // email: String,
-  email: { type: String, required: true, unique: true },
-  role: String,
-  manager: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+
+  email: {
+    type: String,
+    required: true,
+    unique: true
   },
 
-  // 🔥 Nouveau champ image générique
-  avatar: String // URL ou chemin fichier
+  role: {
+    type: String,
+    enum: ['ADMIN', 'VENDEUR', 'ACHETEUR'],
+    default: 'ACHETEUR'
+  },
+
+  avatar: String, //url
+
+  status: {
+    type: String,
+    enum: ['ACTIF', 'INACTIF'],
+    default: 'ACTIF'
+  }
 
 }, { timestamps: true });
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model('User', UserSchema);
