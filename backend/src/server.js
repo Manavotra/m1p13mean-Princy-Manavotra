@@ -1,11 +1,18 @@
-import mongoose from "mongoose";
+// src/server.js
+import dotenv from "dotenv";
+dotenv.config();
 
-export async function connectDB() {
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("✅ MongoDB connected");
-  } catch (err) {
-    console.error("❌ MongoDB connection error:", err.message);
-    process.exit(1);
-  }
+import app from "./app.js";
+import { connectDB } from "./config/database.js";
+
+const PORT = process.env.PORT || 3000;
+
+try {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`🚀 API listening on port ${PORT}`);
+  });
+} catch (err) {
+  console.error("❌ Startup failed:", err);
+  process.exit(1);
 }
