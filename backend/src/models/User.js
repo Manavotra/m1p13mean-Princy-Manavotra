@@ -17,13 +17,8 @@ const UserSchema = new mongoose.Schema({
     default: 'ACHETEUR'
   },
 
-  avatar: String, //url
+  avatar: String //url
 
-  status: {
-    type: String,
-    enum: ['ACTIF', 'INACTIF'],
-    default: 'ACTIF'
-  }
 
 }, { timestamps: true });
 
