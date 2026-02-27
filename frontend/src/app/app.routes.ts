@@ -1,18 +1,16 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home.component';
-import { UsersPage } from './pages/users.page';
-import { ProductsPage } from './pages/products.page';
-import { CategoriesPage } from './pages/categories.page';
-import { SubCategoriesPage } from './pages/subcategories.page';
+import { UserPage } from './pages/user.page';
+import { ShopPage } from './pages/shop.page';
+import { ProductPage } from './pages/product.page';
+import { OrderPage } from './pages/order.page';
+import { FavoritePage } from './pages/favorite.page';
+import { DiscountPage } from './pages/discount.page';
+import { CategoryPage } from './pages/category.page';
+import { CartPage } from './pages/cart.page';
 
-import { ProjectsPage } from './pages/projects.page';
-import { InvoicesPage } from './pages/invoices.page';
-import { AuthorsPage } from './pages/authors.page';
-import { BooksPage } from './pages/books.page';
-import { WarehousesPage } from './pages/warehouses.page';
-import { TasksPage } from './pages/tasks.page';
 
-import { OrdersPage } from './pages/orders.page';
+
 
 import { AdminLayout } from '../app/layouts/admin-layout/admin-layout';
 import { ShopLayout } from '../app/layouts/shop-layout/shop-layout';
@@ -27,8 +25,14 @@ export const routes: Routes = [
     component: CustomerLayout,
     children: [
       { path: '', component: HomeComponent },
-      { path: 'products', component: ProductsPage },
-      { path: 'orders', component: OrdersPage }
+      { path: 'user', component: UserPage },
+      { path: 'shop', component: ShopPage },
+      { path: 'product', component: ProductPage },
+      { path: 'order', component: OrderPage },
+      { path: 'favorite', component: FavoritePage },
+      { path: 'discount', component: DiscountPage },
+      { path: 'category', component: CategoryPage },
+      { path: 'cart', component: CartPage }
     ]
   },
 
@@ -37,15 +41,15 @@ export const routes: Routes = [
     path: 'admin',
     component: AdminLayout,
     children: [
-      { path: 'users', component: UsersPage },
-      { path: 'categories', component: CategoriesPage },
-      { path: 'subcategories', component: SubCategoriesPage },
-      { path: 'projects', component: ProjectsPage },
-      { path: 'invoices', component: InvoicesPage },
-      { path: 'authors', component: AuthorsPage },
-      { path: 'books', component: BooksPage },
-      { path: 'warehouses', component: WarehousesPage },
-      { path: 'tasks', component: TasksPage }
+      // { path: 'users', component: UsersPage },
+      // { path: 'categories', component: CategoriesPage },
+      // { path: 'subcategories', component: SubCategoriesPage },
+      // { path: 'projects', component: ProjectsPage },
+      // { path: 'invoices', component: InvoicesPage },
+      // { path: 'authors', component: AuthorsPage },
+      // { path: 'books', component: BooksPage },
+      // { path: 'warehouses', component: WarehousesPage },
+      // { path: 'tasks', component: TasksPage }
     ]
   },
 
@@ -54,8 +58,8 @@ export const routes: Routes = [
     path: 'shop',
     component: ShopLayout,
     children: [
-      { path: 'products', component: ProductsPage },
-      { path: 'orders', component: OrdersPage }
+      // { path: 'products', component: ProductsPage },
+      // { path: 'orders', component: OrdersPage }
     ]
   }
 

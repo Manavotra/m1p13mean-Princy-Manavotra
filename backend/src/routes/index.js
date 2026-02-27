@@ -36,31 +36,31 @@ router.delete('/users/:id', userController.delete);
 
 
 // Shop
-router.get('/shop', shopController.getAll);
-router.get('/shop/:id', shopController.getOne);
+router.get('/shops', shopController.getAll);
+router.get('/shops/:id', shopController.getOne);
 
 // Upload single logo
 router.post(
-  '/shop',
+  '/shops',
   upload.single('logo'),
   shopController.create
 );
 
 router.put(
-  '/shop/:id',
+  '/shops/:id',
   upload.single('logo'),
   shopController.update
 );
 
-router.delete('/shop/:id', shopController.delete);
+router.delete('/shops/:id', shopController.delete);
 
 
 // Category
-router.get('/category', categoryController.getAll);
-router.get('/category/:id', categoryController.getById);
-router.post('/category', categoryController.create);
-router.put('/category/:id', categoryController.update);
-router.delete('/category/:id', categoryController.delete);
+router.get('/categories', categoryController.getAll);
+router.get('/categories/:id', categoryController.getById);
+router.post('/categories', categoryController.create);
+router.put('/categories/:id', categoryController.update);
+router.delete('/categories/:id', categoryController.delete);
 
 
 
@@ -71,35 +71,35 @@ router.get('/products', productController.getAll);
 router.get('/products/:id', productController.getOne);
 // Upload single image
 router.post(
-  '/users',
+  '/products',
   upload.single('image'),
-  userController.create
+  productController.create
 );
 
 router.put(
-  '/users/:id',
+  '/products/:id',
   upload.single('image'),
-  userController.update
+  productController.update
 );
 router.delete('/products/:id', productController.delete);
 
 
 
 // Discount
-router.get('/discount', discountController.getAll);
-router.get('/discount/:id', discountController.getById);
-router.post('/discount', discountController.create);
-router.put('/discount/:id', discountController.update);
-router.delete('/discount/:id', discountController.delete);
+router.get('/discounts', discountController.getAll);
+router.get('/discounts/:id', discountController.getById);
+router.post('/discounts', discountController.create);
+router.put('/discounts/:id', discountController.update);
+router.delete('/discounts/:id', discountController.delete);
 
 
 
 // Cart
-router.get('/cart', cartController.getAll);
-router.get('/cart/:id', cartController.getById);
-router.post('/cart', cartController.create);
-router.put('/cart/:id', cartController.update);
-router.delete('/cart/:id', cartController.delete);
+router.get('/carts', cartController.getAll);
+router.get('/carts/:id', cartController.getById);
+router.post('/carts', cartController.create);
+router.put('/carts/:id', cartController.update);
+router.delete('/carts/:id', cartController.delete);
 
 // Orders
 router.get('/orders', orderController.getAll);
@@ -111,10 +111,10 @@ router.delete('/orders/:id', orderController.delete);
 
 
 // Favorite
-router.get('/favorite', favoriteController.getAll);
-router.post('/favorite', favoriteController.create);
-router.put('/favorite/:id', favoriteController.update);
-router.delete('/favorite/:id', favoriteController.delete);
+router.get('/favorites', favoriteController.getAll);
+router.post('/favorites', favoriteController.create);
+router.put('/favorites/:id', favoriteController.update);
+router.delete('/favorites/:id', favoriteController.delete);
 
 
 export default router;

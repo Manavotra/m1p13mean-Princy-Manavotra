@@ -24,8 +24,8 @@ const ProductSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ['ACTIF', 'INACTIF'],
-    default: 'ACTIF'
+    enum: ['DISPONIBLE', 'INACTIF'],
+    default: 'DISPONIBLE'
   }
 
 }, { timestamps: true });
@@ -34,7 +34,6 @@ ProductSchema.virtual('discount', {
   ref: 'Discount',
   localField: '_id',
   foreignField: 'product',
-  justOne: true
 });
 
 ProductSchema.set('toJSON', { virtuals: true });

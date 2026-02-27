@@ -5,25 +5,27 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
   standalone: true,
   imports: [GenericListComponent],
   template: `
-    <h2>Projects</h2>
+    <h2>User</h2>
     <app-generic-list
-      endpoint="projects"
+      endpoint="users"
       [fields]="fields"
       [searchFields]="searchFields">
     </app-generic-list>
   `
 })
-export class ProjectsPage {
-
+export class UserPage {
   fields = [
     { name: 'name', type: 'text' },
-    // { name: 'status', type: 'select', options: ['draft', 'active', 'completed'] },
-    { name: 'tags', type: 'array' } // tableau simple
+    { name: 'email', type: 'text' },
+    { name: 'role', type: 'select', options: ['ADMIN', 'VENDEUR', 'ACHETEUR'] },
+    { name: 'avatar', type: 'image' }
+
   ];
 
-    searchFields = [
+  searchFields = [
     { name: 'name', type: 'text' },
-    // { name: 'status', type: 'select', options: ['draft', 'active', 'completed'] },
-    { name: 'tags', type: 'array' } // tableau simple
+    { name: 'email', type: 'text' },
+    { name: 'role', type: 'select', options: ['ADMIN', 'VENDEUR', 'ACHETEUR'] }
+
   ];
 }

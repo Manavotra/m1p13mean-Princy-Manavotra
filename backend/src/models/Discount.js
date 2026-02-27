@@ -6,7 +6,8 @@ const DiscountSchema = new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',
-    unique: true
+    // ref: 'Product',
+    // unique: true
   },
 
   type: {
@@ -18,8 +19,8 @@ const DiscountSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ['ACTIVE', 'INACTIVE'],
-    default: 'ACTIVE'
+    enum: ['EFFECTIVE', 'INACTIVE'],
+    default: 'EFFECTIVE'
   }
 
 }, { timestamps: true });
