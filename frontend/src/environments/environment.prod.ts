@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://ton-backend-en-ligne.com/api/'
+  apiUrl: 'https://m1p13mean-princy-manavotra.onrender.com'
 };
