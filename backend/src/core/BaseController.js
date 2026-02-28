@@ -248,26 +248,35 @@ detectRelations(model) {
   }
 
   extractImagePaths(obj, results = []) {
-
     if (!obj) return results;
 
+    // 1. Si c'est une string, on vérifie si c'est un chemin d'image
     if (typeof obj === 'string') {
-
-      // Normalise Windows + Linux
       const normalized = obj.replace(/\\/g, '/');
-
       if (normalized.includes('uploads/')) {
         results.push(obj);
       }
+      return results;
     }
 
+    // 2. Si c'est un tableau, on itère
     if (Array.isArray(obj)) {
       obj.forEach(item => this.extractImagePaths(item, results));
+      return results;
     }
 
-    if (typeof obj === 'object') {
-      Object.values(obj).forEach(value => {
-        this.extractImagePaths(value, results);
+    // 3. Si c'est un objet (mais pas null, pas une Date, pas un ObjectId)
+    if (typeof obj === 'object' && obj !== null && !(obj instanceof Date)) {
+      
+      // 🔥 PROTECTION : Si c'est un document Mongoose peuplé, 
+      // on ne scanne que les données réelles (_doc) pour éviter la boucle infinie
+      const target = obj._doc || obj;
+
+      Object.keys(target).forEach(key => {
+        // Optionnel : ignorer les clés internes Mongoose commençant par $ ou _
+        if (key.startsWith('$')) return; 
+        
+        this.extractImagePaths(target[key], results);
       });
     }
 

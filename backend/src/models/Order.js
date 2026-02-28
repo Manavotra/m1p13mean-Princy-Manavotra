@@ -1,4 +1,4 @@
-// models/Order.js
+// src/models/Order.js
 import mongoose from 'mongoose';
 
 const OrderItemSchema = new mongoose.Schema({
@@ -6,15 +6,17 @@ const OrderItemSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product'
   },
+  shop: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Shop'
+  },
   quantity: Number,
   unitPrice: Number
 }, { _id: false });
 
-const ShippingAddressSchema = new mongoose.Schema({
-  street: String,
-  city: String,
-  zipCode: String,
-  country: String
+const LieuSchema = new mongoose.Schema({
+  lieu: String,
+  repere_adress: String
 }, { _id: false });
 
 const OrderSchema = new mongoose.Schema({
@@ -26,14 +28,15 @@ const OrderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'shipped', 'delivered']
+    enum: ['NOUVELLE', 'EN_PREPARATION', 'EXPEDIEE', 'LIVREE'],
+    default: 'NOUVELLE'
   },
 
-  shippingAddress: ShippingAddressSchema,
+  lieuLivraison: LieuSchema,
 
-  notes: [String],
+  items: [OrderItemSchema],
 
-  products: [OrderItemSchema]
+  totalAmount: Number
 
 }, { timestamps: true });
 
