@@ -19,14 +19,17 @@ app.use(express.json());
 app.get("/health", (req, res) => res.status(200).json({ ok: true }));
 
 // SESSION CONFIG
+app.set("trust proxy", 1); // very important on Render
+
 app.use(
   session({
     secret: "superSecretKey",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // true in HTTPS
+      secure: true,          // must be true in HTTPS
       httpOnly: true,
+      sameSite: "none",      // REQUIRED for cross-site cookies
       maxAge: 1000 * 60 * 60 * 24
     }
   })
