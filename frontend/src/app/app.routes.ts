@@ -10,6 +10,8 @@ import { CategoryPage } from './pages/category.page';
 import { CartPage } from './pages/cart.page';
 
 import { UserListPage } from './pages/users/users-list.page';
+import { UserCreatePage } from './pages/users/users-create.page';
+import { UsersEditPage } from './pages/users/users-edit.page';
 
 
 
@@ -36,8 +38,8 @@ export const routes: Routes = [
       { path: 'cart', component: CartPage },
 
       { path: 'users', component: UserListPage },
-      { path: 'users/create', component: UserListPage },
-      { path: 'users/:id/edit', component: UserListPage },
+      { path: 'users/create', component: UserCreatePage },
+      { path: 'users/:id/edit', component: UsersEditPage },
 
     ]
   },

@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
   standalone: true,
   imports: [GenericListComponent],
   template: `
-    <h2>User</h2>
+    <h2>Edit User</h2>
     <app-generic-list
       endpoint="users"
       [fields]="fields"
@@ -18,12 +18,14 @@ import { ActivatedRoute } from '@angular/router';
       [showTable]="false"
       [showSearch]="false"
 
+      [editingId]="id"
+
 
       [canEdit]="true"
       [canDelete]="true"
       [canAdd]="true"
 
-      redirectAfterSuccess="/favorite">
+      redirectAfterSuccess="/users">
     </app-generic-list>
   `
 })

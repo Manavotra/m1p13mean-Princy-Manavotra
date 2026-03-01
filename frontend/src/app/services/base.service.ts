@@ -54,6 +54,10 @@ export class BaseService<T> {
     return this.http.get<T[]>(this.api + endpoint);
   }
 
+  getById(endpoint: string, id: string) {
+    return this.http.get<T>(this.api + endpoint + '/' + id);
+  }
+
   getAllWithParams(endpoint: string, searchObject: any) {
 
     console.log('==============================');

@@ -23,7 +23,7 @@ import { GenericListComponent } from '../../components/generic-list/generic-list
     </app-generic-list>
   `
 })
-export class UserListPage {
+export class UserCreatePage {
   fields = [
     { name: 'name', type: 'text' },
     { name: 'email', type: 'text' },

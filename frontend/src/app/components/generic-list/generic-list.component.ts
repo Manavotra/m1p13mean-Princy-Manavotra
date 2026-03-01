@@ -50,6 +50,7 @@ export class GenericListComponent implements OnInit {
   @Input() redirectAfterSuccess?: string;
 
 
+  @Input() editingId?: string; 
   
 
   /** 🔥 Cache pour éviter double download */
@@ -71,12 +72,28 @@ export class GenericListComponent implements OnInit {
       this.initializeModelStructure(this.searchModel, this.searchFields, true);
     }
 
-    // 🔥 Charge la liste UNIQUEMENT si le tableau est visible
+    // 🔥 MODE EDIT PAGE
+    if (this.editingId) {
+
+      this.service.getById(this.endpoint, this.editingId)
+          .subscribe(data => {
+
+          this.editingItem = data;
+
+          // IMPORTANT pour nested/subdocuments
+          this.initializeModelStructure(this.editingItem, this.fields);
+
+          this.cdr.detectChanges();
+        });
+
+      return; // ⚠ stop ici (ne pas load list)
+    }
+
+    // 🔥 MODE LIST
     if (this.showTable) {
       this.load();
     }
 
-    // 🔥 Charge relations uniquement si form ou search visible
     if (this.showForm || this.showSearch) {
       this.loadRelationsRecursive(this.fields);
     }
