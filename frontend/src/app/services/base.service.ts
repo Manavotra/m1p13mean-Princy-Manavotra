@@ -1,7 +1,8 @@
 // services/base.service.ts
 import { HttpClient,HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { environment } from 'src/environments/environment';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class BaseService<T> {
@@ -47,16 +48,26 @@ export class BaseService<T> {
     return hasFile ? formData : data;
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+    private zone: NgZone // Injecte NgZone
+  ) {}
 
 
+// Exemple pour getAll (à appliquer aux autres)
   getAll(endpoint: string) {
-    return this.http.get<T[]>(this.api + endpoint);
+    return this.http.get<T[]>(this.api + endpoint).pipe(
+      map(data => {
+        // On s'assure que le retour est bien capté par Angular
+        return this.zone.run(() => data);
+      })
+    );
   }
 
-  getById(endpoint: string, id: string) {
-    return this.http.get<T>(this.api + endpoint + '/' + id);
-  }
+getById(endpoint: string, id: string) {
+  return this.http.get<T>(this.api + endpoint + '/' + id).pipe(
+    map(data => this.zone.run(() => data))
+  );
+}
 
   getAllWithParams(endpoint: string, searchObject: any) {
 
@@ -103,10 +114,9 @@ export class BaseService<T> {
     console.log('🌍 Final URL:', this.api + endpoint + '?' + params.toString());
     console.log('==============================');
 
-    return this.http.get<T[]>(
-      this.api + endpoint,
-      { params }
-    );
+    return this.http.get<T[]>(this.api + endpoint, { params }).pipe(
+        map(data => this.zone.run(() => data))
+      );
   }
 
 create(endpoint: string, data: any) {

@@ -10,10 +10,30 @@ import orderController from '../controllers/order.controller.js';
 
 import favoriteController from '../controllers/favorite.controller.js';
 
+import authController from '../controllers/auth.controller.js';
+import authMiddleware from '../middlewares/auth.middleware.js';
+import { authorizeRoles } from '../middlewares/role.middleware.js';
 
 import upload from '../middlewares/upload.middleware.js';
 
 const router = express.Router();
+
+
+/* AUTH */
+router.post('/login', authController.login);
+router.post('/logout', authController.logout);
+router.get('/me', authMiddleware, authController.me);
+
+
+// router.get(
+//   '/admin-only',
+//   authMiddleware,
+//   authorizeRoles('ADMIN'),
+//   (req, res) => {
+//     res.json({ message: 'Admin content' });
+//   }
+// );
+
 
 // Users
 router.get('/users', userController.getAll);

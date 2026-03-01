@@ -83,7 +83,7 @@ export class GenericListComponent implements OnInit {
           // IMPORTANT pour nested/subdocuments
           this.initializeModelStructure(this.editingItem, this.fields);
 
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         });
 
       return; // ⚠ stop ici (ne pas load list)
@@ -120,6 +120,7 @@ export class GenericListComponent implements OnInit {
       .subscribe(data => {
         // 🔥 Nouvelle référence = change detection garanti
         this.items = [...data];
+        this.cdr.markForCheck(); // Informe Angular qu'il faut vérifier ce composant
       });
   }
 

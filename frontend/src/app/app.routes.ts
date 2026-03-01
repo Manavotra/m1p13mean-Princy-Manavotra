@@ -13,6 +13,8 @@ import { UserListPage } from './pages/users/users-list.page';
 import { UserCreatePage } from './pages/users/users-create.page';
 import { UsersEditPage } from './pages/users/users-edit.page';
 
+import { LoginPage  } from './pages/login.page';
+import { ProfilePage  } from './pages/profile.page';
 
 
 import { AdminLayout } from '../app/layouts/admin-layout/admin-layout';
@@ -40,6 +42,9 @@ export const routes: Routes = [
       { path: 'users', component: UserListPage },
       { path: 'users/create', component: UserCreatePage },
       { path: 'users/:id/edit', component: UsersEditPage },
+
+      { path: 'login', component: LoginPage },
+      { path: 'profile', component: ProfilePage },
 
     ]
   },

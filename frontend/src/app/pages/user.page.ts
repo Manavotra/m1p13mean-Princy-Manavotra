@@ -24,6 +24,7 @@ export class UserPage {
   fields = [
     { name: 'name', type: 'text' },
     { name: 'email', type: 'text' },
+    { name: 'password', type: 'text' },
     { name: 'role', type: 'select', options: ['ADMIN', 'VENDEUR', 'ACHETEUR'] },
     { name: 'avatar', type: 'image' }
 
