@@ -1,51 +1,53 @@
-<h3>{{ editingItem ? 'Modifier' : 'Ajouter' }}</h3>
+<div *ngIf="showForm">
+  <h3>{{ editingItem ? 'Modifier' : 'Ajouter' }}</h3>
 
-<!-- ===== FORMULAIRE RÉCURSIF ===== -->
-<ng-container
-  *ngTemplateOutlet="renderFields;
-                     context:{ model: currentModel,
-                               fields: fields,
-                               isSearch: false }">
-</ng-container>
+  <!-- ===== FORMULAIRE RÉCURSIF ===== -->
+  <ng-container
+    *ngTemplateOutlet="renderFields;
+                      context:{ model: currentModel,
+                                fields: fields,
+                                isSearch: false }">
+  </ng-container>
 
-<button type="button"
-        [disabled]="isProcessing"
-        (click)="editingItem ? save() : submit()">
-  {{ isProcessing ? 'Traitement...' : (editingItem ? 'Enregistrer' : 'Ajouter') }}
-</button>
+  <button type="button"
+          [disabled]="isProcessing"
+          (click)="editingItem ? save() : submit()">
+    {{ isProcessing ? 'Traitement...' : (editingItem ? 'Enregistrer' : 'Enregistrer') }}
+  </button>
+</div>
 
 <hr>
+<div *ngIf="showSearch">
+  <h3>Recherche</h3>
 
-<h3>Recherche</h3>
+  <ng-container
+    *ngTemplateOutlet="renderFields;
+                      context:{ model: searchModel,
+                                fields: searchFields,
+                                isSearch: true }">
+  </ng-container>
 
-<ng-container
-  *ngTemplateOutlet="renderFields;
-                     context:{ model: searchModel,
-                               fields: searchFields,
-                               isSearch: true }">
-</ng-container>
+  <button type="button"
+          [disabled]="isProcessing"
+          (click)="search()">
+    Rechercher
+  </button>
 
-<button type="button"
-        [disabled]="isProcessing"
-        (click)="search()">
-  Rechercher
-</button>
-
-<button type="button"
-        [disabled]="isProcessing"
-        (click)="resetSearch()">
-  Reset
-</button>
-
+  <button type="button"
+          [disabled]="isProcessing"
+          (click)="resetSearch()">
+    Reset
+  </button>
+</div>
 
 
 <!-- ===== TABLE LISTING ===== -->
-<table border="1">
+<table *ngIf="showTable" border="1">
   <tr>
     <th *ngFor="let field of fields; trackBy: trackByIndex">
       {{ field.name }}
     </th>
-    <th>Actions</th>
+    <th >Actions</th>
   </tr>
 
   <tr *ngFor="let item of items; trackBy: trackByIndex">
@@ -144,13 +146,15 @@
     </td>
 
     <td>
-      <button type="button"
+      <button *ngIf="canEdit"
+              type="button"
               [disabled]="isProcessing"
               (click)="edit(item)">
         Modifier
       </button>
 
-      <button type="button"
+      <button *ngIf="canDelete"
+              type="button"
               [disabled]="isProcessing"
               (click)="delete(item._id)">
         Supprimer
