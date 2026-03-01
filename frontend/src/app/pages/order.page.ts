@@ -23,6 +23,7 @@ export class OrderPage {
 
     {
       name: 'customer',
+      label: 'Acheteur',
       type: 'relation',
       endpoint: 'users'
     }, 

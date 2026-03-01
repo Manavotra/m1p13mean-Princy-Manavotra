@@ -1,0 +1,223 @@
+<div class="pg-wrapper">
+
+  <!-- ========== HEADER ========== -->
+  <div class="pg-header">
+    <div class="pg-title-block">
+      <span class="pg-icon">🛍️</span>
+      <h2 class="pg-title">Produits</h2>
+      <span class="pg-count">{{ items.length }} article{{ items.length > 1 ? 's' : '' }}</span>
+    </div>
+    <!-- Bouton "Nouveau produit" uniquement pour les vendeurs connectés -->
+    <button class="pg-btn-add" (click)="toggleForm()" *ngIf="isVendeur">
+      {{ showFormPanel ? '✕ Fermer' : '+ Nouveau produit' }}
+    </button>
+  </div>
+
+  <app-profile></app-profile> 
+
+
+  <!-- ========== SEARCH BAR ========== -->
+  <div class="pg-search-panel" *ngIf="showSearch">
+    <div class="pg-search-grid">
+
+      <div class="pg-field" *ngFor="let field of searchFields">
+        <label class="pg-label">{{ getLabel(field) }}</label>
+
+        <!-- Text -->
+        <input *ngIf="field.type === 'text'"
+               class="pg-input" type="text"
+               [(ngModel)]="searchModel[field.name]"
+               [placeholder]="getLabel(field)" />
+
+        <!-- Number range -->
+        <div *ngIf="field.type === 'range-number'" class="pg-range">
+          <input class="pg-input" type="number"
+                 [(ngModel)]="searchModel[field.name + '_min']"
+                 placeholder="Min" />
+          <span class="pg-range-sep">–</span>
+          <input class="pg-input" type="number"
+                 [(ngModel)]="searchModel[field.name + '_max']"
+                 placeholder="Max" />
+        </div>
+
+        <!-- Number -->
+        <input *ngIf="field.type === 'number'"
+               class="pg-input" type="number"
+               [(ngModel)]="searchModel[field.name]"
+               [placeholder]="getLabel(field)" />
+
+        <!-- Select -->
+        <select *ngIf="field.type === 'select'" class="pg-input"
+                [(ngModel)]="searchModel[field.name]">
+          <option value="">-- Tous --</option>
+          <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
+        </select>
+
+        <!-- Relation -->
+        <select *ngIf="field.type === 'relation'" class="pg-input"
+                [(ngModel)]="searchModel[field.name]">
+          <option value="">-- Tous --</option>
+          <option *ngFor="let r of relationsData[field.name]" [value]="r._id">
+            {{ r.name || r.title || r.label }}
+          </option>
+        </select>
+
+      </div>
+    </div>
+
+    <div class="pg-search-actions">
+      <button class="pg-btn pg-btn-primary" [disabled]="isProcessing" (click)="search()">
+        🔍 Rechercher
+      </button>
+      <button class="pg-btn pg-btn-ghost" [disabled]="isProcessing" (click)="resetSearch()">
+        ↺ Réinitialiser
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== FORM PANEL (vendeur seulement) ========== -->
+  <div class="pg-form-panel" *ngIf="showFormPanel && isVendeur">
+    <h3 class="pg-form-title">{{ editingItem ? '✏️ Modifier le produit' : '✨ Nouveau produit' }}</h3>
+
+    <div class="pg-form-grid">
+      <div class="pg-field" *ngFor="let field of fields">
+        <label class="pg-label">{{ getLabel(field) }}</label>
+
+        <!-- Image upload -->
+        <div *ngIf="field.type === 'image'" class="pg-image-upload">
+          <input type="file" class="pg-file-input"
+                 (change)="onFileChange($event, currentModel, field.name)" />
+          <div *ngIf="currentModel[field.name] && isImagePath(currentModel[field.name])" class="pg-preview">
+            <img [src]="getImageUrl(currentModel[field.name])" />
+          </div>
+        </div>
+
+        <!-- Text -->
+        <input *ngIf="field.type === 'text'" class="pg-input" type="text"
+               [(ngModel)]="currentModel[field.name]"
+               [placeholder]="getLabel(field)" />
+
+        <!-- Number -->
+        <input *ngIf="field.type === 'number'" class="pg-input" type="number"
+               [(ngModel)]="currentModel[field.name]"
+               [placeholder]="getLabel(field)" />
+
+        <!-- Select -->
+        <select *ngIf="field.type === 'select'" class="pg-input"
+                [(ngModel)]="currentModel[field.name]">
+          <option value="">-- Choisir --</option>
+          <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
+        </select>
+
+        <!-- Relation -->
+        <select *ngIf="field.type === 'relation'" class="pg-input"
+                [(ngModel)]="currentModel[field.name]">
+          <option value="">-- Choisir --</option>
+          <option *ngFor="let r of relationsData[field.name]" [value]="r._id">
+            {{ r.name || r.title || r.label }}
+          </option>
+        </select>
+
+      </div>
+    </div>
+
+    <div class="pg-form-actions">
+      <button class="pg-btn pg-btn-primary" [disabled]="isProcessing"
+              (click)="editingItem ? save() : submit()">
+        {{ isProcessing ? '⏳ Traitement...' : (editingItem ? '💾 Enregistrer' : '✅ Créer le produit') }}
+      </button>
+      <button class="pg-btn pg-btn-ghost" (click)="cancelForm()">Annuler</button>
+    </div>
+  </div>
+
+  <!-- ========== PRODUCT GRID ========== -->
+  <div class="pg-grid">
+
+    <div class="pg-card" *ngFor="let item of items; trackBy: trackById">
+
+      <!-- Image -->
+      <div class="pg-card-image">
+        <img *ngIf="getImageField(item)" [src]="getImageUrl(getImageField(item)!)" [alt]="item.name" />
+        <div *ngIf="!getImageField(item)" class="pg-card-no-image">📦</div>
+
+        <!-- Status badge -->
+        <span class="pg-badge" [ngClass]="getBadgeClass(item.status)">
+          {{ item.status || '—' }}
+        </span>
+      </div>
+
+      <!-- Card Body -->
+      <div class="pg-card-body">
+        <h3 class="pg-card-name">{{ item.name }}</h3>
+        <p class="pg-card-desc" *ngIf="item.description">{{ item.description }}</p>
+
+        <!-- Prix + Stock -->
+        <div class="pg-card-meta">
+          <span class="pg-meta-price" *ngIf="item.price !== undefined">
+            {{ item.price | number:'1.0-0' }} Ar
+          </span>
+          <span class="pg-meta-stock" [ngClass]="{'low': item.stock < 5}">
+            📦 {{ item.stock }} en stock
+          </span>
+        </div>
+
+        <!-- Tags relation -->
+        <div class="pg-card-tags">
+          <span class="pg-tag" *ngIf="item.category">
+            🏷️ {{ item.category?.name || item.category?.title || item.category }}
+          </span>
+          <span class="pg-tag pg-tag-shop" *ngIf="item.shop">
+            🏪 {{ item.shop?.name || item.shop?.title || item.shop }}
+          </span>
+        </div>
+      </div>
+
+      <!-- ===== CARD FOOTER selon rôle ===== -->
+      <div class="pg-card-footer">
+
+        <!-- Non connecté : aucun bouton -->
+        <ng-container *ngIf="!currentUser">
+          <span class="pg-footer-hint">Connectez-vous pour interagir</span>
+        </ng-container>
+
+        <!-- Vendeur : Modifier + Supprimer -->
+        <ng-container *ngIf="isVendeur">
+          <button class="pg-btn pg-btn-sm pg-btn-edit"
+                  [disabled]="isProcessing"
+                  (click)="editProduct(item)">
+            ✏️ Modifier
+          </button>
+          <button class="pg-btn pg-btn-sm pg-btn-delete"
+                  [disabled]="isProcessing"
+                  (click)="delete(item._id)">
+            🗑️ Supprimer
+          </button>
+        </ng-container>
+
+        <!-- Client (DEFAULT) : Favoris + Panier -->
+        <ng-container *ngIf="isClient">
+          <button class="pg-btn pg-btn-sm pg-btn-fav"
+                  [disabled]="isProcessing"
+                  (click)="addToFavorites(item)">
+            ♥ Favoris
+          </button>
+          <button class="pg-btn pg-btn-sm pg-btn-cart"
+                  [disabled]="isProcessing"
+                  (click)="addToCart(item)">
+            🛒 Panier
+          </button>
+        </ng-container>
+
+      </div>
+
+    </div>
+
+    <!-- Empty state -->
+    <div class="pg-empty" *ngIf="items.length === 0">
+      <span class="pg-empty-icon">📭</span>
+      <p>Aucun produit trouvé</p>
+    </div>
+
+  </div>
+
+</div>

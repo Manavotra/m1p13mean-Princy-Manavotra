@@ -1,0 +1,397 @@
+/* =============================================
+   PRODUCT GRID COMPONENT — product-grid.component.css
+   Charte graphique à personnaliser ici
+   ============================================= */
+
+/* ===== VARIABLES ===== */
+:host {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.13);
+  --radius: 12px;
+  --radius-sm: 8px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ===== WRAPPER ===== */
+.pg-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  color: var(--text);
+}
+
+/* ===== HEADER ===== */
+.pg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+}
+
+.pg-title-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pg-icon { font-size: 28px; }
+
+.pg-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.pg-count {
+  background: var(--primary);
+  color: white;
+  border-radius: 20px;
+  padding: 2px 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pg-btn-add {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pg-btn-add:hover { background: var(--primary-hover); }
+
+/* ===== SEARCH PANEL ===== */
+.pg-search-panel {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.pg-search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.pg-search-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ===== FORM PANEL ===== */
+.pg-form-panel {
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow);
+}
+
+.pg-form-title {
+  margin: 0 0 20px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.pg-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.pg-form-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== CHAMPS ===== */
+.pg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pg-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pg-input {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pg-input:focus { border-color: var(--primary); }
+
+.pg-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pg-range-sep {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ===== BOUTONS ===== */
+.pg-btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.pg-btn:hover { transform: translateY(-1px); }
+.pg-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.pg-btn-primary { background: var(--primary); color: white; }
+.pg-btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+
+.pg-btn-ghost { background: var(--border); color: var(--text); }
+.pg-btn-ghost:hover:not(:disabled) { background: #cbd5e1; }
+
+.pg-btn-sm { padding: 6px 12px; font-size: 12px; }
+
+.pg-btn-edit { background: #e0f2fe; color: #0369a1; }
+.pg-btn-edit:hover:not(:disabled) { background: #bae6fd; }
+
+.pg-btn-delete { background: #fee2e2; color: var(--danger); }
+.pg-btn-delete:hover:not(:disabled) { background: #fecaca; }
+
+/* Bouton Favoris */
+.pg-btn-fav { background: #fdf2f8; color: #9d174d; }
+.pg-btn-fav:hover:not(:disabled) { background: #fce7f3; }
+
+/* Bouton Panier */
+.pg-btn-cart { background: #f0fdf4; color: #166534; }
+.pg-btn-cart:hover:not(:disabled) { background: #dcfce7; }
+
+/* ===== IMAGE UPLOAD ===== */
+.pg-image-upload { display: flex; flex-direction: column; gap: 8px; }
+.pg-file-input { font-size: 13px; }
+
+.pg-preview img {
+  width: 100px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+/* ===== GRILLE DE PRODUITS ===== */
+.pg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* ===== CARTE PRODUIT ===== */
+.pg-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.25s, transform 0.2s;
+}
+
+.pg-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+}
+
+/* Image de la carte */
+.pg-card-image {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  overflow: hidden;
+}
+
+.pg-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pg-card-no-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 48px;
+  opacity: 0.4;
+}
+
+/* Badge statut */
+.pg-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pg-badge.disponible { background: #dcfce7; color: #166534; }
+.pg-badge.inactif    { background: #fef9c3; color: #854d0e; }
+.pg-badge.banni      { background: #fee2e2; color: #991b1b; }
+.pg-badge.default    { background: #f1f5f9; color: #475569; }
+
+/* Corps de la carte */
+.pg-card-body {
+  padding: 14px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pg-card-name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pg-card-desc {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pg-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.pg-meta-price {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.pg-meta-stock {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.pg-meta-stock.low { color: var(--danger); font-weight: 700; }
+
+.pg-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pg-tag {
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pg-tag-shop { background: #ede9fe; color: #6d28d9; }
+
+/* Pied de carte */
+.pg-card-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  background: var(--surface-alt);
+  min-height: 52px;
+}
+
+.pg-footer-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ===== ÉTAT VIDE ===== */
+.pg-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.pg-empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.pg-empty p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .pg-wrapper { padding: 14px; }
+  .pg-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .pg-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
