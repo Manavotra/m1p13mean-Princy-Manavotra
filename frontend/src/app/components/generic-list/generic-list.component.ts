@@ -401,6 +401,12 @@ delete(id: string) {
     });
 }
 
+getFieldLabel(field: any): string {
+  if (field.label) return field.label;
+  const name = field.name || '';
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
     // =============================
   // FILE HANDLING
   // =============================

@@ -45,7 +45,7 @@
 <table *ngIf="showTable" border="1">
   <tr>
     <th *ngFor="let field of fields; trackBy: trackByIndex">
-      {{ field.name }}
+      {{ getFieldLabel(field) }}
     </th>
     <th >Actions</th>
   </tr>
@@ -59,7 +59,7 @@
   <table style="width:100%; border-collapse:collapse; font-size:12px;">
     <tr *ngFor="let subField of field.fields">
       <td style="border:1px solid #eee; padding:4px; font-weight:600;">
-        {{ subField.name }}
+        {{ getFieldLabel(subField) }}
       </td>
       <td style="border:1px solid #eee; padding:4px;">
         {{ item[field.name]?.[subField.name] || '—' }}
@@ -83,7 +83,7 @@
     <tr style="background:#f3f3f3;">
       <th *ngFor="let subField of field.fields"
           style="border:1px solid #ddd; padding:4px; text-align:left;">
-        {{ subField.name }}
+        {{ getFieldLabel(subField) }}
       </th>
     </tr>
 
@@ -177,33 +177,25 @@
 
     <!-- ===== INPUT DATE ===== -->
     <div *ngIf="field.type === 'range-date'">
-
-      <input type="date"
-            [(ngModel)]="model[field.name + '_from']"
-            [placeholder]="field.name + ' from'" />
-
-      <input type="date"
-            [(ngModel)]="model[field.name + '_to']"
-            [placeholder]="field.name + ' to'" />
-
+      <label>{{ getFieldLabel(field) }}</label>
+      <input type="date" 
+        [(ngModel)]="model[field.name + '_from']" 
+        [placeholder]="getFieldLabel(field) + ' from'" />
+      <input type="date" 
+        [(ngModel)]="model[field.name + '_to']" 
+        [placeholder]="getFieldLabel(field) + ' to'" />
     </div>
 
     <!-- ===== INPUT NUMBER ===== -->
     <div *ngIf="field.type === 'range-number'">
-
-      <input type="number"
-            [(ngModel)]="model[field.name + '_min']"
-            [placeholder]="field.name + ' min'" />
-
-      <input type="number"
-            [(ngModel)]="model[field.name + '_max']"
-            [placeholder]="field.name + ' max'" />
-
+      <label>{{ getFieldLabel(field) }}</label>
+      <input type="number" [(ngModel)]="model[field.name + '_min']" [placeholder]="getFieldLabel(field) + ' min'" />
+      <input type="number" [(ngModel)]="model[field.name + '_max']" [placeholder]="getFieldLabel(field) + ' max'" />
     </div>
 
     <!-- ===== IMAGE UPLOAD ===== -->
     <div *ngIf="field.type === 'image'">
-
+    <label>{{ getFieldLabel(field) }}</label>
       <input type="file"
             (change)="onFileChange($event, model, field.name)" />
 
@@ -218,87 +210,58 @@
 
 
     <!-- ===== INPUT SIMPLE ===== -->
-    <input *ngIf="field.type !== 'nested'
-                  && field.type !== 'array'
-                  && field.type !== 'relation'
-                  && field.type !== 'select'
-                  && field.type !== 'subdocument'
-                  && field.type !== 'range-date'
-                  && field.type !== 'range-number'"
-              [type]="field.type"
-              [(ngModel)]="model[field.name]"
-              [placeholder]="field.name" />
+   <ng-container *ngIf="field.type !== 'nested'
+                && field.type !== 'array'
+                && field.type !== 'relation'
+                && field.type !== 'select'
+                && field.type !== 'subdocument'
+                && field.type !== 'range-date'
+                && field.type !== 'range-number'
+                && field.type !== 'image'">
+      <label>{{ getFieldLabel(field) }}</label>
+      <input [type]="field.type"
+             [(ngModel)]="model[field.name]"
+             [placeholder]="getFieldLabel(field)" />
+    </ng-container>
 
     <!-- ===== SELECT ENUM ===== -->
-    <select *ngIf="field.type === 'select'"
-            [(ngModel)]="model[field.name]">
-      <option *ngFor="let opt of field.options; trackBy: trackByIndex"
-              [value]="opt">
-        {{ opt }}
-      </option>
-    </select>
+    <ng-container *ngIf="field.type === 'select'">
+      <label>{{ getFieldLabel(field) }}</label>
+      <select [(ngModel)]="model[field.name]">
+        <option *ngFor="let opt of field.options; trackBy: trackByIndex" [value]="opt">{{ opt }}</option>
+      </select>
+    </ng-container>
 
     <!-- ===== ARRAY SIMPLE ===== -->
     <div *ngIf="field.type === 'array'">
-
-      <div *ngFor="let item of model[field.name];
-                   let i = index;
-                   trackBy: trackByIndex">
-
+      <label>{{ getFieldLabel(field) }}</label>
+      <div *ngFor="let item of model[field.name]; let i = index; trackBy: trackByIndex">
         <input [(ngModel)]="model[field.name][i]" />
-
-        <button type="button"
-                (click)="model[field.name].splice(i, 1)">
-          X
-        </button>
+        <button type="button" (click)="model[field.name].splice(i, 1)">X</button>
       </div>
-
-      <button type="button"
-              (click)="model[field.name].push('')">
-        Ajouter
-      </button>
+      <button type="button" (click)="model[field.name].push('')">Ajouter</button>
     </div>
 
     <!-- ===== RELATION ===== -->
-    <select *ngIf="field.type === 'relation'"
-            [(ngModel)]="model[field.name]">
-      <option *ngFor="let r of relationsData[field.name];
-                      trackBy: trackByIndex"
-              [value]="r._id">
-        {{ r.name || r.title || r.label }}
-      </option>
-    </select>
+    <ng-container *ngIf="field.type === 'relation'">
+      <label>{{ getFieldLabel(field) }}</label>
+      <select [(ngModel)]="model[field.name]">
+        <option *ngFor="let r of relationsData[field.name]; trackBy: trackByIndex" [value]="r._id">
+          {{ r.name || r.title || r.label }}
+        </option>
+      </select>
+    </ng-container>
 
     <!-- ===== NESTED ===== -->
     <div *ngIf="field.type === 'nested'"
-         style="margin-left:20px;
-                border-left:2px solid #ccc;
-                padding-left:10px">
-
-      <strong>{{ field.name }}</strong>
-
+         style="margin-left:20px; border-left:2px solid #ccc; padding-left:10px">
+      <strong>{{ getFieldLabel(field) }}</strong>
       <ng-container *ngIf="isSearch">
-        <ng-container
-          *ngTemplateOutlet="renderFields;
-                             context:{
-                               model: model[field.name],
-                               fields: field.fields,
-                               isSearch: true
-                             }">
-        </ng-container>
+        <ng-container *ngTemplateOutlet="renderFields; context:{ model: model[field.name], fields: field.fields, isSearch: true }"></ng-container>
       </ng-container>
-
       <ng-container *ngIf="!isSearch">
-        <ng-container
-          *ngTemplateOutlet="renderFields;
-                             context:{
-                               model: model[field.name],
-                               fields: field.fields,
-                               isSearch: false
-                             }">
-        </ng-container>
+        <ng-container *ngTemplateOutlet="renderFields; context:{ model: model[field.name], fields: field.fields, isSearch: false }"></ng-container>
       </ng-container>
-
     </div>
 
     <!-- ===== SUBDOCUMENT ===== -->
@@ -306,7 +269,7 @@
         style="margin-left:20px;
                 border-left:2px solid #4CAF50;
                 padding-left:10px">
-
+      <strong>{{ getFieldLabel(field) }}</strong>
       <strong>{{ field.name }}</strong>
 
       <!-- 🔥 MODE RECHERCHE -->
