@@ -1,23 +1,14 @@
-// src/app.js
 import express from "express";
 import cors from "cors";
 import routes from "./routes/index.js";
-
-import session from 'express-session';
+import session from "express-session";
 
 const app = express();
 
-// CORS (Vercel + Local)
-const allowedOrigins = [
-  process.env.CORS_ORIGIN,   // ex: https://ton-front.vercel.app
-  "http://localhost:4200"
-].filter(Boolean);
-
+// CORS - allow all origins
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
+    callback(null, true);
   },
   credentials: true
 }));
@@ -27,22 +18,20 @@ app.use(express.json());
 // health check
 app.get("/health", (req, res) => res.status(200).json({ ok: true }));
 
-
-/* 🔥 CONFIG SESSION */
+// SESSION CONFIG
 app.use(
   session({
-    secret: 'superSecretKey',
+    secret: "superSecretKey",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // true seulement en HTTPS
+      secure: false, // true in HTTPS
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 // 1 jour
+      maxAge: 1000 * 60 * 60 * 24
     }
   })
 );
 
 app.use("/api", routes);
-
 
 export default app;
