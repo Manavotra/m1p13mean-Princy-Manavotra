@@ -9,6 +9,7 @@ import { DiscountPage } from './pages/discount.page';
 import { CategoryPage } from './pages/category.page';
 import { CartPage } from './pages/cart.page';
 
+import { UserListPage } from './pages/users/users-list.page';
 
 
 
@@ -32,7 +33,12 @@ export const routes: Routes = [
       { path: 'favorite', component: FavoritePage },
       { path: 'discount', component: DiscountPage },
       { path: 'category', component: CategoryPage },
-      { path: 'cart', component: CartPage }
+      { path: 'cart', component: CartPage },
+
+      { path: 'users', component: UserListPage },
+      { path: 'users/create', component: UserListPage },
+      { path: 'users/:id/edit', component: UserListPage },
+
     ]
   },
 

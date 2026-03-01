@@ -7,6 +7,8 @@ import { BaseService } from '../../services/base.service';
 
 import { ChangeDetectorRef } from '@angular/core';
 
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-generic-list',
   standalone: true,
@@ -27,25 +29,57 @@ export class GenericListComponent implements OnInit {
   relationsData: any = {};
   searchModel: any = {};
 
-  isProcessing = false; // 🔥 NOUVEAU FLAG
+  isProcessing = false; // 🔥 NOUVEAU 
+  
+  // =============================
+  // VISIBILITY TOGGLES
+  // =============================
+
+  @Input() showTable: boolean = true;
+  @Input() showForm: boolean = true;
+  @Input() showSearch: boolean = true;
+
+  @Input() canAdd: boolean = true;
+  @Input() canEdit: boolean = true;
+  @Input() canDelete: boolean = true;
+
+  // =============================
+  // REDIRECTION
+  // =============================
+
+  @Input() redirectAfterSuccess?: string;
+
+
+  
 
   /** 🔥 Cache pour éviter double download */
   private loadedRelationEndpoints = new Set<string>();
 
-  constructor(private service: BaseService<any>, private cdr: ChangeDetectorRef) {}
-
+  constructor(
+  private service: BaseService<any>,
+  private cdr: ChangeDetectorRef,
+  private router: Router
+) {}
 
   ngOnInit() {
-    // 🔹 Form CRUD
-    this.initializeModelStructure(this.form, this.fields);
 
-    // 🔹 Search model
-    if (this.searchFields?.length) {
+    if (this.showForm) {
+      this.initializeModelStructure(this.form, this.fields);
+    }
+
+    if (this.searchFields?.length && this.showSearch) {
       this.initializeModelStructure(this.searchModel, this.searchFields, true);
     }
 
-    this.load();
-    this.loadRelationsRecursive(this.fields); // 🔥 remplacé
+    // 🔥 Charge la liste UNIQUEMENT si le tableau est visible
+    if (this.showTable) {
+      this.load();
+    }
+
+    // 🔥 Charge relations uniquement si form ou search visible
+    if (this.showForm || this.showSearch) {
+      this.loadRelationsRecursive(this.fields);
+    }
   }
 
   // =============================
@@ -272,10 +306,22 @@ submit() {
   this.service.create(this.endpoint, payload)
     .subscribe({
       next: () => {
+
+        this.isProcessing = false;
+
+        // 🔥 Redirection si définie
+        if (this.redirectAfterSuccess) {
+          this.router.navigate([this.redirectAfterSuccess]);
+          return;
+        }
+
+        // Sinon comportement normal
         this.form = {};
         this.initializeModelStructure(this.form, this.fields);
-        this.refreshList();           // 🔹 Rafraîchit tout
-        this.isProcessing = false;
+
+        if (this.showTable) {
+          this.refreshList();
+        }
       },
       error: (err) => {
         console.error("CREATE ERROR", err);
@@ -298,9 +344,19 @@ save() {
   this.service.update(this.endpoint, this.editingItem._id, payload)
     .subscribe({
       next: () => {
-        this.editingItem = null;
-        this.refreshList();           // 🔹 Rafraîchit tout
+
         this.isProcessing = false;
+
+        if (this.redirectAfterSuccess) {
+          this.router.navigate([this.redirectAfterSuccess]);
+          return;
+        }
+
+        this.editingItem = null;
+
+        if (this.showTable) {
+          this.refreshList();
+        }
       },
       error: (err) => {
         console.error("UPDATE ERROR", err);

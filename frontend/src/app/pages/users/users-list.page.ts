@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { GenericListComponent } from '../components/generic-list/generic-list.component';
+import { GenericListComponent } from '../../components/generic-list/generic-list.component';
 
 @Component({
   standalone: true,
@@ -10,17 +10,20 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
       endpoint="users"
       [fields]="fields"
       [searchFields]="searchFields"
+
+      [showForm]="false"
+      [showSearch]="true"
       [showTable]="true"
-      [showSearch]="false"
 
       [canEdit]="true"
-      [canDelete]="false"
+      [canDelete]="true"
+      [canAdd]="false"
 
       redirectAfterSuccess="/favorite">
     </app-generic-list>
   `
 })
-export class UserPage {
+export class UserListPage {
   fields = [
     { name: 'name', type: 'text' },
     { name: 'email', type: 'text' },
