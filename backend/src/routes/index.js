@@ -10,14 +10,34 @@ import orderController from '../controllers/order.controller.js';
 
 import favoriteController from '../controllers/favorite.controller.js';
 
+import authController from '../controllers/auth.controller.js';
+import authMiddleware from '../middlewares/auth.middleware.js';
+import { authorizeRoles } from '../middlewares/role.middleware.js';
 
 import upload from '../middlewares/upload.middleware.js';
 
 const router = express.Router();
 
+
+/* AUTH */
+router.post('/login', authController.login);
+router.post('/logout', authController.logout);
+router.get('/me', authMiddleware, authController.me);
+
+
+// router.get(
+//   '/admin-only',
+//   authMiddleware,
+//   authorizeRoles('ADMIN'),
+//   (req, res) => {
+//     res.json({ message: 'Admin content' });
+//   }
+// );
+
+
 // Users
 router.get('/users', userController.getAll);
-router.get('/users/:id', userController.getOne);
+router.get('/users/:id', userController.getById);
 
 // Upload single avatar
 router.post(
@@ -37,7 +57,7 @@ router.delete('/users/:id', userController.delete);
 
 // Shop
 router.get('/shops', shopController.getAll);
-router.get('/shops/:id', shopController.getOne);
+router.get('/shops/:id', shopController.getById);
 
 // Upload single logo
 router.post(
@@ -68,7 +88,7 @@ router.delete('/categories/:id', categoryController.delete);
 
 // Products
 router.get('/products', productController.getAll);
-router.get('/products/:id', productController.getOne);
+router.get('/products/:id', productController.getById);
 // Upload single image
 router.post(
   '/products',
@@ -103,6 +123,7 @@ router.delete('/carts/:id', cartController.delete);
 
 // Orders
 router.get('/orders', orderController.getAll);
+router.get('/orders/:id', orderController.getById);
 router.post('/orders', orderController.create);
 router.put('/orders/:id', orderController.update);
 router.delete('/orders/:id', orderController.delete);

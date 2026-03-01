@@ -9,7 +9,14 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
     <app-generic-list
       endpoint="users"
       [fields]="fields"
-      [searchFields]="searchFields">
+      [searchFields]="searchFields"
+      [showTable]="true"
+      [showSearch]="false"
+
+      [canEdit]="true"
+      [canDelete]="false"
+
+      redirectAfterSuccess="/favorite">
     </app-generic-list>
   `
 })
@@ -17,6 +24,7 @@ export class UserPage {
   fields = [
     { name: 'name', type: 'text' },
     { name: 'email', type: 'text' },
+    { name: 'password', type: 'text' },
     { name: 'role', type: 'select', options: ['ADMIN', 'VENDEUR', 'ACHETEUR'] },
     { name: 'avatar', type: 'image' }
 
