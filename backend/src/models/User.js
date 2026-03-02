@@ -23,7 +23,8 @@ const UserSchema = new mongoose.Schema({
     default: 'ACHETEUR'
   },
 
-  avatar: String
+  avatar: String,
+  avatarPublicId: String
 
 }, { timestamps: true });
 

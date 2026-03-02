@@ -136,7 +136,7 @@ detectRelations(model) {
     try {
 
       // 🔥 Injecte fichiers si présents
-      this.processFiles(req);
+      await this.processFiles(req);
 
       const item = await this.model.create(req.body);
       console.log("CREATED:", item);
@@ -158,7 +158,7 @@ detectRelations(model) {
       const oldDoc = await this.model.findById(req.params.id);
 
       // 🔥 Injecte fichiers si présents
-      this.processFiles(req);
+      await this.processFiles(req);
 
 
       const updated = await this.model.findByIdAndUpdate(
@@ -168,12 +168,23 @@ detectRelations(model) {
       );
 
       // 🔥 Nettoyage images inutilisées
-      const oldImages = this.extractImagePaths(oldDoc);
-      const newImages = this.extractImagePaths(updated);
+// --- Nettoyage Cloudinary (public ids) ---
+const oldPublicIds = this.extractPublicIds(oldDoc);
+const newPublicIds = this.extractPublicIds(updated);
+const toDeletePublicIds = oldPublicIds.filter(id => !newPublicIds.includes(id));
 
-      const toDelete = oldImages.filter(path => !newImages.includes(path));
+for (const publicId of toDeletePublicIds) {
+  await this.deleteAsset(publicId);
+}
 
-      toDelete.forEach(path => this.deleteFile(path));
+// --- Nettoyage local (compat anciens paths) ---
+const oldImages = this.extractImagePaths(oldDoc);
+const newImages = this.extractImagePaths(updated);
+const toDeleteLocal = oldImages.filter(p => !newImages.includes(p));
+
+for (const p of toDeleteLocal) {
+  await this.deleteAsset(p);
+}
 
       console.log("Updated item:", updated);
 
@@ -193,9 +204,15 @@ detectRelations(model) {
 
       const doc = await this.model.findById(req.params.id);
 
-      const images = this.extractImagePaths(doc);
+const publicIds = this.extractPublicIds(doc);
+for (const id of publicIds) {
+  await this.deleteAsset(id);
+}
 
-      images.forEach(path => this.deleteFile(path));
+const images = this.extractImagePaths(doc);
+for (const p of images) {
+  await this.deleteAsset(p);
+}
 
       await this.model.findByIdAndDelete(req.params.id);
 
@@ -231,22 +248,36 @@ detectRelations(model) {
     });
   }
 
-  processFiles(req) {
+async processFiles(req) {
+  // Cas single file
+  if (req.file) {
+    // memoryStorage => buffer
+    const result = await uploadBufferToCloudinary(req.file.buffer, {
+      folder: "uploads",
+    });
 
-    // Cas single file
-    if (req.file) {
-      this.setDeepValue(req.body, req.file.fieldname, req.file.path);
-    }
+    // 1) champ principal = URL (remplace l'ancien path local)
+    this.setDeepValue(req.body, req.file.fieldname, result.secure_url);
 
-    // Cas multiple files
-    if (req.files) {
-
-      Object.values(req.files).flat().forEach(file => {
-        this.setDeepValue(req.body, file.fieldname, file.path);
-      });
-      }
+    // 2) champ publicId associé (si ton schema le supporte)
+    // Convention: si fieldname = "image", alors "imagePublicId"
+    this.setDeepValue(req.body, `${req.file.fieldname}PublicId`, result.public_id);
   }
 
+  // Cas multiple files
+  if (req.files) {
+    const files = Object.values(req.files).flat();
+
+    for (const file of files) {
+      const result = await uploadBufferToCloudinary(file.buffer, {
+        folder: "uploads",
+      });
+
+      this.setDeepValue(req.body, file.fieldname, result.secure_url);
+      this.setDeepValue(req.body, `${file.fieldname}PublicId`, result.public_id);
+    }
+  }
+}
   extractImagePaths(obj, results = []) {
     if (!obj) return results;
 
@@ -283,17 +314,56 @@ detectRelations(model) {
     return results;
   }
 
+  extractPublicIds(obj, results = []) {
+  if (!obj) return results;
 
-  deleteFile(path) {
-
-    if (!path) return;
-
-    const normalized = path.replace(/\\/g, '/');
-
-    if (fs.existsSync(normalized)) {
-      fs.unlinkSync(normalized);
-      console.log("🗑 Deleted:", normalized);
-    }
+  if (typeof obj === "string") {
+    return results;
   }
+
+  if (Array.isArray(obj)) {
+    obj.forEach(item => this.extractPublicIds(item, results));
+    return results;
+  }
+
+  if (typeof obj === "object" && obj !== null && !(obj instanceof Date)) {
+    const target = obj._doc || obj;
+
+    Object.keys(target).forEach(key => {
+      if (key.startsWith("$")) return;
+
+      // convention: fields ending with PublicId
+      if (key.toLowerCase().endsWith("publicid") && typeof target[key] === "string") {
+        results.push(target[key]);
+      } else {
+        this.extractPublicIds(target[key], results);
+      }
+    });
+  }
+
+  return results;
+}
+
+async deleteAsset(value) {
+  if (!value) return;
+
+  // 1) Si c'est un public_id cloudinary (on assume que public_id ne contient pas "uploads/")
+  // Ici on delete si ça ressemble à un public_id (string non vide)
+  // -> La vraie source de vérité est extractPublicIds()
+  try {
+    await deleteFromCloudinary(value);
+    console.log("🗑 Cloudinary deleted:", value);
+    return;
+  } catch (e) {
+    // Si ce n'est pas un public_id valide, on continue en mode local
+  }
+
+  // 2) fallback: ancien mode local (uploads/)
+  const normalized = value.replace(/\\/g, "/");
+  if (normalized.includes("uploads/") && fs.existsSync(normalized)) {
+    fs.unlinkSync(normalized);
+    console.log("🗑 Local deleted:", normalized);
+  }
+}
 
 }
