@@ -49,17 +49,14 @@ export class ProductGridComponent implements OnInit {
   // RÔLES UTILISATEUR
   // =============================
 
-  /** Utilisateur courant (null si non connecté) */
   get currentUser(): any {
     return this.auth.getUser();
   }
 
-  /** Vrai si connecté et rôle VENDEUR */
   get isVendeur(): boolean {
     return this.currentUser?.role === 'VENDEUR';
   }
 
-  /** Vrai si connecté et rôle client (ni VENDEUR ni ADMIN) */
   get isClient(): boolean {
     const role = this.currentUser?.role;
     return !!role && role !== 'VENDEUR' && role !== 'ADMIN';
@@ -107,9 +104,8 @@ export class ProductGridComponent implements OnInit {
   }
 
   /**
-   * Récupère le shop du vendeur (owner = userId, status = APPROUVE).
-   * Si trouvé, charge uniquement les produits de ce shop.
-   * Si non trouvé (shop en attente/banni), la liste reste vide.
+   * Récupère le shop du vendeur (owner=userId, status=APPROUVE)
+   * puis charge uniquement les produits DISPONIBLES de ce shop.
    */
   loadVendorProducts() {
     const userId = this.currentUser?._id;
@@ -162,7 +158,7 @@ export class ProductGridComponent implements OnInit {
     this.fields?.forEach(f => {
       if (f.type === 'array') this.form[f.name] = [];
     });
-    // Pré-remplit le shop avec le shop du vendeur
+    // Pré-remplit le shop si vendeur et shopId déjà connu
     if (this.isVendeur && this.vendorShopId) {
       this.form['shop'] = this.vendorShopId;
     }
@@ -187,7 +183,7 @@ export class ProductGridComponent implements OnInit {
   }
 
   /**
-   * Retourne le nom du shop du vendeur pour l'affichage (champ verrouillé).
+   * Retourne le nom du shop du vendeur pour le champ verrouillé.
    */
   getVendorShopName(): string {
     if (!this.vendorShopId || !this.relationsData['shop']) return '—';
@@ -273,6 +269,10 @@ export class ProductGridComponent implements OnInit {
   submit() {
     if (this.isProcessing) return;
     this.isProcessing = true;
+    // Force shop + status pour vendeur
+    if (this.isVendeur && this.vendorShopId) {
+      this.form['shop'] = this.vendorShopId;
+    }
     const payload = this.buildPayload(this.form);
     this.service.create(this.endpoint, payload)
       .subscribe({
@@ -344,17 +344,81 @@ export class ProductGridComponent implements OnInit {
   }
 
   // =============================
-  // ACTIONS CLIENT (à implémenter)
+  // ACTIONS CLIENT
   // =============================
 
+  /**
+   * Crée directement un favori en DB puis redirige vers /favorite.
+   */
   addToFavorites(item: any) {
-    // TODO: appel API favoris
-    console.log('Ajouter aux favoris :', item._id);
+    const userId = this.currentUser?._id;
+    if (!userId) return;
+
+    this.service.create('favorites', { user: userId, product: item._id }).subscribe({
+      next: () => this.router.navigate(['/favorite']),
+      error: (err) => console.error('FAVORITE ERROR', err)
+    });
   }
 
+  /**
+   * Ajoute le produit au panier en DB (upsert) :
+   * - Panier existant → ajoute/incrémente la ligne produit
+   * - Pas de panier → en crée un nouveau
+   * Puis redirige vers /cart.
+   */
   addToCart(item: any) {
-    // TODO: appel API panier
-    console.log('Ajouter au panier :', item._id);
+    const userId = this.currentUser?._id;
+    if (!userId) return;
+
+    this.service.getAllWithParams('carts', { user: userId }).subscribe({
+      next: (carts: any[]) => {
+        if (carts && carts.length > 0) {
+          const cart = carts[0];
+          const existingItems: any[] = cart.items || [];
+
+          // Vérifie si le produit est déjà dans le panier
+          const existingLine = existingItems.find(
+            (i: any) => (i.product?._id || i.product) === item._id
+          );
+
+          let updatedItems;
+          if (existingLine) {
+            // Incrémente la quantité
+            updatedItems = existingItems.map((i: any) => {
+              const pid = i.product?._id || i.product;
+              return pid === item._id
+                ? { product: pid, quantity: (i.quantity || 1) + 1 }
+                : { product: pid, quantity: i.quantity || 1 };
+            });
+          } else {
+            // Nouvelle ligne
+            updatedItems = [
+              ...existingItems.map((i: any) => ({
+                product: i.product?._id || i.product,
+                quantity: i.quantity || 1
+              })),
+              { product: item._id, quantity: 1 }
+            ];
+          }
+
+          this.service.update('carts', cart._id, { user: userId, items: updatedItems }).subscribe({
+            next: () => this.router.navigate(['/cart']),
+            error: (err) => console.error('CART UPDATE ERROR', err)
+          });
+
+        } else {
+          // Création d'un nouveau panier
+          this.service.create('carts', {
+            user: userId,
+            items: [{ product: item._id, quantity: 1 }]
+          }).subscribe({
+            next: () => this.router.navigate(['/cart']),
+            error: (err) => console.error('CART CREATE ERROR', err)
+          });
+        }
+      },
+      error: (err) => console.error('CART FETCH ERROR', err)
+    });
   }
 
   // =============================

@@ -245,7 +245,14 @@
     <!-- ===== RELATION ===== -->
     <ng-container *ngIf="field.type === 'relation'">
       <label>{{ getFieldLabel(field) }}</label>
-      <select [(ngModel)]="model[field.name]">
+      <!-- Champ verrouillé (defaultValue + locked) -->
+      <div *ngIf="field.locked"
+           style="padding:8px 10px; background:#f1f5f9; border:1px solid #e2e8f0;
+                  border-radius:6px; color:#64748b; font-style:italic; cursor:not-allowed;">
+        {{ getRelationLabel(relationsData[field.name], model[field.name]) }}
+      </div>
+      <!-- Champ normal -->
+      <select *ngIf="!field.locked" [(ngModel)]="model[field.name]">
         <option *ngFor="let r of relationsData[field.name]; trackBy: trackByIndex" [value]="r._id">
           {{ r.name || r.title || r.label }}
         </option>

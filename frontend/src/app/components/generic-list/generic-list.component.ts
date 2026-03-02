@@ -63,33 +63,25 @@ export class GenericListComponent implements OnInit {
 ) {}
 
   ngOnInit() {
-
     if (this.showForm) {
       this.initializeModelStructure(this.form, this.fields);
+      this.applyDefaultValues(this.form, this.fields);
     }
 
     if (this.searchFields?.length && this.showSearch) {
       this.initializeModelStructure(this.searchModel, this.searchFields, true);
     }
 
-    // 🔥 MODE EDIT PAGE
     if (this.editingId) {
-
       this.service.getById(this.endpoint, this.editingId)
-          .subscribe(data => {
-
+        .subscribe(data => {
           this.editingItem = data;
-
-          // IMPORTANT pour nested/subdocuments
           this.initializeModelStructure(this.editingItem, this.fields);
-
           this.cdr.markForCheck();
         });
-
-      return; // ⚠ stop ici (ne pas load list)
+      return;
     }
 
-    // 🔥 MODE LIST
     if (this.showTable) {
       this.load();
     }
@@ -97,6 +89,51 @@ export class GenericListComponent implements OnInit {
     if (this.showForm || this.showSearch) {
       this.loadRelationsRecursive(this.fields);
     }
+  }
+
+  // =============================
+  // LABEL HELPER
+  // =============================
+
+  /** Retourne field.label si défini, sinon capitalize du field.name */
+  getFieldLabel(field: any): string {
+    if (field.label) return field.label;
+    const name = field.name || '';
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }
+
+  /**
+   * Applique les defaultValue définis dans la config des fields.
+   * Ne remplace pas une valeur déjà présente.
+   */
+  applyDefaultValues(model: any, fields: any[]) {
+    fields.forEach(field => {
+      if (field.defaultValue !== undefined && field.defaultValue !== null) {
+        if (!model[field.name]) {
+          model[field.name] = field.defaultValue;
+        }
+      }
+      // Récursion pour subdocuments/nested
+      if (field.fields && model[field.name]) {
+        if (Array.isArray(model[field.name])) {
+          model[field.name].forEach((item: any) => this.applyDefaultValues(item, field.fields));
+        } else {
+          this.applyDefaultValues(model[field.name], field.fields);
+        }
+      }
+    });
+  }
+
+  /**
+   * Retourne le label d'une relation pour l'affichage d'un champ verrouillé.
+   * @param relationList liste des items de la relation (relationsData[field.name])
+   * @param value        valeur actuelle du modèle (peut être un _id string ou un objet peuplé)
+   */
+  getRelationLabel(relationList: any[], value: any): string {
+    if (!relationList || !value) return '—';
+    const id = typeof value === 'object' ? value._id : value;
+    const found = relationList.find((r: any) => r._id === id);
+    return found?.name || found?.title || found?.label || id || '—';
   }
 
   // =============================
@@ -401,11 +438,6 @@ delete(id: string) {
     });
 }
 
-getFieldLabel(field: any): string {
-  if (field.label) return field.label;
-  const name = field.name || '';
-  return name.charAt(0).toUpperCase() + name.slice(1);
-}
 
     // =============================
   // FILE HANDLING
