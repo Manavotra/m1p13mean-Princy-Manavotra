@@ -19,8 +19,7 @@ import { ProfilePage  } from './pages/profile.page';
 import { ShopAdminPage } from './pages/shop.admin.page';
 
 import { OrderNotDeliveredVendorPage } from './pages/order-not-delivered-vendor.page';
-
-
+import { HistoriquePage } from './pages/historique.page';
 
 // import { AdminLayout } from '../app/layouts/admin-layout/admin-layout';
 // import { ShopLayout } from '../app/layouts/shop-layout/shop-layout';
@@ -36,24 +35,27 @@ import { AdminDashboardPage }   from './pages/admin-dashboard.page';
 export const routes: Routes = [
    { path: '', component: LoginPage },
       { path: 'users/create', component: UserCreatePage },
+
+
       { path: 'user', component: UserPage },
       { path: 'order_pending', component: OrderNotDeliveredVendorPage },
       { path: 'profile', component: ProfilePage },
+      { path: 'users', component: UserListPage },
+      { path: 'discount', component: DiscountPage },
 
 
       // =============================
       // VENDEUR - ACHETEUR
       // =============================
       { path: 'product', component: ProductPage },
+      { path: 'users/:id/edit', component: UsersEditPage },
 
-      
+
       // Mes commandes (utilisateur connecté) + suppression panier après commande
       { path: 'order', component: OrderPage },
-      { path: 'discount', component: DiscountPage },
       { path: 'cart', component: CartPage },
 
-      { path: 'users', component: UserListPage },
-      { path: 'users/:id/edit', component: UsersEditPage },
+
 
 
       // Commandes LIVRÉES uniquement (toutes)
@@ -62,13 +64,15 @@ export const routes: Routes = [
       // Commandes en cours (tout sauf LIVREE)
       { path: 'order-not-delivered', component: OrderNotDeliveredPage },
 
-      // Mes commandes LIVRÉES (utilisateur connecté)
+      // Mes commandes LIVRÉES (utilisateur connecté) facture
       { path: 'order-my-delivered',  component: OrderMyDeliveredPage },
 
 
       // =============================
       // ACHETEUR
       // =============================
+      { path: 'historique', component: HistoriquePage },
+
 
       { path: 'favorite', component: FavoritePage },
 
@@ -77,6 +81,7 @@ export const routes: Routes = [
       // =============================
       // VENDEUR
       // =============================
+
 
 
 
