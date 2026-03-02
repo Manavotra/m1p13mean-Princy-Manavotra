@@ -299,6 +299,13 @@ getImageUrl(value: string): string {
   // ✅ Old local path (uploads/xxx.jpg)
   return `${this.service["api"].replace("/api/", "/")}${value}`;
 }
+  refreshList() {
+    this.service.getAll(this.endpoint)
+      .subscribe(data => {
+        this.items = [...data];
+        this.cdr.detectChanges();
+      });
+  }
 
   submit() {
     if (this.isProcessing) return;
