@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BaseService } from '../../services/base.service';
+import { ProfilePage } from '../../pages/profile.page';
 
 @Component({
   selector: 'app-generic-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ProfilePage],
   templateUrl: './generic-list.component.html',
   styleUrls: ['./generic-list.component.css']
 })
