@@ -4,10 +4,12 @@ import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <h2>Login</h2>
     <form (ngSubmit)="submit()">
@@ -17,7 +19,10 @@ import { CommonModule } from '@angular/common';
         {{ loading ? 'Connexion...' : 'Se connecter' }}
       </button>
       <p *ngIf="error" style="color:red">{{ error }}</p>
+      <br>
     </form>
+          <a routerLink="/users/create">S'inscrire</a>
+
   `
 })
 export class LoginPage {

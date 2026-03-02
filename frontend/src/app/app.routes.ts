@@ -40,7 +40,7 @@ export const routes: Routes = [
       { path: 'home', component: HomeComponent },
       { path: 'user', component: UserPage },
       { path: 'shop', component: ShopPage },
-      { path: '', component: ProductPage },
+      { path: 'product', component: ProductPage },
       // Mes commandes (utilisateur connecté) + suppression panier après commande
       { path: 'order', component: OrderPage },
       { path: 'favorite', component: FavoritePage },

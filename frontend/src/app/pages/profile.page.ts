@@ -59,7 +59,7 @@ import { RouterModule } from '@angular/router';
 
     </div>
     <div *ngIf="!user && !loading">
-      <p>Non connecté. <a routerLink="/login">Se connecter</a></p>
+      <p>Non connecté. <a routerLink="/">Se connecter</a></p>
     </div>
   `
 })
@@ -95,7 +95,7 @@ export class ProfilePage implements OnInit {
     logout() {
         this.auth.logout().subscribe(() => {
         // Pour le logout, on redirige simplement
-        location.href = '/login';
+        location.href = '/';
         });
     }
 }
