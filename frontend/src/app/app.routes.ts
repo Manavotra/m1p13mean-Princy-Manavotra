@@ -28,7 +28,6 @@ import { OrderNotDeliveredPage} from './pages/order-not-delivered.page';
 import { OrderMyDeliveredPage } from './pages/order-my-delivered.page';
 import { AdminDashboardPage }   from './pages/admin-dashboard.page';
 
-import { ProductGridComponent } from './components/product-grid/product-grid.component';
 
 export const routes: Routes = [
 
@@ -37,12 +36,11 @@ export const routes: Routes = [
     path: '',
     component: CustomerLayout,
     children: [
-      { path: '', component: ProductGridComponent },
 
       { path: 'home', component: HomeComponent },
       { path: 'user', component: UserPage },
       { path: 'shop', component: ShopPage },
-      { path: 'product', component: ProductPage },
+      { path: '', component: ProductPage },
       // Mes commandes (utilisateur connecté) + suppression panier après commande
       { path: 'order', component: OrderPage },
       { path: 'favorite', component: FavoritePage },
@@ -54,7 +52,7 @@ export const routes: Routes = [
       { path: 'users/create', component: UserCreatePage },
       { path: 'users/:id/edit', component: UsersEditPage },
 
-      { path: 'login', component: LoginPage },
+      { path: '', component: LoginPage },
       { path: 'profile', component: ProfilePage },
 
       // Toutes les commandes — sans filtre (admin)
