@@ -58,7 +58,6 @@ import { RouterModule } from '@angular/router';
         </div>
 
     </div>
-    <router-outlet></router-outlet>
         <div *ngIf="!user && !loading">
       <p>Non connecté. <a routerLink="/">Se connecter</a></p>
     </div>
