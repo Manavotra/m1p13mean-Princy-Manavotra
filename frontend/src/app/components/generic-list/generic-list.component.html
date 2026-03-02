@@ -1,7 +1,6 @@
 <div *ngIf="showForm">
   <h3>{{ editingItem ? 'Modifier' : 'Ajouter' }}</h3>
 
-  <!-- ===== FORMULAIRE RÉCURSIF ===== -->
   <ng-container
     *ngTemplateOutlet="renderFields;
                       context:{ model: currentModel,
@@ -9,11 +8,30 @@
                                 isSearch: false }">
   </ng-container>
 
-  <button type="button"
-          [disabled]="isProcessing"
-          (click)="editingItem ? save() : submit()">
-    {{ isProcessing ? 'Traitement...' : (editingItem ? 'Enregistrer' : 'Enregistrer') }}
-  </button>
+  <!-- Hint d'édition -->
+  <p *ngIf="editingItem && editHint"
+     style="margin:8px 0; padding:10px 14px; background:#fef9c3; border:1px solid #fde68a;
+            border-radius:6px; color:#854d0e; font-size:14px;">
+    {{ editHint }}
+  </p>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <button type="button"
+            [disabled]="isProcessing"
+            (click)="editingItem ? save() : submit()">
+      {{ isProcessing ? 'Traitement...' : (editingItem ? 'Enregistrer' : 'Enregistrer') }}
+    </button>
+
+    <!-- Bouton action secondaire (ex: Passer commande) -->
+    <button *ngIf="editingItem && editActionLabel"
+            type="button"
+            [disabled]="isProcessing"
+            (click)="save(); editActionClicked.emit(editingItem)"
+            style="background:#2563eb; color:white; border:none; border-radius:6px;
+                   padding:8px 16px; font-weight:600; cursor:pointer;">
+      {{ editActionLabel }}
+    </button>
+  </div>
 </div>
 
 <hr>
@@ -47,92 +65,64 @@
     <th *ngFor="let field of fields; trackBy: trackByIndex">
       {{ getFieldLabel(field) }}
     </th>
-    <th >Actions</th>
+    <th>Actions</th>
   </tr>
 
   <tr *ngFor="let item of items; trackBy: trackByIndex">
     <td *ngFor="let field of fields; trackBy: trackByIndex">
 
-<!-- ===== NESTED DISPLAY (TABLE STYLE) ===== -->
-<ng-container *ngIf="field.type === 'nested'">
+      <!-- ===== NESTED DISPLAY ===== -->
+      <ng-container *ngIf="field.type === 'nested'">
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <tr *ngFor="let subField of field.fields">
+            <td style="border:1px solid #eee; padding:4px; font-weight:600;">
+              {{ getFieldLabel(subField) }}
+            </td>
+            <td style="border:1px solid #eee; padding:4px;">
+              {{ item[field.name]?.[subField.name] || '—' }}
+            </td>
+          </tr>
+        </table>
+      </ng-container>
 
-  <table style="width:100%; border-collapse:collapse; font-size:12px;">
-    <tr *ngFor="let subField of field.fields">
-      <td style="border:1px solid #eee; padding:4px; font-weight:600;">
-        {{ getFieldLabel(subField) }}
-      </td>
-      <td style="border:1px solid #eee; padding:4px;">
-        {{ item[field.name]?.[subField.name] || '—' }}
-      </td>
-    </tr>
-  </table>
-
-</ng-container>
-
-<!-- ===== SUBDOCUMENT DISPLAY (TABLE STYLE) ===== -->
-<ng-container *ngIf="field.type === 'subdocument'">
-
-  <div *ngIf="!item[field.name] || item[field.name].length === 0">
-    —
-  </div>
-
-  <table *ngIf="item[field.name]?.length > 0"
-         style="width:100%; border-collapse:collapse; font-size:12px;">
-
-    <!-- Header -->
-    <tr style="background:#f3f3f3;">
-      <th *ngFor="let subField of field.fields"
-          style="border:1px solid #ddd; padding:4px; text-align:left;">
-        {{ getFieldLabel(subField) }}
-      </th>
-    </tr>
-
-    <!-- Rows -->
-    <tr *ngFor="let sub of item[field.name]; trackBy: trackByIndex">
-      <td *ngFor="let subField of field.fields"
-          style="border:1px solid #eee; padding:4px;">
-
-        <!-- Relation peuplée -->
-        <ng-container *ngIf="sub[subField.name]?._id; else normalValue">
-          {{ sub[subField.name][subField.displayField || 'name']
-             || sub[subField.name]._id }}
-        </ng-container>
-
-        <!-- Valeur normale -->
-        <ng-template #normalValue>
-          {{ sub[subField.name] }}
-        </ng-template>
-
-      </td>
-    </tr>
-
-  </table>
-
-</ng-container>
+      <!-- ===== SUBDOCUMENT DISPLAY ===== -->
+      <ng-container *ngIf="field.type === 'subdocument'">
+        <div *ngIf="!item[field.name] || item[field.name].length === 0">—</div>
+        <table *ngIf="item[field.name]?.length > 0"
+               style="width:100%; border-collapse:collapse; font-size:12px;">
+          <tr style="background:#f3f3f3;">
+            <th *ngFor="let subField of field.fields"
+                style="border:1px solid #ddd; padding:4px; text-align:left;">
+              {{ getFieldLabel(subField) }}
+            </th>
+          </tr>
+          <tr *ngFor="let sub of item[field.name]; trackBy: trackByIndex">
+            <td *ngFor="let subField of field.fields"
+                style="border:1px solid #eee; padding:4px;">
+              <ng-container *ngIf="sub[subField.name]?._id; else normalValue">
+                {{ sub[subField.name][subField.displayField || 'name'] || sub[subField.name]._id }}
+              </ng-container>
+              <ng-template #normalValue>{{ sub[subField.name] }}</ng-template>
+            </td>
+          </tr>
+        </table>
+      </ng-container>
 
       <!-- ===== RELATION DISPLAY ===== -->
-      <span *ngIf="field.type !== 'nested'
-                    && field.type !== 'subdocument'
-                    && item[field.name]?._id">
-        {{ item[field.name].name
-           || item[field.name].title
-           || item[field.name].label }}
+      <span *ngIf="field.type !== 'nested' && field.type !== 'subdocument' && item[field.name]?._id">
+        {{ item[field.name].name || item[field.name].title || item[field.name].label }}
       </span>
 
       <!-- ===== ARRAY DISPLAY ===== -->
-      <span *ngIf="field.type !== 'nested'
-                    && field.type !== 'subdocument'
-                    && isArray(item[field.name])">
+      <span *ngIf="field.type !== 'nested' && field.type !== 'subdocument' && isArray(item[field.name])">
         {{ item[field.name].join(', ') }}
       </span>
-
 
       <!-- ===== IMAGE DISPLAY ===== -->
       <img *ngIf="field.type === 'image' && item[field.name]"
           [src]="getImageUrl(item[field.name])"
           width="60"
           style="border-radius:4px;" />
-
 
       <!-- ===== SIMPLE DISPLAY ===== -->
       <span *ngIf="field.type !== 'nested'
@@ -146,22 +136,16 @@
     </td>
 
     <td>
-      <button *ngIf="canEdit"
-              type="button"
-              [disabled]="isProcessing"
-              (click)="edit(item)">
+      <button *ngIf="canEdit" type="button" [disabled]="isProcessing" (click)="edit(item)">
         Modifier
       </button>
-
-      <button *ngIf="canDelete"
-              type="button"
-              [disabled]="isProcessing"
-              (click)="delete(item._id)">
+      <button *ngIf="canDelete" type="button" [disabled]="isProcessing" (click)="delete(item._id)">
         Supprimer
       </button>
     </td>
   </tr>
 </table>
+
 
 <!-- ===================================================== -->
 <!-- ===== TEMPLATE RÉCURSIF POUR LES CHAMPS ===== -->
@@ -175,18 +159,14 @@
   <div *ngFor="let field of fields; trackBy: trackByIndex"
        style="margin-bottom:10px">
 
-    <!-- ===== INPUT DATE ===== -->
+    <!-- ===== RANGE DATE ===== -->
     <div *ngIf="field.type === 'range-date'">
       <label>{{ getFieldLabel(field) }}</label>
-      <input type="date" 
-        [(ngModel)]="model[field.name + '_from']" 
-        [placeholder]="getFieldLabel(field) + ' from'" />
-      <input type="date" 
-        [(ngModel)]="model[field.name + '_to']" 
-        [placeholder]="getFieldLabel(field) + ' to'" />
+      <input type="date" [(ngModel)]="model[field.name + '_from']" [placeholder]="getFieldLabel(field) + ' from'" />
+      <input type="date" [(ngModel)]="model[field.name + '_to']" [placeholder]="getFieldLabel(field) + ' to'" />
     </div>
 
-    <!-- ===== INPUT NUMBER ===== -->
+    <!-- ===== RANGE NUMBER ===== -->
     <div *ngIf="field.type === 'range-number'">
       <label>{{ getFieldLabel(field) }}</label>
       <input type="number" [(ngModel)]="model[field.name + '_min']" [placeholder]="getFieldLabel(field) + ' min'" />
@@ -195,22 +175,15 @@
 
     <!-- ===== IMAGE UPLOAD ===== -->
     <div *ngIf="field.type === 'image'">
-    <label>{{ getFieldLabel(field) }}</label>
-      <input type="file"
-            (change)="onFileChange($event, model, field.name)" />
-
-      <!-- Preview -->
+      <label>{{ getFieldLabel(field) }}</label>
+      <input type="file" (change)="onFileChange($event, model, field.name)" />
       <div *ngIf="model[field.name] && isImagePath(model[field.name])">
-        <img [src]="getImageUrl(model[field.name])"
-            width="100"
-            style="margin-top:5px; border:1px solid #ccc;" />
+        <img [src]="getImageUrl(model[field.name])" width="100" style="margin-top:5px; border:1px solid #ccc;" />
       </div>
-
     </div>
 
-
     <!-- ===== INPUT SIMPLE ===== -->
-   <ng-container *ngIf="field.type !== 'nested'
+    <ng-container *ngIf="field.type !== 'nested'
                 && field.type !== 'array'
                 && field.type !== 'relation'
                 && field.type !== 'select'
@@ -219,7 +192,15 @@
                 && field.type !== 'range-number'
                 && field.type !== 'image'">
       <label>{{ getFieldLabel(field) }}</label>
-      <input [type]="field.type"
+      <!-- Champ verrouillé -->
+      <div *ngIf="field.locked"
+           style="padding:8px 10px; background:#f1f5f9; border:1px solid #e2e8f0;
+                  border-radius:6px; color:#64748b; font-style:italic; cursor:not-allowed;">
+        {{ model[field.name] !== undefined && model[field.name] !== null ? model[field.name] : '—' }}
+      </div>
+      <!-- Champ éditable -->
+      <input *ngIf="!field.locked"
+             [type]="field.type"
              [(ngModel)]="model[field.name]"
              [placeholder]="getFieldLabel(field)" />
     </ng-container>
@@ -245,7 +226,7 @@
     <!-- ===== RELATION ===== -->
     <ng-container *ngIf="field.type === 'relation'">
       <label>{{ getFieldLabel(field) }}</label>
-      <!-- Champ verrouillé (defaultValue + locked) -->
+      <!-- Champ verrouillé (locked: true) -->
       <div *ngIf="field.locked"
            style="padding:8px 10px; background:#f1f5f9; border:1px solid #e2e8f0;
                   border-radius:6px; color:#64748b; font-style:italic; cursor:not-allowed;">
@@ -273,59 +254,19 @@
 
     <!-- ===== SUBDOCUMENT ===== -->
     <div *ngIf="field.type === 'subdocument'"
-        style="margin-left:20px;
-                border-left:2px solid #4CAF50;
-                padding-left:10px">
+         style="margin-left:20px; border-left:2px solid #4CAF50; padding-left:10px">
       <strong>{{ getFieldLabel(field) }}</strong>
-      <strong>{{ field.name }}</strong>
-
-      <!-- 🔥 MODE RECHERCHE -->
       <ng-container *ngIf="isSearch">
-
-        <ng-container
-          *ngTemplateOutlet="renderFields;
-                            context:{
-                              model: model[field.name],
-                              fields: field.fields,
-                              isSearch: true
-                            }">
-        </ng-container>
-
+        <ng-container *ngTemplateOutlet="renderFields; context:{ model: model[field.name], fields: field.fields, isSearch: true }"></ng-container>
       </ng-container>
-
-      <!-- 🔥 MODE CRUD NORMAL -->
       <ng-container *ngIf="!isSearch">
-
-        <div *ngFor="let subItem of model[field.name];
-                    let i = index;
-                    trackBy: trackByIndex"
-            style="margin-bottom:10px;
-                    padding:10px;
-                    border:1px solid #ccc">
-
-          <ng-container
-            *ngTemplateOutlet="renderFields;
-                              context:{
-                                model: subItem,
-                                fields: field.fields,
-                                isSearch: false
-                              }">
-          </ng-container>
-
-          <button type="button"
-                  (click)="removeSubdocumentItem(field.name, i)">
-            Supprimer ligne
-          </button>
-
+        <div *ngFor="let subItem of model[field.name]; let i = index; trackBy: trackByIndex"
+             style="margin-bottom:10px; padding:10px; border:1px solid #ccc">
+          <ng-container *ngTemplateOutlet="renderFields; context:{ model: subItem, fields: field.fields, isSearch: false }"></ng-container>
+          <button type="button" (click)="removeSubdocumentItem(field.name, i)">Supprimer ligne</button>
         </div>
-
-        <button type="button"
-                (click)="addSubdocumentItem(field)">
-          Ajouter ligne
-        </button>
-
+        <button type="button" (click)="addSubdocumentItem(field)">Ajouter ligne</button>
       </ng-container>
-
     </div>
 
   </div>

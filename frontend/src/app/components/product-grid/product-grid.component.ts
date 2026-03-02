@@ -118,10 +118,9 @@ export class ProductGridComponent implements OnInit {
             this.vendorShopId = shops[0]._id;
             // Pré-remplit le shop dans le formulaire
             this.form['shop'] = this.vendorShopId;
-            // Charge les produits du shop avec status DISPONIBLE
+            // Charge tous les produits du shop du vendeur
             this.service.getAllWithParams(this.endpoint, {
-              shop: this.vendorShopId,
-              status: 'DISPONIBLE'
+              shop: this.vendorShopId
             }).subscribe(data => {
               this.items = [...data];
               this.cdr.detectChanges();
