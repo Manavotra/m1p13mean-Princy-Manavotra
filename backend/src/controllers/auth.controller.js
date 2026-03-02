@@ -23,6 +23,8 @@ class AuthController {
     req.session.userId = user._id;
     req.session.role = user.role; 
 
+    await req.session.save();
+
     // 🔥 Renvoie les infos au frontend
     res.json({
       message: 'Login successful',
