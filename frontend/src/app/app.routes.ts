@@ -17,9 +17,9 @@ import { LoginPage  } from './pages/login.page';
 import { ProfilePage  } from './pages/profile.page';
 
 
-import { AdminLayout } from '../app/layouts/admin-layout/admin-layout';
-import { ShopLayout } from '../app/layouts/shop-layout/shop-layout';
-import { CustomerLayout } from '../app/layouts/customer-layout/customer-layout';
+// import { AdminLayout } from '../app/layouts/admin-layout/admin-layout';
+// import { ShopLayout } from '../app/layouts/shop-layout/shop-layout';
+// import { CustomerLayout } from '../app/layouts/customer-layout/customer-layout';
 
 
 import { OrderAllPage }         from './pages/order-all.page';
@@ -34,7 +34,7 @@ export const routes: Routes = [
   // CUSTOMER LAYOUT
   {
     path: '',
-    component: CustomerLayout,
+    component: ProfilePage,
     children: [
 
       { path: 'home', component: HomeComponent },
@@ -49,10 +49,8 @@ export const routes: Routes = [
       { path: 'cart', component: CartPage },
 
       { path: 'users', component: UserListPage },
-      { path: 'users/create', component: UserCreatePage },
       { path: 'users/:id/edit', component: UsersEditPage },
 
-      { path: '', component: LoginPage },
       { path: 'profile', component: ProfilePage },
 
       // Toutes les commandes — sans filtre (admin)
@@ -75,9 +73,11 @@ export const routes: Routes = [
 
   // ADMIN LAYOUT
   {
-    path: 'admin',
-    component: AdminLayout,
+    path: '',
+    // component: AdminLayout,
     children: [
+      { path: 'login', component: LoginPage },
+      { path: 'register', component: UserCreatePage },
       // { path: 'users', component: UsersPage },
       // { path: 'categories', component: CategoriesPage },
       // { path: 'subcategories', component: SubCategoriesPage },
@@ -93,7 +93,7 @@ export const routes: Routes = [
   // SHOP LAYOUT
   {
     path: 'shop',
-    component: ShopLayout,
+    // component: ShopLayout,
     children: [
       // { path: 'products', component: ProductsPage },
       // { path: 'orders', component: OrdersPage }

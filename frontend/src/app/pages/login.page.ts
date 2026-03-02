@@ -6,23 +6,88 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-
 @Component({
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
-    <h2>Login</h2>
-    <form (ngSubmit)="submit()">
-      <input [(ngModel)]="email" name="email" placeholder="Email" />
-      <input [(ngModel)]="password" name="password" type="password" placeholder="Password" />
-      <button type="submit" [disabled]="loading">
-        {{ loading ? 'Connexion...' : 'Se connecter' }}
-      </button>
-      <p *ngIf="error" style="color:red">{{ error }}</p>
-      <br>
-    </form>
-          <a routerLink="/users/create">S'inscrire</a>
+    <div class="min-h-screen bg-base-200 flex items-center justify-center p-4">
+      <div class="card w-full max-w-md bg-base-100 shadow-xl">
+        <div class="card-body">
 
+          <div class="flex items-center justify-between">
+            <h2 class="card-title text-2xl">Login</h2>
+            <a routerLink="/" class="link link-hover text-sm opacity-70">Accueil</a>
+          </div>
+
+          <p class="text-sm opacity-70">
+            Connectez-vous pour accéder à votre compte.
+          </p>
+
+          <form (ngSubmit)="submit()" class="mt-4 space-y-4">
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">Email</span>
+              </label>
+              <input
+                class="input input-bordered w-full"
+                [(ngModel)]="email"
+                name="email"
+                type="email"
+                placeholder="ex: nom@email.com"
+                autocomplete="email"
+                [disabled]="loading"
+                required
+              />
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">Mot de passe</span>
+              </label>
+              <input
+                class="input input-bordered w-full"
+                [(ngModel)]="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                autocomplete="current-password"
+                [disabled]="loading"
+                required
+              />
+              <label class="label">
+                <span class="label-text-alt opacity-70">
+                  Utilisez vos identifiants habituels.
+                </span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary w-full"
+              [disabled]="loading"
+            >
+              <span *ngIf="!loading">Se connecter</span>
+              <span *ngIf="loading" class="flex items-center gap-2">
+                <span class="loading loading-spinner loading-xs"></span>
+                Connexion...
+              </span>
+            </button>
+
+            <div *ngIf="error" class="alert alert-error">
+              <span>{{ error }}</span>
+            </div>
+
+            <div class="divider">OU</div>
+
+            <a routerLink="/register" class="btn btn-outline w-full">
+              S'inscrire
+            </a>
+          </form>
+
+        </div>
+      </div>
+    </div>
   `
 })
 export class LoginPage {
@@ -37,12 +102,9 @@ export class LoginPage {
     this.loading = true;
     this.error = '';
 
-    // Le tap() dans auth.service setUser automatiquement via le pipe
-    // On n'a donc PAS besoin d'appeler setUser ni getMe ici
     this.auth.login({ email: this.email, password: this.password }).subscribe({
       next: (res: any) => {
         this.loading = false;
-        // Redirection selon le rôle stocké dans le BehaviorSubject par le tap()
         switch (res.user.role) {
           case 'ADMIN':
             this.router.navigate(['/order']);
