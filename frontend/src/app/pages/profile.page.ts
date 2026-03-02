@@ -1,39 +1,67 @@
+// pages/profile.page.ts
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
-
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
-    selector: 'app-profile',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
-        <h2>Profile</h2>
+  selector: 'app-profile',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
+    <div *ngIf="user">
+      <h2>Profil</h2>
+      <p><strong>Nom :</strong> {{ user.name }}</p>
+      <p><strong>Email :</strong> {{ user.email }}</p>
+      <p><strong>Rôle :</strong> {{ user.role }}</p>
+      <button (click)="logout()">Logout</button>
+    
+      <hr>
 
-        <div *ngIf="user$ | async as user; else noUser">
-        <p>Name: {{ user.name }}</p>
-        <p>Email: {{ user.email }}</p>
-        <p>Role: {{ user.role }}</p>
-        <button (click)="logout()">Logout</button>
+        <!-- 🔹 Lien conditionnel si admin -->
+        <div *ngIf="user.role === 'VENDEUR'">
+            <a routerLink="/shop">Shop</a>
+        </div>
+        <div *ngIf="user.role !== 'ADMIN' && user.role !== 'VENDEUR'">
+            <a routerLink="/favorite">Favoris</a>
+            <a routerLink="/cart">Panier</a>
         </div>
 
-        <ng-template #noUser>
-        <p>Loading or not logged in...</p>
-        </ng-template>
-    `
+    </div>
+    <div *ngIf="!user && !loading">
+      <p>Non connecté. <a routerLink="/login">Se connecter</a></p>
+    </div>
+  `
 })
 export class ProfilePage implements OnInit {
-    // 1. On change le type pour un Observable (important pour le pipe async)
-    user$: Observable<any> | undefined;
+  user: any = null;
+  loading = true;
 
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
-    ngOnInit() {
-        // 2. On affecte directement l'observable sans faire de .subscribe() manuel
-        // La logique NgZone est déjà gérée à l'intérieur de getMe()
-        this.user$ = this.auth.getMe();
+  ngOnInit() {
+    // 1. Si le user est déjà en mémoire (vient de se connecter), on l'utilise directement
+    const cached = this.auth.getUser();
+    if (cached) {
+      this.user = cached;
+      this.loading = false;
+      return;
     }
+
+    // 2. Sinon, tentative de restauration de session via cookie (refresh de page)
+    this.auth.getMe().subscribe({
+      next: (user: any) => {
+        this.user = user;
+        this.loading = false;
+      },
+      error: () => {
+        // Session expirée ou non connecté → redirection login
+        this.loading = false;
+        this.router.navigate(['/login']);
+      }
+    });
+  }
 
     logout() {
         this.auth.logout().subscribe(() => {

@@ -29,7 +29,9 @@ export const routes: Routes = [
     path: '',
     component: CustomerLayout,
     children: [
-      { path: '', component: HomeComponent },
+      { path: '', component: ProductPage },
+
+      { path: 'home', component: HomeComponent },
       { path: 'user', component: UserPage },
       { path: 'shop', component: ShopPage },
       { path: 'product', component: ProductPage },

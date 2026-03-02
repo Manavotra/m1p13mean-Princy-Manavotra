@@ -1,48 +1,40 @@
+// pages/product.page.ts
 import { Component } from '@angular/core';
-import { GenericListComponent } from '../components/generic-list/generic-list.component';
+import { ProductGridComponent } from '../components/product-grid/product-grid.component';
 
 @Component({
   standalone: true,
-  imports: [GenericListComponent],
+  imports: [ProductGridComponent],
   template: `
-    <h2>Product</h2>
-    <app-generic-list
+    <app-product-grid
       endpoint="products"
       [fields]="fields"
       [searchFields]="searchFields">
-    </app-generic-list>
+    </app-product-grid>
   `
 })
 export class ProductPage {
+
   fields = [
-    { name: 'name', type: 'text' },
-    { name: 'description', type: 'text' },
-    { name: 'price', type: 'number' },
-    { name: 'stock', type: 'number' },
-    { name: 'image', type: 'image' },
-    { name: 'shop', type: 'relation', endpoint: 'shops' },
-    { name: 'category', type: 'relation', endpoint: 'categories' },
-    { name: 'status', type: 'select', options: ['DISPONIBLE', 'INACTIF', 'BANNI'] }
-
-
+    { name: 'name',        label: 'Nom du produit',      type: 'text' },
+    { name: 'description', label: 'Description',          type: 'text' },
+    { name: 'price',       label: 'Prix (€)',             type: 'number' },
+    { name: 'stock',       label: 'Stock disponible',     type: 'number' },
+    { name: 'image',       label: 'Photo du produit',     type: 'image' },
+    { name: 'shop',        label: 'Boutique partenaire',  type: 'relation', endpoint: 'shops' },
+    { name: 'category',    label: 'Catégorie',            type: 'relation', endpoint: 'categories' },
+    { name: 'status',      label: 'Statut',               type: 'select',
+      options: ['DISPONIBLE', 'INACTIF', 'BANNI'] }
   ];
+
   searchFields = [
-    { name: 'name', type: 'text' },
-    { name: 'description', type: 'text' },
-    { name: 'price', type: 'range-number' },
-
-    // { name: 'price', type: 'number' },
-    { name: 'stock', type: 'number' },
-    { name: 'shop', type: 'relation', endpoint: 'shops' },
-    { name: 'category', type: 'relation', endpoint: 'categories' },
-    { name: 'status', type: 'select', options: ['DISPONIBLE', 'INACTIF', 'BANNI'] }
-
-
-    // // 🔥 SUBDOCUMENT RANGE NUMBER
-    // { name: 'price', type: 'range-number' },
-
-    // // 🔥 SUBDOCUMENT RANGE DATE
-    // { name: 'date', type: 'range-date' }
+    { name: 'name',        label: 'Nom',                  type: 'text' },
+    { name: 'description', label: 'Description',          type: 'text' },
+    { name: 'price',       label: 'Prix',                 type: 'range-number' },
+    { name: 'stock',       label: 'Stock',                type: 'number' },
+    { name: 'shop',        label: 'Boutique',             type: 'relation', endpoint: 'shops' },
+    { name: 'category',    label: 'Catégorie',            type: 'relation', endpoint: 'categories' },
+    { name: 'status',      label: 'Statut',               type: 'select',
+      options: ['DISPONIBLE', 'INACTIF', 'BANNI'] }
   ];
-
 }
