@@ -22,6 +22,14 @@ import { ShopLayout } from '../app/layouts/shop-layout/shop-layout';
 import { CustomerLayout } from '../app/layouts/customer-layout/customer-layout';
 
 
+import { OrderAllPage }         from './pages/order-all.page';
+import { OrderDeliveredPage }   from './pages/order-delivered.page';
+import { OrderNotDeliveredPage} from './pages/order-not-delivered.page';
+import { OrderMyDeliveredPage } from './pages/order-my-delivered.page';
+import { AdminDashboardPage }   from './pages/admin-dashboard.page';
+
+import { ProductGridComponent } from './components/product-grid/product-grid.component';
+
 export const routes: Routes = [
 
   // CUSTOMER LAYOUT
@@ -29,12 +37,13 @@ export const routes: Routes = [
     path: '',
     component: CustomerLayout,
     children: [
-      { path: '', component: ProductPage },
+      { path: '', component: ProductGridComponent },
 
       { path: 'home', component: HomeComponent },
       { path: 'user', component: UserPage },
       { path: 'shop', component: ShopPage },
       { path: 'product', component: ProductPage },
+      // Mes commandes (utilisateur connecté) + suppression panier après commande
       { path: 'order', component: OrderPage },
       { path: 'favorite', component: FavoritePage },
       { path: 'discount', component: DiscountPage },
@@ -47,6 +56,21 @@ export const routes: Routes = [
 
       { path: 'login', component: LoginPage },
       { path: 'profile', component: ProfilePage },
+
+      // Toutes les commandes — sans filtre (admin)
+      { path: 'order-all',           component: OrderAllPage },
+
+      // Commandes LIVRÉES uniquement (toutes)
+      { path: 'order-delivered',     component: OrderDeliveredPage },
+
+      // Commandes en cours (tout sauf LIVREE)
+      { path: 'order-not-delivered', component: OrderNotDeliveredPage },
+
+      // Mes commandes LIVRÉES (utilisateur connecté)
+      { path: 'order-my-delivered',  component: OrderMyDeliveredPage },
+
+      // Dashboard admin
+      { path: 'admin-dashboard',     component: AdminDashboardPage },
 
     ]
   },
