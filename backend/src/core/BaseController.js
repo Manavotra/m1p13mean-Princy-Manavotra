@@ -1,8 +1,8 @@
 // src/core/BaseController.js
 
-import QueryBuilder from './QueryBuilder.js';
-
-import fs from 'fs';
+import QueryBuilder from "./QueryBuilder.js";
+import fs from "fs";
+import { uploadBufferToCloudinary, deleteFromCloudinary } from "../utils/cloudinaryUpload.js";
 
 export default class BaseController {
   constructor(model) {
