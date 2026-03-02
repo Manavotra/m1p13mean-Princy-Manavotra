@@ -7,7 +7,9 @@ import { BaseService } from '../services/base.service';
   imports: [CommonModule],
   template: `
     <div style="padding: 20px; font-family: sans-serif; background: #f4f7f6; min-height: 100vh;">
-      <h2>Tableau de Bord Admin</h2>
+      <h2 style="color: #2c3e50; font-weight: 600; margin: 0 0 25px 0; padding-bottom: 10px;
+      border-bottom: 3px solid #3498db; letter-spacing: 0.5px;">
+      Tableau de Bord Admin</h2>
 
       <div *ngIf="loading">Chargement des données...</div>
 

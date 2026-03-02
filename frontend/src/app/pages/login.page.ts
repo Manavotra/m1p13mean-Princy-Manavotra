@@ -16,7 +16,6 @@ import { RouterModule } from '@angular/router';
 
           <div class="flex items-center justify-between">
             <h2 class="card-title text-2xl">Login</h2>
-            <a routerLink="/" class="link link-hover text-sm opacity-70">Accueil</a>
           </div>
 
           <p class="text-sm opacity-70">
@@ -80,7 +79,7 @@ import { RouterModule } from '@angular/router';
 
             <div class="divider">OU</div>
 
-            <a routerLink="/register" class="btn btn-outline w-full">
+            <a routerLink="/users/create" class="btn btn-outline w-full">
               S'inscrire
             </a>
           </form>
@@ -107,13 +106,13 @@ export class LoginPage {
         this.loading = false;
         switch (res.user.role) {
           case 'ADMIN':
-            this.router.navigate(['/order']);
+            this.router.navigate(['/admin-dashboard']);
             break;
           case 'VENDEUR':
-            this.router.navigate(['/']);
+            this.router.navigate(['/product']);
             break;
           default:
-            this.router.navigate(['/']);
+            this.router.navigate(['/product']);
         }
       },
       error: (err) => {

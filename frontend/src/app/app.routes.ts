@@ -16,6 +16,11 @@ import { UsersEditPage } from './pages/users/users-edit.page';
 import { LoginPage  } from './pages/login.page';
 import { ProfilePage  } from './pages/profile.page';
 
+import { ShopAdminPage } from './pages/shop.admin.page';
+
+import { OrderNotDeliveredVendorPage } from './pages/order-not-delivered-vendor.page';
+
+
 
 // import { AdminLayout } from '../app/layouts/admin-layout/admin-layout';
 // import { ShopLayout } from '../app/layouts/shop-layout/shop-layout';
@@ -32,22 +37,24 @@ export const routes: Routes = [
    { path: '', component: LoginPage },
       { path: 'users/create', component: UserCreatePage },
       { path: 'user', component: UserPage },
-      { path: 'shop', component: ShopPage },
+      { path: 'order_pending', component: OrderNotDeliveredVendorPage },
+      { path: 'profile', component: ProfilePage },
+
+
+      // =============================
+      // VENDEUR - ACHETEUR
+      // =============================
       { path: 'product', component: ProductPage },
+
+      
       // Mes commandes (utilisateur connecté) + suppression panier après commande
       { path: 'order', component: OrderPage },
-      { path: 'favorite', component: FavoritePage },
       { path: 'discount', component: DiscountPage },
-      { path: 'category', component: CategoryPage },
       { path: 'cart', component: CartPage },
 
       { path: 'users', component: UserListPage },
       { path: 'users/:id/edit', component: UsersEditPage },
 
-      { path: 'profile', component: ProfilePage },
-
-      // Toutes les commandes — sans filtre (admin)
-      { path: 'order-all',           component: OrderAllPage },
 
       // Commandes LIVRÉES uniquement (toutes)
       { path: 'order-delivered',     component: OrderDeliveredPage },
@@ -57,6 +64,34 @@ export const routes: Routes = [
 
       // Mes commandes LIVRÉES (utilisateur connecté)
       { path: 'order-my-delivered',  component: OrderMyDeliveredPage },
+
+
+      // =============================
+      // ACHETEUR
+      // =============================
+
+      { path: 'favorite', component: FavoritePage },
+
+
+
+      // =============================
+      // VENDEUR
+      // =============================
+
+
+
+      { path: 'shop', component: ShopPage },
+
+      // =============================
+      // ADMIN
+      // =============================
+      
+      { path: 'category', component: CategoryPage },
+
+      { path: 'shop-admin', component: ShopAdminPage },
+
+      // Toutes les commandes — sans filtre (admin)
+      { path: 'order-all',           component: OrderAllPage },
 
       // Dashboard admin
       { path: 'admin-dashboard',     component: AdminDashboardPage },
