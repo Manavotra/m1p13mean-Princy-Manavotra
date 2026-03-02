@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   template: `
     <div *ngIf="user">
       <h2>Profil</h2>
@@ -15,6 +16,17 @@ import { Router } from '@angular/router';
       <p><strong>Email :</strong> {{ user.email }}</p>
       <p><strong>Rôle :</strong> {{ user.role }}</p>
       <button (click)="logout()">Logout</button>
+    
+      <hr>
+
+        <!-- 🔹 Lien conditionnel si admin -->
+        <div *ngIf="user.role === 'VENDEUR'">
+            <a routerLink="/shop">Shop</a>
+        </div>
+        <div *ngIf="user.role !== 'ADMIN' && user.role !== 'VENDEUR'">
+            <a routerLink="/favorite">Favoris</a>
+            <a routerLink="/cart">Panier</a>
+        </div>
 
     </div>
     <div *ngIf="!user && !loading">

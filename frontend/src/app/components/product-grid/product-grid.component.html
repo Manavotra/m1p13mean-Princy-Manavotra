@@ -2,6 +2,8 @@
 
   <!-- ========== HEADER ========== -->
   <div class="pg-header">
+  <app-profile></app-profile> 
+
     <div class="pg-title-block">
       <span class="pg-icon">🛍️</span>
       <h2 class="pg-title">Produits</h2>
@@ -13,8 +15,10 @@
     </button>
   </div>
 
-  <app-profile></app-profile> 
-
+  <!-- ========== ALERTE VENDEUR SANS SHOP APPROUVÉ ========== -->
+  <div class="pg-alert-warning" *ngIf="isVendeur && vendorShopId === null">
+    ⚠️ Votre boutique n'est pas encore approuvée. Vous ne pouvez pas gérer de produits pour l'instant.
+  </div>
 
   <!-- ========== SEARCH BAR ========== -->
   <div class="pg-search-panel" *ngIf="showSearch">
@@ -110,13 +114,20 @@
         </select>
 
         <!-- Relation -->
-        <select *ngIf="field.type === 'relation'" class="pg-input"
-                [(ngModel)]="currentModel[field.name]">
-          <option value="">-- Choisir --</option>
-          <option *ngFor="let r of relationsData[field.name]" [value]="r._id">
-            {{ r.name || r.title || r.label }}
-          </option>
-        </select>
+        <ng-container *ngIf="field.type === 'relation'">
+          <!-- Vendeur : champ shop verrouillé sur sa propre boutique -->
+          <div *ngIf="isVendeur && field.name === 'shop'" class="pg-input pg-input-readonly">
+            {{ getVendorShopName() }}
+          </div>
+          <!-- Toutes les autres relations (ou non-vendeur) -->
+          <select *ngIf="!(isVendeur && field.name === 'shop')" class="pg-input"
+                  [(ngModel)]="currentModel[field.name]">
+            <option value="">-- Choisir --</option>
+            <option *ngFor="let r of relationsData[field.name]" [value]="r._id">
+              {{ r.name || r.title || r.label }}
+            </option>
+          </select>
+        </ng-container>
 
       </div>
     </div>

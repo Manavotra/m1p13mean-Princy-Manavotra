@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BaseService } from '../../services/base.service';
 import { AuthService } from '../../services/auth.service';
-
 import { ProfilePage } from '../../pages/profile.page';
 
 @Component({
@@ -32,6 +31,9 @@ export class ProductGridComponent implements OnInit {
 
   isProcessing = false;
   showFormPanel = false;
+
+  /** ID du shop du vendeur connecté (null si pas vendeur ou shop non approuvé) */
+  vendorShopId: string | null = null;
 
   private loadedRelationEndpoints = new Set<string>();
   private imageFieldName: string | null = null;
@@ -64,7 +66,7 @@ export class ProductGridComponent implements OnInit {
   }
 
   // =============================
-  // INIT
+  // INIT — restaure la session si nécessaire avant de charger
   // =============================
 
   ngOnInit() {
@@ -72,9 +74,73 @@ export class ProductGridComponent implements OnInit {
     this.imageFieldName = imageField?.name || null;
 
     this.initForm();
-    this.load();
     this.loadRelations(this.fields);
     if (this.searchFields?.length) this.loadRelations(this.searchFields);
+
+    const cached = this.auth.getUser();
+
+    if (cached) {
+      // Session déjà en mémoire (navigation normale)
+      this.onSessionReady();
+    } else {
+      // Refresh de page : restaure la session via cookie avant de charger
+      this.auth.getMe().subscribe({
+        next: (user: any) => {
+          this.auth.setUser(user);
+          this.onSessionReady();
+        },
+        error: () => {
+          // Non connecté : charge tous les produits normalement
+          this.load();
+        }
+      });
+    }
+  }
+
+  /** Appelé une fois la session connue */
+  private onSessionReady() {
+    if (this.isVendeur) {
+      this.loadVendorProducts();
+    } else {
+      this.load();
+    }
+  }
+
+  /**
+   * Récupère le shop du vendeur (owner = userId, status = APPROUVE).
+   * Si trouvé, charge uniquement les produits de ce shop.
+   * Si non trouvé (shop en attente/banni), la liste reste vide.
+   */
+  loadVendorProducts() {
+    const userId = this.currentUser?._id;
+    if (!userId) return;
+
+    this.service.getAllWithParams('shops', { owner: userId, status: 'APPROUVE' })
+      .subscribe({
+        next: (shops: any[]) => {
+          if (shops && shops.length > 0) {
+            this.vendorShopId = shops[0]._id;
+            // Pré-remplit le shop dans le formulaire
+            this.form['shop'] = this.vendorShopId;
+            // Charge les produits du shop avec status DISPONIBLE
+            this.service.getAllWithParams(this.endpoint, {
+              shop: this.vendorShopId,
+              status: 'DISPONIBLE'
+            }).subscribe(data => {
+              this.items = [...data];
+              this.cdr.detectChanges();
+            });
+          } else {
+            this.vendorShopId = null;
+            this.items = [];
+            this.cdr.detectChanges();
+          }
+        },
+        error: () => {
+          this.items = [];
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   // =============================
@@ -96,6 +162,10 @@ export class ProductGridComponent implements OnInit {
     this.fields?.forEach(f => {
       if (f.type === 'array') this.form[f.name] = [];
     });
+    // Pré-remplit le shop avec le shop du vendeur
+    if (this.isVendeur && this.vendorShopId) {
+      this.form['shop'] = this.vendorShopId;
+    }
   }
 
   get currentModel() {
@@ -114,6 +184,15 @@ export class ProductGridComponent implements OnInit {
     this.showFormPanel = false;
     this.editingItem = null;
     this.initForm();
+  }
+
+  /**
+   * Retourne le nom du shop du vendeur pour l'affichage (champ verrouillé).
+   */
+  getVendorShopName(): string {
+    if (!this.vendorShopId || !this.relationsData['shop']) return '—';
+    const shop = this.relationsData['shop'].find((s: any) => s._id === this.vendorShopId);
+    return shop?.name || shop?.title || '—';
   }
 
   // =============================
@@ -143,11 +222,11 @@ export class ProductGridComponent implements OnInit {
   }
 
   refreshList() {
-    this.service.getAll(this.endpoint)
-      .subscribe(data => {
-        this.items = [...data];
-        this.cdr.detectChanges();
-      });
+    if (this.isVendeur) {
+      this.loadVendorProducts();
+    } else {
+      this.load();
+    }
   }
 
   // =============================
@@ -156,6 +235,11 @@ export class ProductGridComponent implements OnInit {
 
   search() {
     const flatParams = this.flattenSearchModel(this.searchModel);
+    // Vendeur : force le filtre shop + status DISPONIBLE
+    if (this.isVendeur && this.vendorShopId) {
+      flatParams['shop'] = this.vendorShopId;
+      flatParams['status'] = 'DISPONIBLE';
+    }
     this.service.getAllWithParams(this.endpoint, flatParams)
       .subscribe(data => {
         this.items = [...data];
@@ -165,7 +249,7 @@ export class ProductGridComponent implements OnInit {
 
   resetSearch() {
     this.searchModel = {};
-    this.load();
+    this.refreshList();
   }
 
   private flattenSearchModel(obj: any, parentKey = '', result: any = {}) {
