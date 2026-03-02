@@ -28,16 +28,9 @@ import { OrderNotDeliveredPage} from './pages/order-not-delivered.page';
 import { OrderMyDeliveredPage } from './pages/order-my-delivered.page';
 import { AdminDashboardPage }   from './pages/admin-dashboard.page';
 
-
 export const routes: Routes = [
-
-  // CUSTOMER LAYOUT
-  {
-    path: '',
-    component: ProfilePage,
-    children: [
-
-      { path: 'home', component: HomeComponent },
+   { path: '', component: LoginPage },
+      { path: 'users/create', component: UserCreatePage },
       { path: 'user', component: UserPage },
       { path: 'shop', component: ShopPage },
       { path: 'product', component: ProductPage },
@@ -67,37 +60,4 @@ export const routes: Routes = [
 
       // Dashboard admin
       { path: 'admin-dashboard',     component: AdminDashboardPage },
-
-    ]
-  },
-
-  // ADMIN LAYOUT
-  {
-    path: '',
-    // component: AdminLayout,
-    children: [
-      { path: 'login', component: LoginPage },
-      { path: 'register', component: UserCreatePage },
-      // { path: 'users', component: UsersPage },
-      // { path: 'categories', component: CategoriesPage },
-      // { path: 'subcategories', component: SubCategoriesPage },
-      // { path: 'projects', component: ProjectsPage },
-      // { path: 'invoices', component: InvoicesPage },
-      // { path: 'authors', component: AuthorsPage },
-      // { path: 'books', component: BooksPage },
-      // { path: 'warehouses', component: WarehousesPage },
-      // { path: 'tasks', component: TasksPage }
-    ]
-  },
-
-  // SHOP LAYOUT
-  {
-    path: 'shop',
-    // component: ShopLayout,
-    children: [
-      // { path: 'products', component: ProductsPage },
-      // { path: 'orders', component: OrdersPage }
-    ]
-  }
-
 ];
