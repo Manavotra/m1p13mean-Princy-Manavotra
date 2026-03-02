@@ -1,11 +1,13 @@
+// src/app.js
 import express from "express";
 import cors from "cors";
 import routes from "./routes/index.js";
 import session from "express-session";
 
 const app = express();
+const isDev = process.env.NODE_ENV !== "production";
 
-// CORS - allow all origins
+// CORS
 app.use(cors({
   origin: (origin, callback) => {
     callback(null, true);
@@ -19,17 +21,21 @@ app.use(express.json());
 app.get("/health", (req, res) => res.status(200).json({ ok: true }));
 
 // SESSION CONFIG
-app.set("trust proxy", 1); // very important on Render
+// En production (Render/HTTPS) : secure=true, sameSite='none'
+// En développement (localhost/HTTP) : secure=false, sameSite='lax'
+if (!isDev) {
+  app.set("trust proxy", 1); // obligatoire derrière un proxy HTTPS (Render, Heroku...)
+}
 
 app.use(
   session({
-    secret: "superSecretKey",
+    secret: process.env.SESSION_SECRET || "superSecretKey",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true,          // must be true in HTTPS
+      secure: !isDev,              // false en dev (http), true en prod (https)
       httpOnly: true,
-      sameSite: "none",      // REQUIRED for cross-site cookies
+      sameSite: isDev ? "lax" : "none",  // 'none' requis uniquement en cross-site HTTPS
       maxAge: 1000 * 60 * 60 * 24
     }
   })
