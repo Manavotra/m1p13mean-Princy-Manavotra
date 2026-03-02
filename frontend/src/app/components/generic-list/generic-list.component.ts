@@ -286,21 +286,19 @@ export class GenericListComponent implements OnInit {
   // CRUD
   // =============================
 
-  isImagePath(value: any): boolean {
-    return typeof value === 'string' && value.includes('uploads');
-  }
+isImagePath(value: any): boolean {
+  if (typeof value !== "string") return false;
+  return value.startsWith("http") || value.includes("uploads");
+}
 
-  getImageUrl(path: string): string {
-    return `${this.service['api'].replace('/api/', '/')}${path}`;
-  }
+getImageUrl(value: string): string {
+  if (!value) return "";
+  // ✅ Cloudinary / external URL already complete
+  if (value.startsWith("http")) return value;
 
-  refreshList() {
-    this.service.getAll(this.endpoint)
-      .subscribe(data => {
-        this.items = [...data];
-        this.cdr.detectChanges();
-      });
-  }
+  // ✅ Old local path (uploads/xxx.jpg)
+  return `${this.service["api"].replace("/api/", "/")}${value}`;
+}
 
   submit() {
     if (this.isProcessing) return;
