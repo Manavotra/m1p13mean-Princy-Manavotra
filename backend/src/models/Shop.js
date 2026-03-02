@@ -4,7 +4,8 @@ import mongoose from 'mongoose';
 const ShopSchema = new mongoose.Schema({
 
   name: String,
-  logo: String, //URL image
+  logo: String,
+  logoPublicId: String,
   description: String,
 
   owner: {

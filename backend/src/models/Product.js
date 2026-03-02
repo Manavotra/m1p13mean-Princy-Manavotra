@@ -10,7 +10,8 @@ const ProductSchema = new mongoose.Schema({
 
   stock: Number,
 
-  image: String, //url
+  image: String,
+  imagePublicId: String,
 
   shop: {
     type: mongoose.Schema.Types.ObjectId,
