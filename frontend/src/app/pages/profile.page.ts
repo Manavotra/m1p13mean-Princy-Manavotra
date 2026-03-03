@@ -29,11 +29,22 @@ import { BaseService } from '../services/base.service';
 <div *ngIf="user && !loading"
      class="navbar bg-base-100 shadow-sm sticky top-0 z-50 w-full rounded-none border-0">
         <!-- Left: Brand / Title -->
-        <div class="flex-1">
-          <a routerLink="/product" class="btn btn-ghost text-xl">
-            Gérant du Commerce
-          </a>
-        </div>
+<div class="flex-1 flex items-center gap-4">
+  <a routerLink="/product" class="btn btn-ghost text-xl normal-case p-1">
+    Géant du Commerce
+  </a>
+
+  <div *ngIf="user.role === 'VENDEUR'" class="hidden lg:block w-px h-6 bg-base-300"></div>
+
+  <ng-container *ngIf="user.role === 'VENDEUR'">
+    <div class="hidden sm:block px-3 py-1 bg-warning/10 border border-warning/20 rounded-full">
+      <h3 class="text-[10px] md:text-xs text-warning-content whitespace-nowrap">
+        <span class="mr-1">ℹ️</span>
+        <strong>Note: Boutique approuvée requise pour gérer vos produits</strong>
+      </h3>
+    </div>
+  </ng-container>
+</div>
 
         <!-- Center (optional): quick links (role-based) -->
         <div class="hidden md:flex flex-none">
