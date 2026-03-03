@@ -5,7 +5,6 @@ import { GenericListComponent } from '../../components/generic-list/generic-list
   standalone: true,
   imports: [GenericListComponent],
   template: `
-    <h2>User</h2>
     <app-generic-list
       endpoint="users"
       [fields]="fields"
