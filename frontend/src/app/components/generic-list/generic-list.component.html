@@ -1,7 +1,9 @@
 <!-- generic-list.component.html -->
 
 <!-- ✅ OUTER CONTAINER: adds spacing from edges + keeps everything centered -->
-<div class="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+<div [ngClass]="embedded
+  ? 'w-full space-y-6'
+  : 'w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6'">
 
   <!-- ✅ ALWAYS on top for every page using GenericList (unless showProfile=false) -->
   <app-profile *ngIf="showProfile"></app-profile>
