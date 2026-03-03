@@ -4,15 +4,17 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { ProfilePage } from './pages/profile.page';
 import { filter } from 'rxjs/operators';
+import { Footer } from "./components/footer/footer";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     RouterOutlet,
-    ProfilePage
-  ],
+    ProfilePage,
+    Footer
+],
   templateUrl: './app.component.html',
   styleUrls: ['./app.css']
 })

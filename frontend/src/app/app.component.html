@@ -1,2 +1,18 @@
-<app-profile *ngIf="showNavbar"></app-profile>
-<router-outlet></router-outlet>
+<div class="min-h-screen flex flex-col">
+
+
+  <div *ngIf="showNavbar" class="sticky top-0 z-50 bg-base-100/90 backdrop-blur border-b border-base-300">
+    <app-profile></app-profile>
+  </div>
+
+
+  <main class="flex-1">
+    <router-outlet></router-outlet>
+  </main>
+
+ 
+  <div *ngIf="showNavbar" class="mt-auto">
+    <app-footer></app-footer>
+  </div>
+
+</div>
