@@ -18,6 +18,10 @@ export class GenericListComponent implements OnInit {
   @Input() endpoint!: string;
   @Input() fields!: any[];
   @Input() searchFields!: any[];
+  @Input() embedded = false;
+  @Input() showProfile = true;
+  @Input() formTitle = ''; 
+  @Input() submitLabel = 'Enregistrer'; 
 
   items: any[] = [];
   form: any = {};
@@ -326,10 +330,13 @@ getImageUrl(value: string): string {
           this.afterSubmit.emit();
           if (this.showTable) this.refreshList();
         },
-        error: (err) => {
-          console.error('CREATE ERROR', err);
-          this.isProcessing = false;
-        }
+error: (err) => {
+  console.log('RAW ERR', err);
+  console.log('status', err?.status);
+  console.log('message', err?.message);
+  console.log('error body', err?.error);
+  console.log('url', err?.url);
+}
       });
   }
 

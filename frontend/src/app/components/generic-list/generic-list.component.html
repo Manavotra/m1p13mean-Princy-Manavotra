@@ -1,15 +1,19 @@
+<!-- generic-list.component.html -->
+
 <!-- ===================== FORM ===================== -->
 <div *ngIf="showForm" class="space-y-4">
 
-  <!-- ✅ Always on top -->
-  <app-profile></app-profile>
+  <!-- ✅ Always on top (hidden when embedded OR showProfile=false) -->
+  <app-profile *ngIf="showProfile && !embedded"></app-profile>
 
-  <div class="card bg-base-100 shadow">
-    <div class="card-body space-y-4">
+  <!-- ✅ EMBEDDED MODE: parent page controls layout (no internal card/divider) -->
+  <ng-container *ngIf="embedded; else normalFormCard">
+    <div class="space-y-4">
 
-      <div class="flex items-center justify-between gap-3">
-        <h3 class="card-title">
-          {{ editingItem ? 'Modifier' : 'Ajouter' }}
+      <!-- Optional title line for embedded mode -->
+      <div *ngIf="formTitle || isProcessing" class="flex items-center justify-between gap-3">
+        <h3 *ngIf="formTitle" class="text-lg font-semibold">
+          {{ formTitle }}
         </h3>
 
         <span *ngIf="isProcessing" class="badge badge-ghost">
@@ -29,39 +33,98 @@
         <span class="text-sm">{{ editHint }}</span>
       </div>
 
-      <div class="flex flex-wrap gap-3">
-        <button
-          type="button"
-          class="btn btn-primary"
-          [disabled]="isProcessing"
-          (click)="editingItem ? save() : submit()"
-        >
-          <ng-container *ngIf="!isProcessing">
-            {{ editingItem ? 'Enregistrer' : 'Enregistrer' }}
-          </ng-container>
-          <ng-container *ngIf="isProcessing">
-            <span class="loading loading-spinner loading-xs mr-2"></span>
-            Traitement...
-          </ng-container>
-        </button>
+      <!-- Primary action full-width to match login style -->
+      <button
+        type="button"
+        class="btn btn-primary w-full"
+        [disabled]="isProcessing"
+        (click)="editingItem ? save() : submit()"
+      >
+        <ng-container *ngIf="!isProcessing">
+          {{ submitLabel || (editingItem ? 'Enregistrer' : 'Enregistrer') }}
+        </ng-container>
+        <ng-container *ngIf="isProcessing">
+          <span class="loading loading-spinner loading-xs mr-2"></span>
+          Traitement...
+        </ng-container>
+      </button>
 
-        <!-- Bouton action secondaire (ex: Passer commande) -->
-        <button
-          *ngIf="editingItem && editActionLabel"
-          type="button"
-          class="btn btn-info"
-          [disabled]="isProcessing"
-          (click)="save(); editActionClicked.emit(editingItem)"
-        >
-          {{ editActionLabel }}
-        </button>
-      </div>
+      <!-- Secondary action (optional) -->
+      <button
+        *ngIf="editingItem && editActionLabel"
+        type="button"
+        class="btn btn-info w-full"
+        [disabled]="isProcessing"
+        (click)="save(); editActionClicked.emit(editingItem)"
+      >
+        {{ editActionLabel }}
+      </button>
 
     </div>
-  </div>
+  </ng-container>
+
+  <!-- ✅ NORMAL MODE: your current card layout -->
+  <ng-template #normalFormCard>
+    <div class="card bg-base-100 shadow">
+      <div class="card-body space-y-4">
+
+        <div class="flex items-center justify-between gap-3">
+          <h3 class="card-title">
+            {{ editingItem ? 'Modifier' : 'Ajouter' }}
+          </h3>
+
+          <span *ngIf="isProcessing" class="badge badge-ghost">
+            Traitement...
+          </span>
+        </div>
+
+        <ng-container
+          *ngTemplateOutlet="renderFields;
+                            context:{ model: currentModel,
+                                      fields: fields,
+                                      isSearch: false }">
+        </ng-container>
+
+        <!-- Hint d'édition -->
+        <div *ngIf="editingItem && editHint" class="alert alert-warning">
+          <span class="text-sm">{{ editHint }}</span>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="isProcessing"
+            (click)="editingItem ? save() : submit()"
+          >
+            <ng-container *ngIf="!isProcessing">
+              {{ editingItem ? 'Enregistrer' : 'Enregistrer' }}
+            </ng-container>
+            <ng-container *ngIf="isProcessing">
+              <span class="loading loading-spinner loading-xs mr-2"></span>
+              Traitement...
+            </ng-container>
+          </button>
+
+          <!-- Bouton action secondaire (ex: Passer commande) -->
+          <button
+            *ngIf="editingItem && editActionLabel"
+            type="button"
+            class="btn btn-info"
+            [disabled]="isProcessing"
+            (click)="save(); editActionClicked.emit(editingItem)"
+          >
+            {{ editActionLabel }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </ng-template>
 </div>
 
-<div class="divider"></div>
+<!-- ✅ Divider only when not embedded -->
+<div *ngIf="!embedded" class="divider"></div>
 
 <!-- ===================== SEARCH ===================== -->
 <div *ngIf="showSearch" class="card bg-base-100 shadow">
@@ -225,7 +288,6 @@
     </div>
   </div>
 </div>
-
 
 <!-- ===================================================== -->
 <!-- ===== TEMPLATE RÉCURSIF POUR LES CHAMPS (STYLED) ===== -->
