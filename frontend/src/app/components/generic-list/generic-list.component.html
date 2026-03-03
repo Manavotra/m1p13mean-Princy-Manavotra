@@ -298,7 +298,11 @@
              let-isSearch="isSearch">
 
   <div class="grid gap-4 sm:grid-cols-2">
-    <div *ngFor="let field of fields; trackBy: trackByIndex" class="space-y-2">
+    <div
+  *ngFor="let field of fields; trackBy: trackByIndex"
+  class="space-y-2"
+  [ngClass]="{ 'sm:col-span-2': field.type === 'image' }"
+>
 
       <!-- ===== RANGE DATE ===== -->
       <div *ngIf="field.type === 'range-date'" class="space-y-2">
@@ -335,23 +339,25 @@
       </div>
 
       <!-- ===== IMAGE UPLOAD ===== -->
-      <div *ngIf="field.type === 'image'" class="space-y-2 sm:col-span-2">
-        <label class="label">
-          <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
-        </label>
+    <div *ngIf="field.type === 'image'" class="space-y-2">
+      <label class="label">
+        <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
+      </label>
 
-        <input class="file-input file-input-bordered w-full"
-               type="file"
-               (change)="onFileChange($event, model, field.name)" />
+      <input
+        class="file-input file-input-bordered w-full"
+        type="file"
+        (change)="onFileChange($event, model, field.name)"
+      />
 
-        <div *ngIf="model[field.name] && isImagePath(model[field.name])" class="pt-2">
-          <div class="avatar">
-            <div class="w-24 rounded-lg ring-1 ring-base-300">
-              <img [src]="getImageUrl(model[field.name])" alt="preview" />
-            </div>
+      <div *ngIf="model[field.name] && isImagePath(model[field.name])" class="pt-2">
+        <div class="avatar">
+          <div class="w-24 rounded-lg ring-1 ring-base-300">
+            <img [src]="getImageUrl(model[field.name])" alt="preview" />
           </div>
         </div>
       </div>
+    </div>
 
       <!-- ===== INPUT SIMPLE ===== -->
       <ng-container *ngIf="field.type !== 'nested'
