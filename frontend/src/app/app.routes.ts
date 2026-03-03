@@ -47,6 +47,19 @@ export const routes: Routes = [
       { path: 'discount', component: DiscountPage },
       { path: 'users/:id/edit', component: UsersEditPage },
 
+      
+      // Commandes LIVRÉES uniquement (toutes)
+      { path: 'order-delivered',     component: OrderDeliveredPage },
+
+      // Commandes en cours (tout sauf LIVREE)
+      { path: 'order-not-delivered', component: OrderNotDeliveredPage },
+
+      // Mes commandes LIVRÉES (utilisateur connecté) facture
+      { path: 'order-my-delivered',  component: OrderMyDeliveredPage },
+
+      //AUTOMATIQUE DANS ACHETEUR
+      { path: 'order', component: OrderPage },
+
 
       // =============================
       // VENDEUR - ACHETEUR
@@ -56,20 +69,8 @@ export const routes: Routes = [
 
 
       // Mes commandes (utilisateur connecté) + suppression panier après commande
-      { path: 'order', component: OrderPage },
-      { path: 'cart', component: CartPage },
 
 
-
-
-      // Commandes LIVRÉES uniquement (toutes)
-      { path: 'order-delivered',     component: OrderDeliveredPage },
-
-      // Commandes en cours (tout sauf LIVREE)
-      { path: 'order-not-delivered', component: OrderNotDeliveredPage },
-
-      // Mes commandes LIVRÉES (utilisateur connecté) facture
-      { path: 'order-my-delivered',  component: OrderMyDeliveredPage },
 
 
       // =============================
@@ -80,6 +81,7 @@ export const routes: Routes = [
 
       { path: 'historique', component: HistoriquePage },
 
+      { path: 'cart', component: CartPage },
 
       { path: 'favorite', component: FavoritePage },
 

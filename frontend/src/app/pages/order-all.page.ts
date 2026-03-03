@@ -8,7 +8,10 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
   imports: [GenericListComponent],
   template: `
     <hr>
-    <h2>📋 Toutes les commandes du centre commerciale</h2>
+        <div class="card bg-base-100 shadow p-6 space-y-1">
+          <h1 class="text-2xl font-bold">📋 Toutes les commandes du centre commerciale</h1>
+          <br>
+        </div>
     <app-generic-list
       endpoint="orders"
       [fields]="fields"

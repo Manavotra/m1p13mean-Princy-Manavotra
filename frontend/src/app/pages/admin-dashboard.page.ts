@@ -116,7 +116,7 @@ export class AdminDashboardPage implements OnInit {
 
             // Stats Boutiques
             const sId = item.shop?._id || 'inconnu';
-            const sName = item.shop?.name || 'Boutique inconnue';
+            const sName = item.shop?.name || 'Boutique ';
             if (!shopMap.has(sId)) shopMap.set(sId, { name: sName, qty: 0, amount: 0 });
             shopMap.get(sId).qty += qty;
             shopMap.get(sId).amount += (item.unitPrice * qty);
