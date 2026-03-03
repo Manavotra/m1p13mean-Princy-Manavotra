@@ -31,7 +31,7 @@ import { BaseService } from '../services/base.service';
         <!-- Left: Brand / Title -->
         <div class="flex-1">
           <a routerLink="/product" class="btn btn-ghost text-xl">
-            Géant du Commerce
+            Gérant du Commerce
           </a>
         </div>
 
@@ -112,7 +112,7 @@ import { BaseService } from '../services/base.service';
 <div *ngIf="!user && !loading"
      class="navbar bg-base-100 shadow-sm sticky top-0 z-50 w-full rounded-none border-0">
         <div class="flex-1">
-          <a routerLink="/" class="btn btn-ghost text-xl">RigCraftor</a>
+          <a routerLink="/" class="btn btn-ghost text-xl">Centre Commercial</a>
         </div>
         <div class="flex-none">
           <a routerLink="/" class="btn btn-outline">Se connecter</a>
@@ -132,25 +132,20 @@ export class ProfilePage implements OnInit {
     private service: BaseService<any>
   ) {}
 
-  ngOnInit() {
-    const cached = this.auth.getUser();
-    if (cached) {
-      this.user = cached;
-      this.loading = false;
-      return;
-    }
+ngOnInit() {
+  const cached = this.auth.getUser();
+  if (cached) this.user = cached;
 
-    this.auth.getMe().subscribe({
-      next: (user: any) => {
-        this.user = user;
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-        this.router.navigate(['/login']);
-      }
-    });
-  }
+  this.loading = false;
+
+  this.auth.getMe().subscribe({
+    next: (user: any) => {
+      this.user = user;
+      this.auth.setUser(user); // update cache
+    },
+    error: () => this.router.navigate(['/login'])
+  });
+}
 
   getImageUrl(value: string): string {
     if (!value) return '';
