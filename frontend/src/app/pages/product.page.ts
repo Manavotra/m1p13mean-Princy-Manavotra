@@ -20,7 +20,7 @@ export class ProductPage {
   fields = [
     { name: 'name',        label: 'Nom du produit',      type: 'text' },
     { name: 'description', label: 'Description',          type: 'text' },
-    { name: 'price',       label: 'Prix (€)',             type: 'number' },
+    { name: 'price',       label: 'Prix (Ar)',             type: 'number' },
     { name: 'stock',       label: 'Stock disponible',     type: 'number' },
     { name: 'image',       label: 'Photo du produit',     type: 'image' },
     { name: 'shop',        label: 'Boutique partenaire',  type: 'relation', endpoint: 'shops' },
