@@ -1,232 +1,528 @@
-<div class="pg-wrapper">
+<!-- product-list.component.html (DaisyUI + Tailwind, logic preserved, SVG icons only) -->
 
-  <!-- ========== HEADER ========== -->
-  <div class="pg-header">
-  <app-profile></app-profile> 
+<div class="space-y-6">
 
-    <div class="pg-title-block">
-      <span class="pg-icon">🛍️</span>
-      <h2 class="pg-title">Produits</h2>
-      <span class="pg-count">{{ items.length }} article{{ items.length > 1 ? 's' : '' }}</span>
-    </div>
-    <!-- Bouton "Nouveau produit" uniquement pour les vendeurs connectés -->
-    <button class="pg-btn-add" (click)="toggleForm()" *ngIf="isVendeur">
-      {{ showFormPanel ? '✕ Fermer' : '+ Nouveau produit' }}
-    </button>
-  </div>
+  <!-- ===================== HEADER ===================== -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
 
-  <!-- ========== ALERTE VENDEUR SANS SHOP APPROUVÉ ========== -->
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
+        <div class="flex items-center gap-3">
+          <!-- Icon: Shopping bag -->
+          <svg class="h-7 w-7 opacity-80" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 8h12l-1 13H7L6 8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M9 8a3 3 0 0 1 6 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
 
-  <!-- ========== SEARCH BAR ========== -->
-  <div class="pg-search-panel" *ngIf="showSearch">
-    <div class="pg-search-grid">
-
-      <div class="pg-field" *ngFor="let field of searchFields">
-        <label class="pg-label">{{ getLabel(field) }}</label>
-
-        <!-- Text -->
-        <input *ngIf="field.type === 'text'"
-               class="pg-input" type="text"
-               [(ngModel)]="searchModel[field.name]"
-               [placeholder]="getLabel(field)" />
-
-        <!-- Number range -->
-        <div *ngIf="field.type === 'range-number'" class="pg-range">
-          <input class="pg-input" type="number"
-                 [(ngModel)]="searchModel[field.name + '_min']"
-                 placeholder="Min" />
-          <span class="pg-range-sep">–</span>
-          <input class="pg-input" type="number"
-                 [(ngModel)]="searchModel[field.name + '_max']"
-                 placeholder="Max" />
+          <div class="space-y-1">
+            <h2 class="text-xl font-semibold">Produits</h2>
+            <div class="text-sm opacity-70">
+              {{ items.length }} article{{ items.length > 1 ? 's' : '' }}
+            </div>
+          </div>
         </div>
 
-        <!-- Number -->
-        <input *ngIf="field.type === 'number'"
-               class="pg-input" type="number"
-               [(ngModel)]="searchModel[field.name]"
-               [placeholder]="getLabel(field)" />
+        <div class="flex items-center gap-3">
+          <span *ngIf="isProcessing" class="badge badge-ghost">
+            <span class="loading loading-spinner loading-xs mr-2"></span>
+            Traitement...
+          </span>
 
-        <!-- Select -->
-        <select *ngIf="field.type === 'select'" class="pg-input"
-                [(ngModel)]="searchModel[field.name]">
-          <option value="">-- Tous --</option>
-          <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
-        </select>
-
-        <!-- Relation -->
-        <select *ngIf="field.type === 'relation'" class="pg-input"
-                [(ngModel)]="searchModel[field.name]">
-          <option value="">-- Tous --</option>
-          <option *ngFor="let r of relationsData[field.name]" [value]="r._id">
-            {{ r.name || r.title || r.label }}
-          </option>
-        </select>
+          <!-- Bouton "Nouveau produit" uniquement pour les vendeurs connectés -->
+          <button
+            *ngIf="isVendeur"
+            type="button"
+            class="btn btn-primary"
+            (click)="toggleForm()"
+          >
+            <span class="inline-flex items-center gap-2">
+              <!-- Icon: plus -->
+              <svg *ngIf="!showFormPanel" class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+              </svg>
+              <!-- Icon: x -->
+              <svg *ngIf="showFormPanel" class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+              </svg>
+              {{ showFormPanel ? 'Fermer' : 'Nouveau produit' }}
+            </span>
+          </button>
+        </div>
 
       </div>
-    </div>
 
-    <div class="pg-search-actions">
-      <button class="pg-btn pg-btn-primary" [disabled]="isProcessing" (click)="search()">
-        🔍 Rechercher
-      </button>
-      <button class="pg-btn pg-btn-ghost" [disabled]="isProcessing" (click)="resetSearch()">
-        ↺ Réinitialiser
-      </button>
+      <!-- Profile stays (same logic) -->
+      <div class="pt-2">
+        <app-profile></app-profile>
+      </div>
+
     </div>
   </div>
 
-  <!-- ========== FORM PANEL (vendeur seulement) ========== -->
-  <div class="pg-form-panel" *ngIf="showFormPanel && isVendeur">
-    <h3 class="pg-form-title">{{ editingItem ? '✏️ Modifier le produit' : '✨ Nouveau produit' }}</h3>
+  <!-- ===================== SEARCH ===================== -->
+  <div *ngIf="showSearch" class="card bg-base-100 shadow">
+    <div class="card-body space-y-4">
 
-    <div class="pg-form-grid">
-      <div class="pg-field" *ngFor="let field of fields">
-        <label class="pg-label">{{ getLabel(field) }}</label>
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="card-title">Recherche</h3>
+      </div>
 
-        <!-- Image upload -->
-        <div *ngIf="field.type === 'image'" class="pg-image-upload">
-          <input type="file" class="pg-file-input"
-                 (change)="onFileChange($event, currentModel, field.name)" />
-          <div *ngIf="currentModel[field.name] && isImagePath(currentModel[field.name])" class="pg-preview">
-            <img [src]="getImageUrl(currentModel[field.name])" />
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div *ngFor="let field of searchFields" class="space-y-2">
+
+          <label class="label">
+            <span class="label-text font-medium">{{ getLabel(field) }}</span>
+          </label>
+
+          <!-- Text -->
+          <input
+            *ngIf="field.type === 'text'"
+            class="input input-bordered w-full"
+            type="text"
+            [(ngModel)]="searchModel[field.name]"
+            [placeholder]="getLabel(field)"
+          />
+
+          <!-- Number range -->
+          <div *ngIf="field.type === 'range-number'" class="grid grid-cols-2 gap-2">
+            <input
+              class="input input-bordered w-full"
+              type="number"
+              [(ngModel)]="searchModel[field.name + '_min']"
+              placeholder="Min"
+            />
+            <input
+              class="input input-bordered w-full"
+              type="number"
+              [(ngModel)]="searchModel[field.name + '_max']"
+              placeholder="Max"
+            />
           </div>
-        </div>
 
-        <!-- Text -->
-        <input *ngIf="field.type === 'text'" class="pg-input" type="text"
-               [(ngModel)]="currentModel[field.name]"
-               [placeholder]="getLabel(field)" />
+          <!-- Number -->
+          <input
+            *ngIf="field.type === 'number'"
+            class="input input-bordered w-full"
+            type="number"
+            [(ngModel)]="searchModel[field.name]"
+            [placeholder]="getLabel(field)"
+          />
 
-        <!-- Number -->
-        <input *ngIf="field.type === 'number'" class="pg-input" type="number"
-               [(ngModel)]="currentModel[field.name]"
-               [placeholder]="getLabel(field)" />
+          <!-- Select -->
+          <select
+            *ngIf="field.type === 'select'"
+            class="select select-bordered w-full"
+            [(ngModel)]="searchModel[field.name]"
+          >
+            <option value="">-- Tous --</option>
+            <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
+          </select>
 
-        <!-- Select -->
-        <select *ngIf="field.type === 'select'" class="pg-input"
-                [(ngModel)]="currentModel[field.name]">
-          <option value="">-- Choisir --</option>
-          <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
-        </select>
-
-        <!-- Relation -->
-        <ng-container *ngIf="field.type === 'relation'">
-          <!-- Vendeur : champ shop verrouillé sur sa propre boutique -->
-          <div *ngIf="isVendeur && field.name === 'shop'" class="pg-input pg-input-readonly">
-            {{ getVendorShopName() }}
-          </div>
-          <!-- Toutes les autres relations (ou non-vendeur) -->
-          <select *ngIf="!(isVendeur && field.name === 'shop')" class="pg-input"
-                  [(ngModel)]="currentModel[field.name]">
-            <option value="">-- Choisir --</option>
+          <!-- Relation -->
+          <select
+            *ngIf="field.type === 'relation'"
+            class="select select-bordered w-full"
+            [(ngModel)]="searchModel[field.name]"
+          >
+            <option value="">-- Tous --</option>
             <option *ngFor="let r of relationsData[field.name]" [value]="r._id">
               {{ r.name || r.title || r.label }}
             </option>
           </select>
-        </ng-container>
 
+        </div>
       </div>
-    </div>
 
-    <div class="pg-form-actions">
-      <button class="pg-btn pg-btn-primary" [disabled]="isProcessing"
-              (click)="editingItem ? save() : submit()">
-        {{ isProcessing ? '⏳ Traitement...' : (editingItem ? '💾 Enregistrer' : '✅ Créer le produit') }}
-      </button>
-      <button class="pg-btn pg-btn-ghost" (click)="cancelForm()">Annuler</button>
+      <div class="flex flex-wrap gap-3">
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="isProcessing"
+          (click)="search()"
+        >
+          <span class="inline-flex items-center gap-2">
+            <!-- Icon: search -->
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            Rechercher
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-ghost"
+          [disabled]="isProcessing"
+          (click)="resetSearch()"
+        >
+          <span class="inline-flex items-center gap-2">
+            <!-- Icon: refresh -->
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M21 12a9 9 0 1 1-2.64-6.36" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M21 3v6h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Réinitialiser
+          </span>
+        </button>
+      </div>
+
     </div>
   </div>
 
-  <!-- ========== PRODUCT GRID ========== -->
-  <div class="pg-grid">
+  <!-- ===================== FORM PANEL (vendeur seulement) ===================== -->
+  <div *ngIf="showFormPanel && isVendeur" class="card bg-base-100 shadow">
+    <div class="card-body space-y-4">
 
-    <div class="pg-card" *ngFor="let item of items; trackBy: trackById">
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="card-title">
+          {{ editingItem ? 'Modifier le produit' : 'Nouveau produit' }}
+        </h3>
 
-      <!-- Image -->
-      <div class="pg-card-image">
-        <img *ngIf="getImageField(item)" [src]="getImageUrl(getImageField(item)!)" [alt]="item.name" />
-        <div *ngIf="!getImageField(item)" class="pg-card-no-image">📦</div>
-
-        <!-- Status badge -->
-        <span class="pg-badge" [ngClass]="getBadgeClass(item.status)">
-          {{ item.status || '—' }}
+        <span *ngIf="isProcessing" class="badge badge-ghost">
+          <span class="loading loading-spinner loading-xs mr-2"></span>
+          Traitement...
         </span>
       </div>
 
-      <!-- Card Body -->
-      <div class="pg-card-body">
-        <h3 class="pg-card-name">{{ item.name }}</h3>
-        <p class="pg-card-desc" *ngIf="item.description">{{ item.description }}</p>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="space-y-2" *ngFor="let field of fields">
 
-        <!-- Prix + Stock -->
-        <div class="pg-card-meta">
-          <span class="pg-meta-price" *ngIf="item.price !== undefined">
-            {{ item.price | number:'1.0-0' }} Ar
-          </span>
-          <span class="pg-meta-stock" [ngClass]="{'low': item.stock < 5}">
-            📦 {{ item.stock }} en stock
-          </span>
-        </div>
+          <label class="label">
+            <span class="label-text font-medium">{{ getLabel(field) }}</span>
+          </label>
 
-        <!-- Tags relation -->
-        <div class="pg-card-tags">
-          <span class="pg-tag" *ngIf="item.category">
-            🏷️ {{ item.category?.name || item.category?.title || item.category }}
-          </span>
-          <span class="pg-tag pg-tag-shop" *ngIf="item.shop">
-            🏪 {{ item.shop?.name || item.shop?.title || item.shop }}
-          </span>
+          <!-- Image upload -->
+          <div *ngIf="field.type === 'image'" class="space-y-3 sm:col-span-2">
+            <input
+              type="file"
+              class="file-input file-input-bordered w-full"
+              (change)="onFileChange($event, currentModel, field.name)"
+            />
+
+            <div *ngIf="currentModel[field.name] && isImagePath(currentModel[field.name])" class="pt-1">
+              <div class="avatar">
+                <div class="w-24 rounded-lg ring-1 ring-base-300">
+                  <img [src]="getImageUrl(currentModel[field.name])" alt="preview" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Text -->
+          <input
+            *ngIf="field.type === 'text'"
+            class="input input-bordered w-full"
+            type="text"
+            [(ngModel)]="currentModel[field.name]"
+            [placeholder]="getLabel(field)"
+          />
+
+          <!-- Number -->
+          <input
+            *ngIf="field.type === 'number'"
+            class="input input-bordered w-full"
+            type="number"
+            [(ngModel)]="currentModel[field.name]"
+            [placeholder]="getLabel(field)"
+          />
+
+          <!-- Select -->
+          <select
+            *ngIf="field.type === 'select'"
+            class="select select-bordered w-full"
+            [(ngModel)]="currentModel[field.name]"
+          >
+            <option value="">-- Choisir --</option>
+            <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
+          </select>
+
+          <!-- Relation -->
+          <ng-container *ngIf="field.type === 'relation'">
+
+            <!-- Vendeur : champ shop verrouillé sur sa propre boutique -->
+            <div
+              *ngIf="isVendeur && field.name === 'shop'"
+              class="rounded-lg border border-base-300 bg-base-200 px-3 py-2 text-sm opacity-80 cursor-not-allowed"
+            >
+              {{ getVendorShopName() }}
+            </div>
+
+            <!-- Toutes les autres relations (ou non-vendeur) -->
+            <select
+              *ngIf="!(isVendeur && field.name === 'shop')"
+              class="select select-bordered w-full"
+              [(ngModel)]="currentModel[field.name]"
+            >
+              <option value="">-- Choisir --</option>
+              <option *ngFor="let r of relationsData[field.name]" [value]="r._id">
+                {{ r.name || r.title || r.label }}
+              </option>
+            </select>
+
+          </ng-container>
+
         </div>
       </div>
 
-      <!-- ===== CARD FOOTER selon rôle ===== -->
-      <div class="pg-card-footer">
+      <div class="flex flex-wrap gap-3">
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="isProcessing"
+          (click)="editingItem ? save() : submit()"
+        >
+          <span class="inline-flex items-center gap-2">
+            <!-- Icon: save -->
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 7a3 3 0 0 1 3-3h8l5 5v12a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+              <path d="M8 4v6h8V6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+              <path d="M8 20v-6h8v6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            </svg>
 
-        <!-- Non connecté : aucun bouton -->
-        <ng-container *ngIf="!currentUser">
-          <span class="pg-footer-hint">Connectez-vous pour interagir</span>
-        </ng-container>
+            <ng-container *ngIf="!isProcessing">
+              {{ editingItem ? 'Enregistrer' : 'Créer le produit' }}
+            </ng-container>
+            <ng-container *ngIf="isProcessing">
+              <span class="loading loading-spinner loading-xs"></span>
+              Traitement...
+            </ng-container>
+          </span>
+        </button>
 
-        <!-- Vendeur : Modifier + Supprimer -->
-        <ng-container *ngIf="isVendeur">
-          <button class="pg-btn pg-btn-sm pg-btn-edit"
-                  [disabled]="isProcessing"
-                  (click)="editProduct(item)">
-            ✏️ Modifier
-          </button>
-          <button class="pg-btn pg-btn-sm pg-btn-delete"
-                  [disabled]="isProcessing"
-                  (click)="delete(item._id)">
-            🗑️ Supprimer
-          </button>
-        </ng-container>
-
-        <!-- Client (DEFAULT) : Favoris + Panier -->
-        <ng-container *ngIf="isClient">
-          <button class="pg-btn pg-btn-sm pg-btn-fav"
-                  [disabled]="isProcessing"
-                  (click)="addToFavorites(item)">
-            ♥ Favoris
-          </button>
-          <button class="pg-btn pg-btn-sm pg-btn-cart"
-                  [disabled]="isProcessing"
-                  (click)="addToCart(item)">
-            🛒 Panier
-          </button>
-        </ng-container>
-
+        <button
+          type="button"
+          class="btn btn-ghost"
+          [disabled]="isProcessing"
+          (click)="cancelForm()"
+        >
+          <span class="inline-flex items-center gap-2">
+            <!-- Icon: cancel -->
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+            </svg>
+            Annuler
+          </span>
+        </button>
       </div>
 
     </div>
+  </div>
 
-    <!-- Empty state -->
-    <div class="pg-empty" *ngIf="items.length === 0">
-      <span class="pg-empty-icon">📭</span>
-      <p>Aucun produit trouvé</p>
+  <!-- ===================== LIST / GRID ===================== -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body space-y-4">
+
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="card-title">Liste</h3>
+        <span class="text-sm opacity-70">{{ items.length || 0 }} élément(s)</span>
+      </div>
+
+      <div class="divider my-0"></div>
+
+      <!-- Product grid -->
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+        <div
+          class="card bg-base-100 border border-base-200 shadow-sm hover:shadow transition"
+          *ngFor="let item of items; trackBy: trackById"
+        >
+
+          <!-- Image / top -->
+          <figure class="relative">
+
+            <img
+              *ngIf="getImageField(item)"
+              class="h-44 w-full object-cover"
+              [src]="getImageUrl(getImageField(item)!)"
+              [alt]="item.name"
+            />
+
+            <div
+              *ngIf="!getImageField(item)"
+              class="h-44 w-full grid place-items-center bg-base-200"
+            >
+              <!-- Icon: box -->
+              <svg class="h-10 w-10 opacity-50" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M3.5 7.5 12 3l8.5 4.5L12 12 3.5 7.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                <path d="M3.5 7.5V16.5L12 21l8.5-4.5V7.5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                <path d="M12 12v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <!-- Status badge -->
+            <span class="badge absolute right-3 top-3"
+                  [ngClass]="getBadgeClass(item.status)">
+              {{ item.status || '—' }}
+            </span>
+          </figure>
+
+          <div class="card-body space-y-3">
+
+            <div class="space-y-1">
+              <h3 class="font-semibold text-base leading-tight line-clamp-2">
+                {{ item.name }}
+              </h3>
+
+              <p class="text-sm opacity-80 line-clamp-3" *ngIf="item.description">
+                {{ item.description }}
+              </p>
+            </div>
+
+            <!-- Meta -->
+            <div class="flex items-center justify-between gap-3">
+              <div class="text-sm font-semibold" *ngIf="item.price !== undefined">
+                {{ item.price | number:'1.0-0' }} Ar
+              </div>
+
+              <div class="text-sm" [ngClass]="{'text-error': item.stock < 5}">
+                <span class="inline-flex items-center gap-1">
+                  <!-- Icon: inventory -->
+                  <svg class="h-4 w-4 opacity-80" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M7 7h10v14H7V7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                    <path d="M9 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                    <path d="M9 11h6M9 15h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                  </svg>
+                  {{ item.stock }} en stock
+                </span>
+              </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="flex flex-wrap gap-2">
+              <span class="badge badge-outline" *ngIf="item.category">
+                <span class="inline-flex items-center gap-1">
+                  <!-- Icon: tag -->
+                  <svg class="h-4 w-4 opacity-80" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M20 13l-7 7-10-10V3h7L20 13Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                    <path d="M7.5 7.5h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                  </svg>
+                  {{ item.category?.name || item.category?.title || item.category }}
+                </span>
+              </span>
+
+              <span class="badge badge-ghost" *ngIf="item.shop">
+                <span class="inline-flex items-center gap-1">
+                  <!-- Icon: store -->
+                  <svg class="h-4 w-4 opacity-80" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 10V20h16V10" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                    <path d="M3 10l2-6h14l2 6H3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                    <path d="M9 20v-6h6v6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                  </svg>
+                  {{ item.shop?.name || item.shop?.title || item.shop }}
+                </span>
+              </span>
+            </div>
+
+            <div class="divider my-1"></div>
+
+            <!-- Footer actions -->
+            <div class="flex flex-wrap items-center justify-between gap-2">
+
+              <!-- Non connecté : aucun bouton -->
+              <ng-container *ngIf="!currentUser">
+                <span class="text-xs opacity-70">Connectez-vous pour interagir</span>
+              </ng-container>
+
+              <!-- Vendeur : Modifier + Supprimer -->
+              <ng-container *ngIf="isVendeur">
+                <div class="flex gap-2">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline"
+                    [disabled]="isProcessing"
+                    (click)="editProduct(item)"
+                  >
+                    <span class="inline-flex items-center gap-2">
+                      <!-- Icon: edit -->
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M4 20h4l10.5-10.5a2 2 0 0 0 0-3L16.5 4a2 2 0 0 0-3 0L3 14.5V20Z"
+                              stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                        <path d="M13.5 6.5 17.5 10.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                      </svg>
+                      Modifier
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-error"
+                    [disabled]="isProcessing"
+                    (click)="delete(item._id)"
+                  >
+                    <span class="inline-flex items-center gap-2">
+                      <!-- Icon: trash -->
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M6 7h12M9 7V5h6v2M8 7l1 14h6l1-14"
+                              stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      Supprimer
+                    </span>
+                  </button>
+                </div>
+              </ng-container>
+
+              <!-- Client (DEFAULT) : Favoris + Panier -->
+              <ng-container *ngIf="isClient">
+                <div class="flex gap-2">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-ghost"
+                    [disabled]="isProcessing"
+                    (click)="addToFavorites(item)"
+                  >
+                    <span class="inline-flex items-center gap-2">
+                      <!-- Icon: heart -->
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z"
+                              stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                      </svg>
+                      Favoris
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    [disabled]="isProcessing"
+                    (click)="addToCart(item)"
+                  >
+                    <span class="inline-flex items-center gap-2">
+                      <!-- Icon: cart -->
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M6 6h15l-2 9H8L6 6Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                        <path d="M6 6 5 3H2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        <path d="M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM18 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+                              stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                      </svg>
+                      Panier
+                    </span>
+                  </button>
+                </div>
+              </ng-container>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="items.length === 0" class="alert">
+        <span class="inline-flex items-center gap-2">
+          <!-- Icon: inbox/empty -->
+          <svg class="h-5 w-5 opacity-70" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 4h16v11H4V4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M4 15l4 5h8l4-5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M9 11h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+          Aucun produit trouvé
+        </span>
+      </div>
+
     </div>
-
   </div>
 
 </div>
