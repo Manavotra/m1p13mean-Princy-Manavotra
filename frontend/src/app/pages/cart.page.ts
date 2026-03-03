@@ -9,6 +9,14 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, GenericListComponent],
   template: `
+    <div class="card bg-base-100 shadow p-6 space-y-1">
+      <h1 class="text-2xl font-bold">🛒 Mon Panier</h1>
+      <p class="text-sm opacity-60">✏️ Aller directement en bas de la page,cliquer sur Modifier puis remonter, modifiez les quantités si vous le souhaitez, puis cliquez sur <strong>Passer commande pour commander.</strong></p>
+      <br>
+      <hr>
+
+      <p class="text-sm opacity-60"><strong>Note:</strong>votre panier ne sera pas supprimer automatiquement si vous ne commandez pas, dans ce cas,si vous vouler faire une nouvelle commande supprimer d'abord le panier restant </p>
+    </div>
     <p *ngIf="loading">Chargement...</p>
     <app-generic-list
       *ngIf="!loading && fields.length"

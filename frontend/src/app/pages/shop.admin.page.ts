@@ -8,7 +8,10 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, GenericListComponent],
   template: `
-    <h2>Shop</h2>
+        <div class="card bg-base-100 shadow p-6 space-y-1">
+          <h1 class="text-2xl font-bold">Gérer les boutiques de votre centre</h1>
+          <br>
+        </div>
     <app-generic-list
       *ngIf="fields.length"
       endpoint="shops"

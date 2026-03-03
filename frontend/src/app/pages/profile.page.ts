@@ -31,7 +31,7 @@ import { BaseService } from '../services/base.service';
         <!-- Left: Brand / Title -->
         <div class="flex-1">
           <a routerLink="/product" class="btn btn-ghost text-xl">
-            Centre Commercial
+            Géant du Commerce
           </a>
         </div>
 
@@ -42,26 +42,24 @@ import { BaseService } from '../services/base.service';
             <!-- ADMIN -->
             <ng-container *ngIf="user.role === 'ADMIN'">
               <li><a routerLink="/admin-dashboard">Dashboard</a></li>
-              <li><a routerLink="/cart">Shops approuvés</a></li>
-              <li><a routerLink="/cart">Shops en attente</a></li>
-              <li><a routerLink="/cart">Shops bannis</a></li>
-              <li><a routerLink="/cart">Commandes expédiées</a></li>
+              <li><a routerLink="/order-all">Commandes</a></li>
+              <li><a routerLink="/shop-admin">Boutiques</a></li>
+              <li><a routerLink="/category">Categories</a></li>
             </ng-container>
 
             <!-- VENDEUR -->
             <ng-container *ngIf="user.role === 'VENDEUR'">
-              <li><a routerLink="/shop">Créer un Shop</a></li>
-              <li><a routerLink="/cart">Mes shops</a></li>
-              <li><a routerLink="/cart">Commandes récentes</a></li>
-              <li><a routerLink="/cart">En préparation</a></li>
+              <li><a routerLink="/shop">Créer une boutique</a></li>
+              <li><a routerLink="/product">Produits</a></li>
             </ng-container>
 
             <!-- ACHETEUR (DEFAULT) -->
             <ng-container *ngIf="user.role !== 'ADMIN' && user.role !== 'VENDEUR'">
+              <li><a routerLink="/product">Produits</a></li>
               <li><a routerLink="/favorite">Favoris</a></li>
               <li><a routerLink="/cart">Panier</a></li>
-              <li><a routerLink="/cart">Historique</a></li>
-              <li><a routerLink="/cart">Factures</a></li>
+              <li><a routerLink="/historique">Historique</a></li>
+              <li><a routerLink="/facture">Factures</a></li>
             </ng-container>
 
           </ul>
@@ -93,32 +91,8 @@ import { BaseService } from '../services/base.service';
 
               <div class="divider my-1"></div>
 
-              <!-- Common -->
-              <li><a routerLink="/cart">Modifier profil</a></li>
-
-              <!-- ADMIN -->
-              <ng-container *ngIf="user.role === 'ADMIN'">
-                <li><a routerLink="/admin-dashboard">Dashboard</a></li>
-                <li><a routerLink="/cart">Shops approuvés</a></li>
-                <li><a routerLink="/cart">Shops en attente</a></li>
-                <li><a routerLink="/cart">Shops bannis</a></li>
-                <li><a routerLink="/cart">Commandes expédiées</a></li>
-              </ng-container>
-
-              <!-- VENDEUR -->
-              <ng-container *ngIf="user.role === 'VENDEUR'">
-                <li><a routerLink="/shop">Créer un Shop</a></li>
-                <li><a routerLink="/cart">Mes shops</a></li>
-                <li><a routerLink="/cart">Commandes récentes</a></li>
-                <li><a routerLink="/cart">En préparation</a></li>
-              </ng-container>
-
-              <!-- ACHETEUR (DEFAULT) -->
-              <ng-container *ngIf="user.role !== 'ADMIN' && user.role !== 'VENDEUR'">
-                <li><a routerLink="/favorite">Favoris</a></li>
-                <li><a routerLink="/cart">Panier</a></li>
-                <li><a routerLink="/cart">Historique</a></li>
-                <li><a routerLink="/cart">Factures</a></li>
+              <ng-container *ngIf="user.role !== 'ADMIN'" >
+                <li><a routerLink="/profile/edit">Modifier profil</a></li>
               </ng-container>
 
               <div class="divider my-1"></div>
