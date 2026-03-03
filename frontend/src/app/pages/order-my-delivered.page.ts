@@ -5,13 +5,11 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GenericListComponent } from '../components/generic-list/generic-list.component';
 import { AuthService } from '../services/auth.service';
-import { ProfilePage } from './profile.page';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, GenericListComponent, ProfilePage],
+  imports: [CommonModule, GenericListComponent],
   template: `
-    <app-profile></app-profile>
     <hr>
     <h2>✅ Mes Commandes Livrées</h2>
     <p *ngIf="loading">Chargement...</p>
