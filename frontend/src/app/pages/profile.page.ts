@@ -31,7 +31,7 @@ import { BaseService } from '../services/base.service';
         <!-- Left: Brand / Title -->
         <div class="flex-1">
           <a routerLink="/product" class="btn btn-ghost text-xl">
-            Centre Commercial
+            Géant du Commerce
           </a>
         </div>
 
