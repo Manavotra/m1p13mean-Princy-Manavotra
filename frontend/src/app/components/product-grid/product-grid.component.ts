@@ -432,13 +432,20 @@ export class ProductGridComponent implements OnInit {
     return item[this.imageFieldName] || null;
   }
 
-  isImagePath(value: any): boolean {
-    return typeof value === 'string' && value.includes('uploads');
-  }
+isImagePath(value: any): boolean {
+  return typeof value === 'string' && (
+    /^https?:\/\//i.test(value) || value.startsWith('/uploads/')
+  );
+}
 
-  getImageUrl(path: string): string {
-    return `${this.service['api'].replace('/api/', '/')}${path}`;
-  }
+getImageUrl(path: string): string {
+  if (!path) return '';
+
+  if (/^https?:\/\//i.test(path)) return path;
+
+  const base = this.service['api'].replace('/api/', '/'); 
+  return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+}
 
   getBadgeClass(status: string): string {
     if (!status) return 'default';
