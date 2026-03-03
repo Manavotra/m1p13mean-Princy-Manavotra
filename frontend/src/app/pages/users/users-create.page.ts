@@ -51,12 +51,13 @@ import { GenericListComponent } from '../../components/generic-list/generic-list
   `
 })
 export class UserCreatePage {
-  fields = [
-    { name: 'name', type: 'text' },
-    { name: 'email', type: 'text' },
-    { name: 'role', type: 'select', options: ['ADMIN', 'VENDEUR', 'ACHETEUR'] },
-    { name: 'avatar', type: 'image' }
-  ];
+fields = [
+  { name: 'name', type: 'text' },
+  { name: 'email', type: 'text' },
+  { name: 'password', type: 'password' },  
+  { name: 'role', type: 'select', options: ['ADMIN', 'VENDEUR', 'ACHETEUR'] },
+  { name: 'avatar', type: 'image' }
+];
 
   searchFields = [
     { name: 'name', type: 'text' },
