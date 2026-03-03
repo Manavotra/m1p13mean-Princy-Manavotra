@@ -1,13 +1,10 @@
 import { Component } from '@angular/core';
 import { GenericListComponent } from '../components/generic-list/generic-list.component';
-import { ProfilePage } from './profile.page';
 
 @Component({
   standalone: true,
-  imports: [GenericListComponent, ProfilePage],
+  imports: [GenericListComponent ],
   template: `
-    <app-profile></app-profile> 
-      
     <hr>
     <h2>Order</h2>
     <app-generic-list

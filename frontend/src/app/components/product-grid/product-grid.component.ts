@@ -5,12 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BaseService } from '../../services/base.service';
 import { AuthService } from '../../services/auth.service';
-import { ProfilePage } from '../../pages/profile.page';
 
 @Component({
   selector: 'app-product-grid',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProfilePage],
+  imports: [CommonModule, FormsModule ],
   templateUrl: './product-grid.component.html',
   styleUrls: ['./product-grid.component.css']
 })
