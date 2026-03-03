@@ -1,5 +1,5 @@
 // pages/profile.page.ts
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
@@ -137,11 +137,12 @@ export class ProfilePage implements OnInit {
   user: any = null;
   loading = true;
 
-  constructor(
-    private auth: AuthService,
-    private router: Router,
-    private service: BaseService<any>
-  ) {}
+constructor(
+  private auth: AuthService,
+  private router: Router,
+  private service: BaseService<any>,
+  private cdr: ChangeDetectorRef
+) {}
 
 ngOnInit() {
   const cached = this.auth.getUser();
@@ -152,7 +153,8 @@ ngOnInit() {
   this.auth.getMe().subscribe({
     next: (user: any) => {
       this.user = user;
-      this.auth.setUser(user); // update cache
+      this.auth.setUser(user);
+      this.cdr.detectChanges();
     },
     error: () => this.router.navigate(['/login'])
   });
