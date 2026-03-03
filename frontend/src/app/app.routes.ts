@@ -32,6 +32,7 @@ import { OrderNotDeliveredPage} from './pages/order-not-delivered.page';
 import { OrderMyDeliveredPage } from './pages/order-my-delivered.page';
 import { AdminDashboardPage }   from './pages/admin-dashboard.page';
 
+import { FacturePage } from './pages/facture.page';
 export const routes: Routes = [
    { path: '', component: LoginPage },
       { path: 'users/create', component: UserCreatePage },
@@ -71,6 +72,9 @@ export const routes: Routes = [
       // =============================
       // ACHETEUR
       // =============================
+
+      { path: 'facture', component: FacturePage },
+
       { path: 'historique', component: HistoriquePage },
 
 

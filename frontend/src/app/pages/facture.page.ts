@@ -1,4 +1,4 @@
-// pages/historique.page.ts
+// pages/facture.page.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -10,10 +10,9 @@ import { AuthService } from '../services/auth.service';
   imports: [CommonModule, GenericListComponent],
   template: `
     <div class="card bg-base-100 shadow p-6 space-y-1">
-      <h1 class="text-2xl font-bold">Historique</h1>
+      <h1 class="text-2xl font-bold">Mes factures</h1>
     </div>
     <hr>
-
     <p *ngIf="loading">Chargement...</p>
 
     <app-generic-list
@@ -25,13 +24,12 @@ import { AuthService } from '../services/auth.service';
       [showTable]="true"
       [showSearch]="true"
       [showForm]="false"
-      
       [canEdit]="false"
       [canDelete]="false">
     </app-generic-list>
   `
 })
-export class HistoriquePage implements OnInit {
+export class FacturePage implements OnInit {
 
   loading = true;
   extraParams: any = {};
@@ -53,10 +51,7 @@ export class HistoriquePage implements OnInit {
     { name: 'totalAmount', label: 'Montant (Ar)', type: 'number' }
   ];
 
-  searchFields = [
-    { name: 'status', label: 'Statut', type: 'select',
-      options: ['NOUVELLE', 'EN_PREPARATION', 'EXPEDIEE', 'LIVREE'] }
-  ];
+  searchFields = [];
 
   constructor(
     private auth: AuthService,
@@ -84,9 +79,8 @@ export class HistoriquePage implements OnInit {
   }
 
   private init(user: any) {
-    this.extraParams = { customer: user._id };
-    // loading = false APRÈS avoir défini extraParams,
-    // + detectChanges() pour forcer Angular à re-render hors zone
+    // Filtre : customer = utilisateur connecté ET status = LIVREE
+    this.extraParams = { customer: user._id, status: 'LIVREE' };
     this.loading = false;
     this.cdr.detectChanges();
   }
