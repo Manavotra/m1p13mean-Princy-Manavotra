@@ -18,7 +18,6 @@ import { GenericListComponent } from '../../components/generic-list/generic-list
           <p class="text-sm opacity-70">
             Créez votre compte pour accéder à l’application.
           </p>
-
           <form class="mt-4 space-y-4">
             <app-generic-list
               endpoint="users"
@@ -30,7 +29,7 @@ import { GenericListComponent } from '../../components/generic-list/generic-list
               [canEdit]="false"
               [canDelete]="false"
               [canAdd]="true"
-              redirectAfterSuccess="/favorite"
+              redirectAfterSuccess="/product"
 
               [embedded]="true"
               [showProfile]="false"
@@ -51,13 +50,15 @@ import { GenericListComponent } from '../../components/generic-list/generic-list
   `
 })
 export class UserCreatePage {
-fields = [
-  { name: 'name', type: 'text' },
-  { name: 'email', type: 'text' },
-  { name: 'password', type: 'password' },  
-  { name: 'role', type: 'select', options: ['ADMIN', 'VENDEUR', 'ACHETEUR'] },
-  { name: 'avatar', type: 'image' }
-];
+  fields = [
+    { name: 'name', type: 'text' },
+    { name: 'email', type: 'text' },
+    { name: 'password',label:'Mot de passe', type: 'text' },
+
+    { name: 'role', type: 'select', options: ['VENDEUR', 'ACHETEUR'] },
+    { name: 'avatar', type: 'image' }
+
+  ];
 
   searchFields = [
     { name: 'name', type: 'text' },
