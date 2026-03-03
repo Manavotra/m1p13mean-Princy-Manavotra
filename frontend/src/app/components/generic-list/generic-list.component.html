@@ -1,76 +1,24 @@
 <!-- generic-list.component.html -->
 
-<!-- ===================== FORM ===================== -->
-<div *ngIf="showForm" class="space-y-4">
+<!-- ✅ OUTER CONTAINER: adds spacing from edges + keeps everything centered -->
+<div [ngClass]="embedded
+  ? 'w-full space-y-6'
+  : 'w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6'">
 
-  <!-- ✅ Always on top (hidden when embedded OR showProfile=false) -->
-  <app-profile *ngIf="showProfile && !embedded"></app-profile>
+  <!-- ✅ ALWAYS on top for every page using GenericList (unless showProfile=false) -->
+  <app-profile *ngIf="showProfile"></app-profile>
 
-  <!-- ✅ EMBEDDED MODE: parent page controls layout (no internal card/divider) -->
-  <ng-container *ngIf="embedded; else normalFormCard">
-    <div class="space-y-4">
+  <!-- ===================== FORM ===================== -->
+  <div *ngIf="showForm" class="space-y-4">
 
-      <!-- Optional title line for embedded mode -->
-      <div *ngIf="formTitle || isProcessing" class="flex items-center justify-between gap-3">
-        <h3 *ngIf="formTitle" class="text-lg font-semibold">
-          {{ formTitle }}
-        </h3>
+    <!-- ✅ EMBEDDED MODE: parent page controls layout (no internal card/divider) -->
+    <ng-container *ngIf="embedded; else normalFormCard">
+      <div class="space-y-4">
 
-        <span *ngIf="isProcessing" class="badge badge-ghost">
-          Traitement...
-        </span>
-      </div>
-
-      <ng-container
-        *ngTemplateOutlet="renderFields;
-                          context:{ model: currentModel,
-                                    fields: fields,
-                                    isSearch: false }">
-      </ng-container>
-
-      <!-- Hint d'édition -->
-      <div *ngIf="editingItem && editHint" class="alert alert-warning">
-        <span class="text-sm">{{ editHint }}</span>
-      </div>
-
-      <!-- Primary action full-width to match login style -->
-      <button
-        type="button"
-        class="btn btn-primary w-full"
-        [disabled]="isProcessing"
-        (click)="editingItem ? save() : submit()"
-      >
-        <ng-container *ngIf="!isProcessing">
-          {{ submitLabel || (editingItem ? 'Enregistrer' : 'Enregistrer') }}
-        </ng-container>
-        <ng-container *ngIf="isProcessing">
-          <span class="loading loading-spinner loading-xs mr-2"></span>
-          Traitement...
-        </ng-container>
-      </button>
-
-      <!-- Secondary action (optional) -->
-      <button
-        *ngIf="editingItem && editActionLabel"
-        type="button"
-        class="btn btn-info w-full"
-        [disabled]="isProcessing"
-        (click)="save(); editActionClicked.emit(editingItem)"
-      >
-        {{ editActionLabel }}
-      </button>
-
-    </div>
-  </ng-container>
-
-  <!-- ✅ NORMAL MODE: your current card layout -->
-  <ng-template #normalFormCard>
-    <div class="card bg-base-100 shadow">
-      <div class="card-body space-y-4">
-
-        <div class="flex items-center justify-between gap-3">
-          <h3 class="card-title">
-            {{ editingItem ? 'Modifier' : 'Ajouter' }}
+        <!-- Optional title line for embedded mode -->
+        <div *ngIf="formTitle || isProcessing" class="flex items-center justify-between gap-3">
+          <h3 *ngIf="formTitle" class="text-lg font-semibold">
+            {{ formTitle }}
           </h3>
 
           <span *ngIf="isProcessing" class="badge badge-ghost">
@@ -90,402 +38,468 @@
           <span class="text-sm">{{ editHint }}</span>
         </div>
 
-        <div class="flex flex-wrap gap-3">
-          <button
-            type="button"
-            class="btn btn-primary"
-            [disabled]="isProcessing"
-            (click)="editingItem ? save() : submit()"
-          >
-            <ng-container *ngIf="!isProcessing">
-              {{ editingItem ? 'Enregistrer' : 'Enregistrer' }}
-            </ng-container>
-            <ng-container *ngIf="isProcessing">
-              <span class="loading loading-spinner loading-xs mr-2"></span>
-              Traitement...
-            </ng-container>
-          </button>
+        <!-- Primary action full-width to match login style -->
+        <button
+          type="button"
+          class="btn btn-primary w-full"
+          [disabled]="isProcessing"
+          (click)="editingItem ? save() : submit()"
+        >
+          <ng-container *ngIf="!isProcessing">
+            {{ submitLabel || (editingItem ? 'Enregistrer' : 'Enregistrer') }}
+          </ng-container>
+          <ng-container *ngIf="isProcessing">
+            <span class="loading loading-spinner loading-xs mr-2"></span>
+            Traitement...
+          </ng-container>
+        </button>
 
-          <!-- Bouton action secondaire (ex: Passer commande) -->
-          <button
-            *ngIf="editingItem && editActionLabel"
-            type="button"
-            class="btn btn-info"
-            [disabled]="isProcessing"
-            (click)="save(); editActionClicked.emit(editingItem)"
-          >
-            {{ editActionLabel }}
-          </button>
-        </div>
+        <!-- Secondary action (optional) -->
+        <button
+          *ngIf="editingItem && editActionLabel"
+          type="button"
+          class="btn btn-info w-full"
+          [disabled]="isProcessing"
+          (click)="save(); editActionClicked.emit(editingItem)"
+        >
+          {{ editActionLabel }}
+        </button>
 
       </div>
-    </div>
-  </ng-template>
-</div>
-
-<!-- ✅ Divider only when not embedded -->
-<div *ngIf="!embedded" class="divider"></div>
-
-<!-- ===================== SEARCH ===================== -->
-<div *ngIf="showSearch" class="card bg-base-100 shadow">
-  <div class="card-body space-y-4">
-    <h3 class="card-title">Recherche</h3>
-
-    <ng-container
-      *ngTemplateOutlet="renderFields;
-                        context:{ model: searchModel,
-                                  fields: searchFields,
-                                  isSearch: true }">
     </ng-container>
 
-    <div class="flex flex-wrap gap-3">
-      <button
-        type="button"
-        class="btn btn-primary"
-        [disabled]="isProcessing"
-        (click)="search()"
-      >
-        Rechercher
-      </button>
+    <!-- ✅ NORMAL MODE: card layout -->
+    <ng-template #normalFormCard>
+      <div class="card bg-base-100 shadow">
+        <div class="card-body space-y-4">
 
-      <button
-        type="button"
-        class="btn btn-ghost"
-        [disabled]="isProcessing"
-        (click)="resetSearch()"
-      >
-        Reset
-      </button>
-    </div>
-  </div>
-</div>
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="card-title">
+              {{ editingItem ? 'Modifier' : 'Ajouter' }}
+            </h3>
 
-<!-- ===================== TABLE LISTING ===================== -->
-<div *ngIf="showTable" class="card bg-base-100 shadow mt-4">
-  <div class="card-body">
-    <div class="flex items-center justify-between">
-      <h3 class="card-title">Liste</h3>
-      <span class="text-sm opacity-70">{{ items?.length || 0 }} élément(s)</span>
-    </div>
+            <span *ngIf="isProcessing" class="badge badge-ghost">
+              Traitement...
+            </span>
+          </div>
 
-    <div class="divider my-2"></div>
+          <ng-container
+            *ngTemplateOutlet="renderFields;
+                              context:{ model: currentModel,
+                                        fields: fields,
+                                        isSearch: false }">
+          </ng-container>
 
-    <div class="overflow-x-auto">
-      <table class="table table-zebra w-full">
-        <thead>
-          <tr>
-            <th *ngFor="let field of fields; trackBy: trackByIndex">
-              {{ getFieldLabel(field) }}
-            </th>
-            <th class="text-right">Actions</th>
-          </tr>
-        </thead>
+          <!-- Hint d'édition -->
+          <div *ngIf="editingItem && editHint" class="alert alert-warning">
+            <span class="text-sm">{{ editHint }}</span>
+          </div>
 
-        <tbody>
-          <tr *ngFor="let item of items; trackBy: trackByIndex">
-            <td *ngFor="let field of fields; trackBy: trackByIndex" class="align-top">
-
-              <!-- ===== NESTED DISPLAY ===== -->
-              <ng-container *ngIf="field.type === 'nested'">
-                <div class="rounded-lg border border-base-300 bg-base-200 p-2">
-                  <table class="table table-compact w-full text-xs">
-                    <tbody>
-                      <tr *ngFor="let subField of field.fields">
-                        <td class="font-semibold w-40">
-                          {{ getFieldLabel(subField) }}
-                        </td>
-                        <td>
-                          {{ item[field.name]?.[subField.name] || '—' }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+          <div class="flex flex-wrap gap-3">
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="isProcessing"
+              (click)="editingItem ? save() : submit()"
+            >
+              <ng-container *ngIf="!isProcessing">
+                {{ editingItem ? 'Enregistrer' : 'Enregistrer' }}
               </ng-container>
-
-              <!-- ===== SUBDOCUMENT DISPLAY ===== -->
-              <ng-container *ngIf="field.type === 'subdocument'">
-                <div *ngIf="!item[field.name] || item[field.name].length === 0" class="opacity-60">—</div>
-
-                <div *ngIf="item[field.name]?.length > 0" class="rounded-lg border border-base-300 bg-base-200 p-2">
-                  <table class="table table-compact w-full text-xs">
-                    <thead>
-                      <tr>
-                        <th *ngFor="let subField of field.fields">
-                          {{ getFieldLabel(subField) }}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let sub of item[field.name]; trackBy: trackByIndex">
-                        <td *ngFor="let subField of field.fields">
-                          <ng-container *ngIf="sub[subField.name]?._id; else normalValue">
-                            {{ sub[subField.name][subField.displayField || 'name'] || sub[subField.name]._id }}
-                          </ng-container>
-                          <ng-template #normalValue>{{ sub[subField.name] }}</ng-template>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <ng-container *ngIf="isProcessing">
+                <span class="loading loading-spinner loading-xs mr-2"></span>
+                Traitement...
               </ng-container>
+            </button>
 
-              <!-- ===== RELATION DISPLAY ===== -->
-              <span *ngIf="field.type !== 'nested' && field.type !== 'subdocument' && item[field.name]?._id">
-                {{ item[field.name].name || item[field.name].title || item[field.name].label }}
-              </span>
+            <!-- Bouton action secondaire (ex: Passer commande) -->
+            <button
+              *ngIf="editingItem && editActionLabel"
+              type="button"
+              class="btn btn-info"
+              [disabled]="isProcessing"
+              (click)="save(); editActionClicked.emit(editingItem)"
+            >
+              {{ editActionLabel }}
+            </button>
+          </div>
 
-              <!-- ===== ARRAY DISPLAY ===== -->
-              <span *ngIf="field.type !== 'nested' && field.type !== 'subdocument' && isArray(item[field.name])">
-                {{ item[field.name].join(', ') }}
-              </span>
-
-              <!-- ===== IMAGE DISPLAY ===== -->
-              <div *ngIf="field.type === 'image' && item[field.name]" class="avatar">
-                <div class="w-14 rounded-lg ring-1 ring-base-300">
-                  <img [src]="getImageUrl(item[field.name])" alt="img" />
-                </div>
-              </div>
-
-              <!-- ===== SIMPLE DISPLAY ===== -->
-              <span *ngIf="field.type !== 'nested'
-                            && field.type !== 'subdocument'
-                            && field.type !== 'image'
-                            && !item[field.name]?._id
-                            && !isArray(item[field.name])">
-                {{ item[field.name] }}
-              </span>
-
-            </td>
-
-            <td class="text-right whitespace-nowrap">
-              <div class="flex justify-end gap-2">
-                <button
-                  *ngIf="canEdit"
-                  type="button"
-                  class="btn btn-sm btn-outline"
-                  [disabled]="isProcessing"
-                  (click)="edit(item)"
-                >
-                  Modifier
-                </button>
-
-                <button
-                  *ngIf="canDelete"
-                  type="button"
-                  class="btn btn-sm btn-error"
-                  [disabled]="isProcessing"
-                  (click)="delete(item._id)"
-                >
-                  Supprimer
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ===================================================== -->
-<!-- ===== TEMPLATE RÉCURSIF POUR LES CHAMPS (STYLED) ===== -->
-<!-- ===================================================== -->
-<ng-template #renderFields
-             let-model="model"
-             let-fields="fields"
-             let-isSearch="isSearch">
-
-  <div class="grid gap-4 sm:grid-cols-2">
-    <div *ngFor="let field of fields; trackBy: trackByIndex" class="space-y-2">
-
-      <!-- ===== RANGE DATE ===== -->
-      <div *ngIf="field.type === 'range-date'" class="space-y-2">
-        <label class="label">
-          <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
-        </label>
-        <div class="grid grid-cols-2 gap-2">
-          <input class="input input-bordered w-full"
-                 type="date"
-                 [(ngModel)]="model[field.name + '_from']"
-                 [placeholder]="getFieldLabel(field) + ' from'" />
-          <input class="input input-bordered w-full"
-                 type="date"
-                 [(ngModel)]="model[field.name + '_to']"
-                 [placeholder]="getFieldLabel(field) + ' to'" />
         </div>
       </div>
+    </ng-template>
 
-      <!-- ===== RANGE NUMBER ===== -->
-      <div *ngIf="field.type === 'range-number'" class="space-y-2">
-        <label class="label">
-          <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
-        </label>
-        <div class="grid grid-cols-2 gap-2">
-          <input class="input input-bordered w-full"
-                 type="number"
-                 [(ngModel)]="model[field.name + '_min']"
-                 [placeholder]="getFieldLabel(field) + ' min'" />
-          <input class="input input-bordered w-full"
-                 type="number"
-                 [(ngModel)]="model[field.name + '_max']"
-                 [placeholder]="getFieldLabel(field) + ' max'" />
-        </div>
+  </div>
+
+  <!-- ✅ Divider only when not embedded -->
+  <div *ngIf="!embedded" class="divider"></div>
+
+  <!-- ===================== SEARCH ===================== -->
+  <div *ngIf="showSearch" class="card bg-base-100 shadow">
+    <div class="card-body space-y-4">
+      <h3 class="card-title">Recherche</h3>
+
+      <ng-container
+        *ngTemplateOutlet="renderFields;
+                          context:{ model: searchModel,
+                                    fields: searchFields,
+                                    isSearch: true }">
+      </ng-container>
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="isProcessing"
+          (click)="search()"
+        >
+          Rechercher
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-ghost"
+          [disabled]="isProcessing"
+          (click)="resetSearch()"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TABLE LISTING ===================== -->
+  <div *ngIf="showTable" class="card bg-base-100 shadow mt-4">
+    <div class="card-body">
+      <div class="flex items-center justify-between">
+        <h3 class="card-title">Liste</h3>
+        <span class="text-sm opacity-70">{{ items?.length || 0 }} élément(s)</span>
       </div>
 
-      <!-- ===== IMAGE UPLOAD ===== -->
-      <div *ngIf="field.type === 'image'" class="space-y-2 sm:col-span-2">
-        <label class="label">
-          <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
-        </label>
+      <div class="divider my-2"></div>
 
-        <input class="file-input file-input-bordered w-full"
-               type="file"
-               (change)="onFileChange($event, model, field.name)" />
+      <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th *ngFor="let field of fields; trackBy: trackByIndex">
+                {{ getFieldLabel(field) }}
+              </th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
 
-        <div *ngIf="model[field.name] && isImagePath(model[field.name])" class="pt-2">
-          <div class="avatar">
-            <div class="w-24 rounded-lg ring-1 ring-base-300">
-              <img [src]="getImageUrl(model[field.name])" alt="preview" />
+          <tbody>
+            <tr *ngFor="let item of items; trackBy: trackByIndex">
+              <td *ngFor="let field of fields; trackBy: trackByIndex" class="align-top">
+
+                <!-- ===== NESTED DISPLAY ===== -->
+                <ng-container *ngIf="field.type === 'nested'">
+                  <div class="rounded-lg border border-base-300 bg-base-200 p-2">
+                    <table class="table table-compact w-full text-xs">
+                      <tbody>
+                        <tr *ngFor="let subField of field.fields">
+                          <td class="font-semibold w-40">
+                            {{ getFieldLabel(subField) }}
+                          </td>
+                          <td>
+                            {{ item[field.name]?.[subField.name] || '—' }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+
+                <!-- ===== SUBDOCUMENT DISPLAY ===== -->
+                <ng-container *ngIf="field.type === 'subdocument'">
+                  <div *ngIf="!item[field.name] || item[field.name].length === 0" class="opacity-60">—</div>
+
+                  <div *ngIf="item[field.name]?.length > 0" class="rounded-lg border border-base-300 bg-base-200 p-2">
+                    <table class="table table-compact w-full text-xs">
+                      <thead>
+                        <tr>
+                          <th *ngFor="let subField of field.fields">
+                            {{ getFieldLabel(subField) }}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let sub of item[field.name]; trackBy: trackByIndex">
+                          <td *ngFor="let subField of field.fields">
+                            <ng-container *ngIf="sub[subField.name]?._id; else normalValue">
+                              {{ sub[subField.name][subField.displayField || 'name'] || sub[subField.name]._id }}
+                            </ng-container>
+                            <ng-template #normalValue>{{ sub[subField.name] }}</ng-template>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+
+                <!-- ===== RELATION DISPLAY ===== -->
+                <span *ngIf="field.type !== 'nested' && field.type !== 'subdocument' && item[field.name]?._id">
+                  {{ item[field.name].name || item[field.name].title || item[field.name].label }}
+                </span>
+
+                <!-- ===== ARRAY DISPLAY ===== -->
+                <span *ngIf="field.type !== 'nested' && field.type !== 'subdocument' && isArray(item[field.name])">
+                  {{ item[field.name].join(', ') }}
+                </span>
+
+                <!-- ===== IMAGE DISPLAY ===== -->
+                <div *ngIf="field.type === 'image' && item[field.name]" class="avatar">
+                  <div class="w-14 rounded-lg ring-1 ring-base-300">
+                    <img [src]="getImageUrl(item[field.name])" alt="img" />
+                  </div>
+                </div>
+
+                <!-- ===== SIMPLE DISPLAY ===== -->
+                <span *ngIf="field.type !== 'nested'
+                              && field.type !== 'subdocument'
+                              && field.type !== 'image'
+                              && !item[field.name]?._id
+                              && !isArray(item[field.name])">
+                  {{ item[field.name] }}
+                </span>
+
+              </td>
+
+              <td class="text-right whitespace-nowrap">
+                <div class="flex justify-end gap-2">
+                  <button
+                    *ngIf="canEdit"
+                    type="button"
+                    class="btn btn-sm btn-outline"
+                    [disabled]="isProcessing"
+                    (click)="edit(item)"
+                  >
+                    Modifier
+                  </button>
+
+                  <button
+                    *ngIf="canDelete"
+                    type="button"
+                    class="btn btn-sm btn-error"
+                    [disabled]="isProcessing"
+                    (click)="delete(item._id)"
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- ===== TEMPLATE RÉCURSIF POUR LES CHAMPS (STYLED) ===== -->
+  <!-- ===================================================== -->
+  <ng-template #renderFields
+               let-model="model"
+               let-fields="fields"
+               let-isSearch="isSearch">
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div
+        *ngFor="let field of fields; trackBy: trackByIndex"
+        class="space-y-2"
+        [ngClass]="{ 'sm:col-span-2': field.type === 'image' }"
+      >
+
+        <!-- ===== RANGE DATE ===== -->
+        <div *ngIf="field.type === 'range-date'" class="space-y-2">
+          <label class="label">
+            <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <input class="input input-bordered w-full"
+                   type="date"
+                   [(ngModel)]="model[field.name + '_from']"
+                   [placeholder]="getFieldLabel(field) + ' from'" />
+            <input class="input input-bordered w-full"
+                   type="date"
+                   [(ngModel)]="model[field.name + '_to']"
+                   [placeholder]="getFieldLabel(field) + ' to'" />
+          </div>
+        </div>
+
+        <!-- ===== RANGE NUMBER ===== -->
+        <div *ngIf="field.type === 'range-number'" class="space-y-2">
+          <label class="label">
+            <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <input class="input input-bordered w-full"
+                   type="number"
+                   [(ngModel)]="model[field.name + '_min']"
+                   [placeholder]="getFieldLabel(field) + ' min'" />
+            <input class="input input-bordered w-full"
+                   type="number"
+                   [(ngModel)]="model[field.name + '_max']"
+                   [placeholder]="getFieldLabel(field) + ' max'" />
+          </div>
+        </div>
+
+        <!-- ===== IMAGE UPLOAD ===== -->
+        <div *ngIf="field.type === 'image'" class="space-y-2">
+          <label class="label">
+            <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
+          </label>
+
+          <input
+            class="file-input file-input-bordered w-full"
+            type="file"
+            (change)="onFileChange($event, model, field.name)"
+          />
+
+          <div *ngIf="model[field.name] && isImagePath(model[field.name])" class="pt-2">
+            <div class="avatar">
+              <div class="w-24 rounded-lg ring-1 ring-base-300">
+                <img [src]="getImageUrl(model[field.name])" alt="preview" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ===== INPUT SIMPLE ===== -->
-      <ng-container *ngIf="field.type !== 'nested'
-                      && field.type !== 'array'
-                      && field.type !== 'relation'
-                      && field.type !== 'select'
-                      && field.type !== 'subdocument'
-                      && field.type !== 'range-date'
-                      && field.type !== 'range-number'
-                      && field.type !== 'image'">
+        <!-- ===== INPUT SIMPLE ===== -->
+        <ng-container *ngIf="field.type !== 'nested'
+                        && field.type !== 'array'
+                        && field.type !== 'relation'
+                        && field.type !== 'select'
+                        && field.type !== 'subdocument'
+                        && field.type !== 'range-date'
+                        && field.type !== 'range-number'
+                        && field.type !== 'image'">
 
-        <label class="label">
-          <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
-        </label>
+          <label class="label">
+            <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
+          </label>
 
-        <!-- ✅ Greyed / locked logic kept -->
-        <div *ngIf="field.locked"
-             class="rounded-lg border border-base-300 bg-base-200 px-3 py-2 text-sm opacity-70 cursor-not-allowed">
-          {{ model[field.name] !== undefined && model[field.name] !== null ? model[field.name] : '—' }}
-        </div>
+          <!-- ✅ Greyed / locked logic kept -->
+          <div *ngIf="field.locked"
+               class="rounded-lg border border-base-300 bg-base-200 px-3 py-2 text-sm opacity-70 cursor-not-allowed">
+            {{ model[field.name] !== undefined && model[field.name] !== null ? model[field.name] : '—' }}
+          </div>
 
-        <input *ngIf="!field.locked"
-               class="input input-bordered w-full"
-               [type]="field.type"
-               [(ngModel)]="model[field.name]"
-               [placeholder]="getFieldLabel(field)" />
-      </ng-container>
+          <input *ngIf="!field.locked"
+                 class="input input-bordered w-full"
+                 [type]="field.type"
+                 [(ngModel)]="model[field.name]"
+                 [placeholder]="getFieldLabel(field)" />
+        </ng-container>
 
-      <!-- ===== SELECT ENUM ===== -->
-      <ng-container *ngIf="field.type === 'select'">
-        <label class="label">
-          <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
-        </label>
-        <select class="select select-bordered w-full" [(ngModel)]="model[field.name]">
-          <option *ngFor="let opt of field.options; trackBy: trackByIndex" [value]="opt">
-            {{ opt }}
-          </option>
-        </select>
-      </ng-container>
+        <!-- ===== SELECT ENUM ===== -->
+        <ng-container *ngIf="field.type === 'select'">
+          <label class="label">
+            <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
+          </label>
+          <select class="select select-bordered w-full" [(ngModel)]="model[field.name]">
+            <option *ngFor="let opt of field.options; trackBy: trackByIndex" [value]="opt">
+              {{ opt }}
+            </option>
+          </select>
+        </ng-container>
 
-      <!-- ===== ARRAY SIMPLE ===== -->
-      <div *ngIf="field.type === 'array'" class="space-y-2 sm:col-span-2">
-        <label class="label">
-          <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
-        </label>
+        <!-- ===== ARRAY SIMPLE ===== -->
+        <div *ngIf="field.type === 'array'" class="space-y-2 sm:col-span-2">
+          <label class="label">
+            <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
+          </label>
 
-        <div *ngFor="let item of model[field.name]; let i = index; trackBy: trackByIndex"
-             class="flex items-center gap-2">
-          <input class="input input-bordered w-full"
-                 [(ngModel)]="model[field.name][i]" />
-          <button type="button"
-                  class="btn btn-square btn-outline btn-sm"
-                  (click)="model[field.name].splice(i, 1)">
-            ✕
+          <div *ngFor="let item of model[field.name]; let i = index; trackBy: trackByIndex"
+               class="flex items-center gap-2">
+            <input class="input input-bordered w-full"
+                   [(ngModel)]="model[field.name][i]" />
+            <button type="button"
+                    class="btn btn-square btn-outline btn-sm"
+                    (click)="model[field.name].splice(i, 1)">
+              ✕
+            </button>
+          </div>
+
+          <button type="button" class="btn btn-sm btn-ghost" (click)="model[field.name].push('')">
+            + Ajouter
           </button>
         </div>
 
-        <button type="button" class="btn btn-sm btn-ghost" (click)="model[field.name].push('')">
-          + Ajouter
-        </button>
-      </div>
+        <!-- ===== RELATION ===== -->
+        <ng-container *ngIf="field.type === 'relation'">
+          <label class="label">
+            <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
+          </label>
 
-      <!-- ===== RELATION ===== -->
-      <ng-container *ngIf="field.type === 'relation'">
-        <label class="label">
-          <span class="label-text font-medium">{{ getFieldLabel(field) }}</span>
-        </label>
-
-        <!-- ✅ Greyed / locked logic kept -->
-        <div *ngIf="field.locked"
-             class="rounded-lg border border-base-300 bg-base-200 px-3 py-2 text-sm opacity-70 cursor-not-allowed">
-          {{ getRelationLabel(relationsData[field.name], model[field.name]) }}
-        </div>
-
-        <select *ngIf="!field.locked"
-                class="select select-bordered w-full"
-                [(ngModel)]="model[field.name]">
-          <option *ngFor="let r of relationsData[field.name]; trackBy: trackByIndex" [value]="r._id">
-            {{ r.name || r.title || r.label }}
-          </option>
-        </select>
-      </ng-container>
-
-      <!-- ===== NESTED ===== -->
-      <div *ngIf="field.type === 'nested'" class="sm:col-span-2">
-        <div class="rounded-xl border border-base-300 bg-base-200 p-4 space-y-3">
-          <div class="flex items-center gap-2">
-            <span class="badge badge-outline">Nested</span>
-            <strong>{{ getFieldLabel(field) }}</strong>
+          <!-- ✅ Greyed / locked logic kept -->
+          <div *ngIf="field.locked"
+               class="rounded-lg border border-base-300 bg-base-200 px-3 py-2 text-sm opacity-70 cursor-not-allowed">
+            {{ getRelationLabel(relationsData[field.name], model[field.name]) }}
           </div>
 
-          <ng-container *ngIf="isSearch">
-            <ng-container *ngTemplateOutlet="renderFields; context:{ model: model[field.name], fields: field.fields, isSearch: true }"></ng-container>
-          </ng-container>
-          <ng-container *ngIf="!isSearch">
-            <ng-container *ngTemplateOutlet="renderFields; context:{ model: model[field.name], fields: field.fields, isSearch: false }"></ng-container>
-          </ng-container>
-        </div>
-      </div>
+          <select *ngIf="!field.locked"
+                  class="select select-bordered w-full"
+                  [(ngModel)]="model[field.name]">
+            <option *ngFor="let r of relationsData[field.name]; trackBy: trackByIndex" [value]="r._id">
+              {{ r.name || r.title || r.label }}
+            </option>
+          </select>
+        </ng-container>
 
-      <!-- ===== SUBDOCUMENT ===== -->
-      <div *ngIf="field.type === 'subdocument'" class="sm:col-span-2">
-        <div class="rounded-xl border border-success/30 bg-base-200 p-4 space-y-3">
-          <div class="flex items-center gap-2">
-            <span class="badge badge-success badge-outline">Subdocument</span>
-            <strong>{{ getFieldLabel(field) }}</strong>
-          </div>
-
-          <ng-container *ngIf="isSearch">
-            <ng-container *ngTemplateOutlet="renderFields; context:{ model: model[field.name], fields: field.fields, isSearch: true }"></ng-container>
-          </ng-container>
-
-          <ng-container *ngIf="!isSearch">
-            <div *ngFor="let subItem of model[field.name]; let i = index; trackBy: trackByIndex"
-                 class="rounded-lg border border-base-300 bg-base-100 p-4 space-y-3">
-              <ng-container *ngTemplateOutlet="renderFields; context:{ model: subItem, fields: field.fields, isSearch: false }"></ng-container>
-
-              <button type="button"
-                      class="btn btn-sm btn-error btn-outline"
-                      (click)="removeSubdocumentItem(field.name, i)">
-                Supprimer ligne
-              </button>
+        <!-- ===== NESTED ===== -->
+        <div *ngIf="field.type === 'nested'" class="sm:col-span-2">
+          <div class="rounded-xl border border-base-300 bg-base-200 p-4 space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="badge badge-outline">Nested</span>
+              <strong>{{ getFieldLabel(field) }}</strong>
             </div>
 
-            <button type="button"
-                    class="btn btn-sm btn-success btn-outline"
-                    (click)="addSubdocumentItem(field)">
-              + Ajouter ligne
-            </button>
-          </ng-container>
+            <ng-container *ngIf="isSearch">
+              <ng-container *ngTemplateOutlet="renderFields; context:{ model: model[field.name], fields: field.fields, isSearch: true }"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="!isSearch">
+              <ng-container *ngTemplateOutlet="renderFields; context:{ model: model[field.name], fields: field.fields, isSearch: false }"></ng-container>
+            </ng-container>
+          </div>
         </div>
+
+        <!-- ===== SUBDOCUMENT ===== -->
+        <div *ngIf="field.type === 'subdocument'" class="sm:col-span-2">
+          <div class="rounded-xl border border-success/30 bg-base-200 p-4 space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="badge badge-success badge-outline">Subdocument</span>
+              <strong>{{ getFieldLabel(field) }}</strong>
+            </div>
+
+            <ng-container *ngIf="isSearch">
+              <ng-container *ngTemplateOutlet="renderFields; context:{ model: model[field.name], fields: field.fields, isSearch: true }"></ng-container>
+            </ng-container>
+
+            <ng-container *ngIf="!isSearch">
+              <div *ngFor="let subItem of model[field.name]; let i = index; trackBy: trackByIndex"
+                   class="rounded-lg border border-base-300 bg-base-100 p-4 space-y-3">
+                <ng-container *ngTemplateOutlet="renderFields; context:{ model: subItem, fields: field.fields, isSearch: false }"></ng-container>
+
+                <button type="button"
+                        class="btn btn-sm btn-error btn-outline"
+                        (click)="removeSubdocumentItem(field.name, i)">
+                  Supprimer ligne
+                </button>
+              </div>
+
+              <button type="button"
+                      class="btn btn-sm btn-success btn-outline"
+                      (click)="addSubdocumentItem(field)">
+                + Ajouter ligne
+              </button>
+            </ng-container>
+          </div>
+        </div>
+
       </div>
-
     </div>
-  </div>
 
-</ng-template>
+  </ng-template>
+
+</div>

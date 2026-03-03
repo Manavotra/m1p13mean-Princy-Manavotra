@@ -6,11 +6,13 @@ import { ProductGridComponent } from '../components/product-grid/product-grid.co
   standalone: true,
   imports: [ProductGridComponent],
   template: `
+  <div class="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
     <app-product-grid
       endpoint="products"
       [fields]="fields"
       [searchFields]="searchFields">
     </app-product-grid>
+  </div>
   `
 })
 export class ProductPage {
