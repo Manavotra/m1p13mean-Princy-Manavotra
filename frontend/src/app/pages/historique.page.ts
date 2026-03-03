@@ -9,8 +9,11 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, GenericListComponent],
   template: `
+    <div class="card bg-base-100 shadow p-6 space-y-1">
+      <h1 class="text-2xl font-bold">Historique</h1>
+    </div>
     <hr>
-    <h2>Mes commandes</h2>
+
     <p *ngIf="loading">Chargement...</p>
 
     <app-generic-list
