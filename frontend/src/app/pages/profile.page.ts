@@ -125,7 +125,7 @@ import { BaseService } from '../services/base.service';
 
               <li>
                 <button class="btn btn-error btn-sm w-full" type="button" (click)="logout()">
-                  Logout
+                  Se déconnecter
                 </button>
               </li>
             </ul>
