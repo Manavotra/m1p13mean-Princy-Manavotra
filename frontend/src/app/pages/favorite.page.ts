@@ -15,6 +15,12 @@ import { BaseService } from '../services/base.service';
       endpoint="favorites"
       [fields]="fields"
       [searchFields]="searchFields"
+      [showTable]="true"
+      [showSearch]="false"
+      [showForm]="false"
+      
+      [canEdit]="false"
+      [canDelete]="true"
       [filterParams]="filterParams">
     </app-generic-list>
   `
@@ -37,14 +43,7 @@ export class FavoritePage implements OnInit {
     this.filterParams = { user: userId };
 
     this.fields = [
-      {
-        name: 'user',
-        label: 'Utilisateur',
-        type: 'relation',
-        endpoint: 'users',
-        defaultValue: userId,
-        locked: true
-      },
+
       { name: 'product', label: 'Produit', type: 'relation', endpoint: 'products' }
     ];
   }

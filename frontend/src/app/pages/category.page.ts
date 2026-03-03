@@ -5,7 +5,7 @@ import { GenericListComponent } from '../components/generic-list/generic-list.co
   standalone: true,
   imports: [GenericListComponent],
   template: `
-    <h2>Category</h2>
+    <h2>Gérer les categories des produits de votre commerce</h2>
     <app-generic-list
       endpoint="categories"
       [fields]="fields"

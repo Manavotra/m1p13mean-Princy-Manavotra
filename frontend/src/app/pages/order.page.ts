@@ -19,9 +19,19 @@ import { BaseService } from '../services/base.service';
       endpoint="orders"
       [fields]="fields"
       [searchFields]="searchFields"
+
+      [showTable]="false"
+      [showSearch]="false"
+      [showForm]="true"
+      
+      [canEdit]="false"
+      [canDelete]="false"
+
       [extraParams]="extraParams"
       [prefillData]="prefillData"
-      (afterSubmit)="onOrderCreated()">
+      (afterSubmit)="onOrderCreated()"
+      redirectAfterSuccess="/historique">
+      >
     </app-generic-list>
   `
 })

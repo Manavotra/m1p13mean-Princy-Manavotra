@@ -10,7 +10,7 @@ import { ProfilePage } from './profile.page';
   template: `
     <app-profile></app-profile>
     <hr>
-    <h2>📋 Toutes les commandes</h2>
+    <h2>📋 Toutes les commandes du centre commerciale</h2>
     <app-generic-list
       endpoint="orders"
       [fields]="fields"
@@ -25,7 +25,7 @@ export class OrderAllPage {
       options: ['NOUVELLE', 'EN_PREPARATION', 'EXPEDIEE', 'LIVREE'] },
     { name: 'lieuLivraison', label: 'Lieu de livraison', type: 'nested', fields: [
         { name: 'lieu',          label: 'Lieu',           type: 'text' },
-        { name: 'repere_adress', label: 'Repère adresse', type: 'text' }
+        { name: 'repere_adress', label: 'Repère/adresse', type: 'text' }
     ]},
     { name: 'items', label: 'Articles', type: 'subdocument', fields: [
         { name: 'product',   label: 'Produit',            type: 'relation', endpoint: 'products' },
@@ -46,6 +46,6 @@ export class OrderAllPage {
         { name: 'product', label: 'Produit',  type: 'relation', endpoint: 'products' },
         { name: 'shop',    label: 'Boutique', type: 'relation', endpoint: 'shops' }
     ]},
-    { name: 'totalAmount', label: 'Montant (Ar)', type: 'number' }
+    { name: 'totalAmount', label: 'Montant (Ar)', type: 'range-number' }
   ];
 }

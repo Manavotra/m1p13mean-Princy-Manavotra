@@ -13,25 +13,19 @@ import { AuthService } from '../services/auth.service';
       *ngIf="fields.length"
       endpoint="shops"
       [fields]="fields"
-      [searchFields]="searchFields"
-      
-      [showTable]="false"
-      [showSearch]="false"
-
-      [canEdit]="true"
-      [canDelete]="false"
-      redirectAfterSuccess="/product">
-      
+      [searchFields]="searchFields">
     </app-generic-list>
   `
 })
-export class ShopPage implements OnInit {
+export class ShopAdminPage implements OnInit {
   fields: any[] = [];
 
   searchFields = [
     { name: 'name',        label: 'Nom',         type: 'text' },
     { name: 'description', label: 'Description',  type: 'text' },
-    { name: 'owner',       label: 'Propriétaire', type: 'relation', endpoint: 'users' }
+    { name: 'owner',       label: 'Propriétaire', type: 'relation', endpoint: 'users' },
+    { name: 'status',      label: 'Statut',       type: 'select',
+      options: ['EN_ATTENTE', 'APPROUVE', 'BANNI'] }
   ];
 
   constructor(private auth: AuthService) {}
@@ -52,7 +46,9 @@ export class ShopPage implements OnInit {
         // Valeur par défaut = utilisateur connecté, champ verrouillé
         defaultValue: userId,
         locked: true
-      }
+      },
+      { name: 'status', label: 'Statut', type: 'select',
+        options: ['EN_ATTENTE', 'APPROUVE', 'BANNI'] }
     ];
   }
 }
